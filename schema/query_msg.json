@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QueryMsg",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "get_stories"
+      ],
+      "properties": {
+        "get_stories": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_story"
+      ],
+      "properties": {
+        "get_story": {
+          "type": "object",
+          "required": [
+            "story_id"
+          ],
+          "properties": {
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_sections"
+      ],
+      "properties": {
+        "get_sections": {
+          "type": "object",
+          "required": [
+            "story_id"
+          ],
+          "properties": {
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_votes"
+      ],
+      "properties": {
+        "get_votes": {
+          "type": "object",
+          "required": [
+            "story_id"
+          ],
+          "properties": {
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_shares"
+      ],
+      "properties": {
+        "get_shares": {
+          "type": "object",
+          "required": [
+            "story_id"
+          ],
+          "properties": {
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_new_sections"
+      ],
+      "properties": {
+        "get_new_sections": {
+          "type": "object",
+          "required": [
+            "after"
+          ],
+          "properties": {
+            "after": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "build:scripts": "npx typescript-bundle ../mobile/src/scripts/stargaze.ts --outFile ./stargaze.js --exportAs commonjs    ",
+    "deploy": "npm run build:scripts && firebase deploy --only functions ",
+    "logs": "firebase functions:log",
+    "postinstall": "node node_modules/puppeteer/install.js"
+  },
+  "engines": {
+    "node": "16"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "@cosmjs/crypto": "^0.29.5",
+    "@cosmjs/stargate": "^0.29.5",
+    "@sparticuz/chromium": "^111.0.0",
+    "cosmwasm": "^1.1.1",
+    "firebase-admin": "^10.0.2",
+    "firebase-functions": "^3.18.0",
+    "got": "^12.6.0",
+    "node-fetch": "2.6.1",
+    "puppeteer": "^19.6.3",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.1",
+    "request": "^2.88.2"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^0.2.0"
+  },
+  "private": true
+}
