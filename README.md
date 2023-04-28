@@ -1,100 +1,27 @@
-# CosmWasm Starter Pack
+# OnceUpon
 
-This is a template to build smart contracts in Rust to run inside a
-[Cosmos SDK](https://github.com/cosmos/cosmos-sdk) module on all chains that enable it.
-To understand the framework better, please read the overview in the
-[cosmwasm repo](https://github.com/CosmWasm/cosmwasm/blob/master/README.md),
-and dig into the [cosmwasm docs](https://www.cosmwasm.com).
-This assumes you understand the theory and just want to get coding.
+## Why
 
-## Creating a new repo from template
+NFTs have limited utility right now. There is gaming assets targeted at specific games where those games give them utility. But for most art NFTs there is none apart from being a speculative assets. It would be good to create utility to any kind of art NFT and therefor increase volume and user base of NFTs.
 
-Assuming you have a recent version of rust and cargo (v1.58.1+) installed
-(via [rustup](https://rustup.rs/)),
-then the following should get you a new repo to start a contract:
+We create a game that allows any NFT to be used. To create such a game we leverage creativity and story writing as they are flexible enough to allow usage of any NFT.
 
-Install [cargo-generate](https://github.com/ashleygwilliams/cargo-generate) and cargo-run-script.
-Unless you did that before, run this line now:
+## Intro
 
-```sh
-cargo install cargo-generate --features vendored-openssl
-cargo install cargo-run-script
-```
+In OnceUpon you write stories together with the community. You propose a start or continuation segment of a story and vote on how the story moves on. In sense of the creator community of web3 every participant, writer and voter, becomes and owner of the story itself. Ownership can be traded as every other tokens based on the expectation of future value of a story.
 
-Now, use it to create your new contract.
-Go to the folder in which you want to place it and run:
+Each segment can have an NFT attached. An attached NFT now becomes part of the story and therefor receives continues story telling and exposure to the community of such story. Only NFTs can be attached that a user really owns. As users will want to put their NFTs into stories they will likely bring in their community to vote for them, creating growth of the OnceUpon community.
 
+As stories and their communities grow, it becomes valuable to place NFTs in them. But if the community is big enough they can’t just be overtaken. In this case an advertiser can put up bounties. A writer can create a valuable segment of the story using the advertised NFT and the bounty will go to the writer and the community/share holders. This should create income for story shares in the long run.
 
-**Latest: 1.0.0**
+## Tech
 
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
-````
+The app is based on a smart contract. I propose the smart contract to be deployed on Stargaze. If this is not possible, we will need to use Interchain Queries to verify the ownership of an NFT.
 
-For cloning minimal code repo:
+Users propose and vote in cycles of a week (for now). This gives them time to participate. Voting cycles, need to be executed by an external instance. There is no cron job for Cosmos chains yet. CronCat is still in development as far as I know.
 
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 1.0-minimal --name PROJECT_NAME
-```
+A frontend will be provided, but the community could build their own.
 
-**Older Version**
+## Demo
 
-Pass version as branch flag:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch <version> --name PROJECT_NAME
-````
-
-Example:
-
-```sh
-cargo generate --git https://github.com/CosmWasm/cw-template.git --branch 0.16 --name PROJECT_NAME
-```
-
-You will now have a new folder called `PROJECT_NAME` (I hope you changed that to something else)
-containing a simple working contract and build system that you can customize.
-
-## Create a Repo
-
-After generating, you have a initialized local git repo, but no commits, and no remote.
-Go to a server (eg. github) and create a new upstream repo (called `YOUR-GIT-URL` below).
-Then run the following:
-
-```sh
-# this is needed to create a valid Cargo.lock file (see below)
-cargo check
-git branch -M main
-git add .
-git commit -m 'Initial Commit'
-git remote add origin YOUR-GIT-URL
-git push -u origin main
-```
-
-## CI Support
-
-We have template configurations for both [GitHub Actions](.github/workflows/Basic.yml)
-and [Circle CI](.circleci/config.yml) in the generated project, so you can
-get up and running with CI right away.
-
-One note is that the CI runs all `cargo` commands
-with `--locked` to ensure it uses the exact same versions as you have locally. This also means
-you must have an up-to-date `Cargo.lock` file, which is not auto-generated.
-The first time you set up the project (or after adding any dep), you should ensure the
-`Cargo.lock` file is updated, so the CI will test properly. This can be done simply by
-running `cargo check` or `cargo unit-test`.
-
-## Using your project
-
-Once you have your custom repo, you should check out [Developing](./Developing.md) to explain
-more on how to run tests and develop code. Or go through the
-[online tutorial](https://docs.cosmwasm.com/) to get a better feel
-of how to develop.
-
-[Publishing](./Publishing.md) contains useful information on how to publish your contract
-to the world, once you are ready to deploy it on a running blockchain. And
-[Importing](./Importing.md) contains information about pulling in other contracts or crates
-that have been published.
-
-Please replace this README file with information about your specific project. You can keep
-the `Developing.md` and `Publishing.md` files as useful referenced, but please set some
-proper description in the README.
+App: https://onceupon.community/

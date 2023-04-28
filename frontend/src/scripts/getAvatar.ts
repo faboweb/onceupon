@@ -1,4 +1,4 @@
-import { useNameStore } from "./../store/names";
+import { useNameStore } from "../store/names";
 
 export const FALLBACK_AVATAR =
   "https://ionicframework.com/docs/img/demos/avatar.svg";
