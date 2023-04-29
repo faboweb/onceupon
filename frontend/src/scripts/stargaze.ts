@@ -53,7 +53,7 @@ export async function loadNftsForAddress(address) {
     body: JSON.stringify({
       query: `
               query Media($owner: String, $size: ImageSize) {
-                tokens(owner: $owner) {
+                tokens(owner: $owner, limit: 1000) {
                   tokens {
                     media {
                       image(size: $size) {
