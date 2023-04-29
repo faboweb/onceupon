@@ -1,6 +1,11 @@
 <template>
   <div style="padding-left: 1rem; padding-right: 1rem">
     <h1 style="text-align: center">Choose NFT to add</h1>
+    <p style="    margin-bottom: 1rem;
+    font-size: 14px;
+    text-align: center;">
+      NFTS are linked to a section by it's ID. OnceUpon doesn't take ownership of your NFTs.
+    </p>
     <ion-avatar
       v-for="nft in nfts"
       :key="nft.key"
