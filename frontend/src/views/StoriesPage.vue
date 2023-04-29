@@ -9,21 +9,7 @@
         style="position: absolute; top: 2rem; right: 1rem"
         >Get Updates</a
       >
-      <div
-        style="
-          padding: 1rem;
-          font-size: 14px;
-          background-color: #f2cc8f6b;
-          margin-bottom: 1rem;
-          border-radius: 8px;
-        "
-      >
-        OnceUpon invites you to write a story together with the community. While
-        everyone participating will own the story.
-        <br />
-        You have a favorite NFT? Finally it can go on amazing adventures
-        together with other NFTs.
-      </div>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       <h1>Stories</h1>
       <div
         style="
