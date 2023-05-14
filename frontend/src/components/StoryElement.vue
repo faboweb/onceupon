@@ -36,7 +36,7 @@
           {{ story.name || "No title" }}
         </h1>
         <p style="text-align: left; white-space: pre-wrap;">
-          {{ story.first_section.substr(0, 100) }}...
+          {{ content.substr(0, 140) || "Loading" }}...
         </p>
         <div>
           <!-- <div style="flex-direction: row; display: flex">
@@ -63,7 +63,7 @@
 import { computed, defineProps } from "vue";
 import { listOutline, eyeOutline, documentOutline } from "ionicons/icons";
 import { formatDistance } from "date-fns";
-import { useNameStore } from "@/store";
+import { useNameStore, useStoryStore } from "@/store";
 import {
   IonIcon,
   IonCard,
@@ -75,6 +75,7 @@ import {
 import NftElement from "./NftElement.vue";
 
 const nameStore = useNameStore();
+const storyStore = useStoryStore();
 
 const props = defineProps<{ story: any }>();
 
@@ -86,6 +87,7 @@ const time = (story) => {
 };
 
 const name = computed(() => nameStore.name(props.story.creator));
+const content = computed(() => props.story.first_section || storyStore.cidLookup[props.story.first_section_cid]);
 </script>
 
 <style scoped>

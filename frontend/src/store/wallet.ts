@@ -162,7 +162,6 @@ export const useWalletStore = defineStore("wallet", {
           break;
       }
       const signingClient = await this.wallet.getSigningCosmWasmClient();
-      debugger;
       await signingClient.execute(
         userAddress,
         process.env.VUE_APP_CONTRACT || "",

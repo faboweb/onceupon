@@ -3,10 +3,12 @@ import { useNameStore } from "./names";
 import { useWalletStore } from "./wallet";
 // import { useImageStore } from "./data";
 import { useNavigationStore } from "./navigation";
+import { useStoryStore } from "./story";
 
 export {
   useWalletStore,
   // useImageStore,
   useNavigationStore,
   useNameStore,
+  useStoryStore,
 };

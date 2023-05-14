@@ -25,6 +25,7 @@
     "@cosmos-kit/keplr-mobile": "^0.33.9",
     "@ionic/vue": "^6.0.0",
     "@ionic/vue-router": "^6.0.0",
+    "axios": "^1.4.0",
     "bowser": "^2.11.0",
     "chain-registry": "^1.8.0",
     "core-js": "^3.6.5",
@@ -44,7 +45,8 @@
     "vue": "^3.2.21",
     "vue-meta": "^2.4.0",
     "vue-resize-text": "^0.1.1",
-    "vue-router": "^4.0.12"
+    "vue-router": "^4.0.12",
+    "web3.storage": "^4.5.4"
   },
   "devDependencies": {
     "@capacitor/cli": "4.6.1",

@@ -1,49 +1,61 @@
+use core::panic;
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, QuerierWrapper, QueryRequest, Response,
-    StdError, StdResult, WasmQuery, Storage, Order,
+    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Order, QuerierWrapper, QueryRequest,
+    Response, StdError, StdResult, Storage, WasmQuery,
 };
 use cw2::set_contract_version;
 use cw721::OwnerOfResponse;
 use cw_storage_plus::Map;
 use schemars::Set;
+use semver::Version;
 use sg721_base::QueryMsg as SgQueryMsg;
-use core::panic;
 use std::collections::{HashMap, HashSet};
-use std::convert::TryFrom;
 use std::env;
 use std::iter::FromIterator;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, GetStoryResponse, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::state::{State, STATE, STORIES, SECTIONS, VOTES, SHARES};
-use crate::types::{Section, SectionVotes, Story, VoteEntry, ShareBalance, StoryOverviewItem, NFT};
+use crate::state::{State, SECTIONS, SHARES, STATE, STORIES, VOTES};
+use crate::types::{Section, SectionVotes, ShareBalance, Story, StoryOverviewItem, VoteEntry, NFT};
 
 // version info for migration info
+const COMPATIBLE_MIGRATION_CONTRACT_NAME: &str = "crates.io:onceupon-cosmwasm";
 const CONTRACT_NAME: &str = "crates.io:onceupon-cosmwasm";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
-const MIN_LENGTH: u32 = 240;
+// const MIN_LENGTH: u32 = 240;
 
 #[entry_point]
 pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, ContractError> {
-    let ver = cw2::get_contract_version(deps.storage)?;
-
-    // ensure we are migrating from an allowed contract
-    if ver.contract != CONTRACT_NAME {
-        return Err(StdError::generic_err("Can only upgrade from same type").into());
-    }
-    // note: better to do proper semver compare, but string compare *usually* works
-    #[allow(clippy::cmp_owned)]
-    if ver.version >= CONTRACT_VERSION.to_string() {
-        return Err(StdError::generic_err("Cannot upgrade from a newer version").into());
+    let current_version = cw2::get_contract_version(deps.storage)?;
+    if ![CONTRACT_NAME, COMPATIBLE_MIGRATION_CONTRACT_NAME]
+        .contains(&current_version.contract.as_str())
+    {
+        return Err(StdError::generic_err("Cannot upgrade to a different contract").into());
     }
 
-    // set the new version
-    cw2::set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    let version: Version = current_version
+        .version
+        .parse()
+        .map_err(|_| StdError::generic_err("Invalid contract version"))?;
+    let new_version: Version = CONTRACT_VERSION
+        .parse()
+        .map_err(|_| StdError::generic_err("Invalid contract version"))?;
 
-    Ok(Response::default())
+    // current version not launchpad v2
+    if version > new_version {
+        return Err(StdError::generic_err("Cannot upgrade to a previous contract version").into());
+    }
+    // if same version return
+    if version == new_version {
+        return Ok(Response::new());
+    }
+
+    // set new contract version
+    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    Ok(Response::new())
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -112,16 +124,27 @@ fn validate_section(
     sender: &str,
     section: &Section,
 ) -> Result<bool, ContractError> {
-    let max_len_size = usize::try_from(MIN_LENGTH).unwrap();
-    if section.content.len() < max_len_size {
+    // TODO currently can't test content as we are storing it on ipfs
+    // let max_len_size = usize::try_from(MIN_LENGTH).unwrap();
+    // if section.content.len() < max_len_size {
+    //     return Err(ContractError::CustomError {
+    //         val: "Sections need to be at least x long".to_string(),
+    //     });
+    // }
+    if section.clone().content_cid.is_none() {
         return Err(ContractError::CustomError {
-            val: "Sections need to be at least x long".to_string(),
+            val: "No content via IPFS CID provided".to_string(),
+        });
+    }
+    if section.clone().content_cid.unwrap().len() != 59 {
+        return Err(ContractError::CustomError {
+            val: "Content cid has wrong format".to_string(),
         });
     }
     if section.nft.is_some() {
         if cfg!(test) {
             // TODO
-            return Ok(true)
+            return Ok(true);
         }
         let nft = section.clone().nft.unwrap();
         if !!env::var("CHECK_NFTS").is_ok() {
@@ -167,7 +190,7 @@ pub fn new_story(
         created: Some(env.block.height),
         creator: info.sender.to_string(),
         sections: [section].to_vec(),
-        shares: None // depr
+        shares: None, // depr
     };
     STORIES.save(storage, id.clone(), &story)?;
 
@@ -193,23 +216,27 @@ pub fn new_story_section(
         });
     }
     let unwrapped_story = story.unwrap();
-        
+
     if env.block.height >= unwrapped_story.last_section + unwrapped_story.interval {
         return Err(ContractError::CustomError {
-            val: "Section submit interval is claused. Call 'cycle' or wait till someone calls it.".to_string(),
+            val: "Section submit interval is claused. Call 'cycle' or wait till someone calls it."
+                .to_string(),
         });
     }
 
     new_section.proposer = Some(String::from(info.sender.as_str().clone()));
     new_section.added = Some(env.block.height);
 
-    let k = (_new_section.story_id.to_string(), _new_section.section_id.to_string());
-   let section_id_exists =  SECTIONS.has(storage, k.clone());
-   if section_id_exists {
-         return Err(ContractError::CustomError {
-              val: "Section with that id already exists".to_string(),
-         });
-   }
+    let k = (
+        _new_section.story_id.to_string(),
+        _new_section.section_id.to_string(),
+    );
+    let section_id_exists = SECTIONS.has(storage, k.clone());
+    if section_id_exists {
+        return Err(ContractError::CustomError {
+            val: "Section with that id already exists".to_string(),
+        });
+    }
 
     SECTIONS.save(storage, k.clone(), &new_section)?;
     Ok(Response::new().add_attribute("method", "new_story_section"))
@@ -223,22 +250,41 @@ pub fn voting(
     section_id: String,
     vote: i8,
 ) -> Result<Response, ContractError> {
-    let k = (story_id.to_string(), section_id.to_string(), info.sender.to_string());
+    let k = (
+        story_id.to_string(),
+        section_id.to_string(),
+        info.sender.to_string(),
+    );
     VOTES.save(deps.storage, k, &vote)?;
     Ok(Response::new().add_attribute("method", "voting"))
 }
 
-fn add_shares(storage: &mut dyn Storage, shares: Map<(String, String), u64>, user: &String, story_id: &String, amount: u64) -> Result<(), ContractError> {
+fn add_shares(
+    storage: &mut dyn Storage,
+    shares: Map<(String, String), u64>,
+    user: &String,
+    story_id: &String,
+    amount: u64,
+) -> Result<(), ContractError> {
     let user_shares = shares.may_load(storage, (story_id.to_string(), user.to_string()))?;
     let new_balance = if user_shares.is_none() {
         amount
     } else {
         user_shares.unwrap() + amount
     };
-    let res = shares.save(storage, (story_id.to_string(), user.to_string()), &new_balance);
+    let res = shares.save(
+        storage,
+        (story_id.to_string(), user.to_string()),
+        &new_balance,
+    );
     if res.is_err() {
         return Err(ContractError::CustomError {
-            val: "Error saving shares".to_string() + &res.err().unwrap().to_string() + "," + &user + "," + &story_id,
+            val: "Error saving shares".to_string()
+                + &res.err().unwrap().to_string()
+                + ","
+                + &user
+                + ","
+                + &story_id,
         });
     }
     Ok(())
@@ -263,11 +309,10 @@ pub fn remove_story(
     Ok(Response::new().add_attribute("method", "new_story"))
 }
 
-
 fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
     let storage = deps.storage;
     let votes = VOTES.range(storage, None, None, Order::Ascending);
-    let mut voted_stories = HashMap::<String, HashMap::<String, SectionVotes>>::new();
+    let mut voted_stories = HashMap::<String, HashMap<String, SectionVotes>>::new();
     votes.for_each(|vote| {
         let ((story_id, section_id, _), vote) = vote.unwrap();
         if voted_stories.contains_key(&story_id) {
@@ -282,102 +327,153 @@ fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
             voted_stories.insert(story_id, section_votes.to_owned());
         } else {
             let mut section_votes = HashMap::<String, SectionVotes>::new();
-            section_votes.insert(section_id.clone(), SectionVotes {
-                section_id: section_id.clone(),
-                yes: if vote == 1 { 1 } else { 0 },
-                veto: if vote == 2 { 1 } else { 0 }
-            });
+            section_votes.insert(
+                section_id.clone(),
+                SectionVotes {
+                    section_id: section_id.clone(),
+                    yes: if vote == 1 { 1 } else { 0 },
+                    veto: if vote == 2 { 1 } else { 0 },
+                },
+            );
             voted_stories.insert(story_id, section_votes.to_owned());
         }
     });
 
     // advance all unvoted stories to signal they have been processed
     let stories = STORIES.range(storage, None, None, Order::Ascending);
-    let unvoted_stories: Vec<Story>  = stories.into_iter().filter_map(|story| {
-        let (story_id, _story) = story.unwrap();
-        if voted_stories.contains_key(&story_id) {
-            None
-        } else {
-            Some(_story)
-        }
-    }).collect();
+    let unvoted_stories: Vec<Story> = stories
+        .into_iter()
+        .filter_map(|story| {
+            let (story_id, _story) = story.unwrap();
+            if voted_stories.contains_key(&story_id) {
+                None
+            } else {
+                Some(_story)
+            }
+        })
+        .collect();
     unvoted_stories.into_iter().for_each(|mut story| {
         if story.last_section + story.interval <= env.block.height {
             story.last_section = env.block.height;
             let res = STORIES.save(storage, story.id.clone(), &story);
             if res.is_err() {
-                panic!("Error saving story. {},{}", res.err().unwrap(), story.id.clone());
+                panic!(
+                    "Error saving story. {},{}",
+                    res.err().unwrap(),
+                    story.id.clone()
+                );
             }
         }
     });
 
-    voted_stories.into_iter().for_each(|(story_id, section_votes)| {
-        let mut story = STORIES.load(storage, story_id.clone()).unwrap();
-        if (story.last_section + story.interval) > env.block.height {
-            println!("skip");
-            return;
-        }
-
-        // get winning section
-        let top_section_votes = section_votes.values().filter(|section_votes| {
-            section_votes.veto < section_votes.yes
-            && section_votes.yes > 0
-        }).max_by(|x, y| x.yes.cmp(&y.yes));
-
-        if top_section_votes.is_none() {
-            // if no winner decided, we open voting again
-            story.last_section = env.block.height;
-            let res = STORIES.save(storage, story_id.clone(), &story);
-            if res.is_err() {
-                panic!("Error saving story. {},{}", res.err().unwrap(), story_id.clone());
+    voted_stories
+        .into_iter()
+        .for_each(|(story_id, section_votes)| {
+            let mut story = STORIES.load(storage, story_id.clone()).unwrap();
+            if (story.last_section + story.interval) > env.block.height {
+                println!("skip");
+                return;
             }
-            return
-        }
 
-        let top_section_votes_unwrapped = top_section_votes.unwrap();
-        let top_section_res = SECTIONS.load(storage, (story_id.clone(), top_section_votes_unwrapped.section_id.to_string()));
-        let top_section = top_section_res.unwrap();
+            // get winning section
+            let top_section_votes = section_votes
+                .values()
+                .filter(|section_votes| {
+                    section_votes.veto < section_votes.yes && section_votes.yes > 0
+                })
+                .max_by(|x, y| x.yes.cmp(&y.yes));
 
-        // calculate shares of story
-        let res = add_shares(storage, SHARES, &top_section.proposer.clone().unwrap(), &story_id, 100);
-        if res.is_err() {
-            panic!("Error saving shares. {},{}", res.err().unwrap(), story_id.clone());
-        }
-        let votes: Vec<Result<((String, String), i8), StdError>> = VOTES
-            .sub_prefix(story_id.clone())
-            .range(storage, None, None, Order::Ascending)
-            .collect();
+            if top_section_votes.is_none() {
+                // if no winner decided, we open voting again
+                story.last_section = env.block.height;
+                let res = STORIES.save(storage, story_id.clone(), &story);
+                if res.is_err() {
+                    panic!(
+                        "Error saving story. {},{}",
+                        res.err().unwrap(),
+                        story_id.clone()
+                    );
+                }
+                return;
+            }
+
+            let top_section_votes_unwrapped = top_section_votes.unwrap();
+            let top_section_res = SECTIONS.load(
+                storage,
+                (
+                    story_id.clone(),
+                    top_section_votes_unwrapped.section_id.to_string(),
+                ),
+            );
+            let top_section = top_section_res.unwrap();
+
+            // calculate shares of story
+            let res = add_shares(
+                storage,
+                SHARES,
+                &top_section.proposer.clone().unwrap(),
+                &story_id,
+                100,
+            );
+            if res.is_err() {
+                panic!(
+                    "Error saving shares. {},{}",
+                    res.err().unwrap(),
+                    story_id.clone()
+                );
+            }
+            let votes: Vec<Result<((String, String), i8), StdError>> = VOTES
+                .sub_prefix(story_id.clone())
+                .range(storage, None, None, Order::Ascending)
+                .collect();
             let votes_dedupe = Set::from_iter(votes.iter().map(|vote| {
                 let ((_, addr), _) = vote.as_ref().unwrap();
                 addr.to_string()
             }));
             votes_dedupe.iter().for_each(|addr| {
-            let res = add_shares(storage, SHARES, &addr.to_string(), &story_id, 1);
+                let res = add_shares(storage, SHARES, &addr.to_string(), &story_id, 1);
+                if res.is_err() {
+                    panic!(
+                        "Error saving shares. {},{}",
+                        res.err().unwrap(),
+                        story_id.clone()
+                    );
+                }
+            });
+
+            // update story
+            story.last_section = env.block.height;
+            story.sections = [story.sections.clone(), [top_section.clone()].to_vec()].concat();
+            let res = STORIES.save(storage, story_id.clone(), &story);
             if res.is_err() {
-                panic!("Error saving shares. {},{}", res.err().unwrap(), story_id.clone());
+                panic!(
+                    "Error saving story. {},{}",
+                    res.err().unwrap(),
+                    story_id.clone()
+                );
             }
-        });
 
-        // update story
-        story.last_section = env.block.height;
-        story.sections = [story.sections.clone(), [top_section.clone()].to_vec()].concat();
-        let res = STORIES.save(storage, story_id.clone(), &story);
-        if res.is_err() {
-            panic!("Error saving story. {},{}", res.err().unwrap(), story_id.clone());
-        }
-
-        // clean up by removing used votes and sections
-        let removable_sections: Vec<Result<(String, Section), StdError>> = SECTIONS.prefix(story_id.clone()).range(storage, None, None, Order::Ascending).collect();
-        removable_sections.iter().for_each(|r| {
-            let (section_id, _) = r.as_ref().unwrap();
-            SECTIONS.remove(storage, (story_id.clone(), section_id.clone()));
+            // clean up by removing used votes and sections
+            let removable_sections: Vec<Result<(String, Section), StdError>> = SECTIONS
+                .prefix(story_id.clone())
+                .range(storage, None, None, Order::Ascending)
+                .collect();
+            removable_sections.iter().for_each(|r| {
+                let (section_id, _) = r.as_ref().unwrap();
+                SECTIONS.remove(storage, (story_id.clone(), section_id.clone()));
+            });
+            let removable_votes: Vec<Result<((String, String), i8), StdError>> = VOTES
+                .sub_prefix(story_id.clone())
+                .range(storage, None, None, Order::Ascending)
+                .collect();
+            removable_votes.iter().for_each(|r| {
+                let ((section_id, addr), _) = r.as_ref().unwrap();
+                VOTES.remove(
+                    storage,
+                    (story_id.clone(), section_id.clone(), addr.to_string()),
+                );
+            });
         });
-        let removable_votes: Vec<Result<((String, String), i8), StdError>> = VOTES.sub_prefix(story_id.clone()).range(storage, None, None, Order::Ascending).collect();
-        removable_votes.iter().for_each(|r| {
-            let ((section_id, addr), _) = r.as_ref().unwrap();
-            VOTES.remove(storage, (story_id.clone(), section_id.clone(), addr.to_string()));
-        });
-    });
 
     // delete used votes and sections
     // somehow need to clean up here as storage is not referencable inside the loop
@@ -454,45 +550,70 @@ fn query_story(deps: Deps, story_id: String) -> StdResult<Binary> {
 }
 
 fn query_shares(deps: Deps, story_id: String) -> StdResult<Binary> {
-    let shares = SHARES.prefix(story_id.clone()).range(deps.storage, None, None, Order::Ascending);
-    to_binary(&shares.map(|r| {
-        let (addr, balance) = r.unwrap();
-        ShareBalance {
-            story_id: Some(story_id.clone()),
-            user: addr.to_string(),
-            balance,
-        }
-    }).collect::<Vec<ShareBalance>>())
+    let shares = SHARES
+        .prefix(story_id.clone())
+        .range(deps.storage, None, None, Order::Ascending);
+    to_binary(
+        &shares
+            .map(|r| {
+                let (addr, balance) = r.unwrap();
+                ShareBalance {
+                    story_id: Some(story_id.clone()),
+                    user: addr.to_string(),
+                    balance,
+                }
+            })
+            .collect::<Vec<ShareBalance>>(),
+    )
 }
 
 fn query_stories(deps: Deps) -> StdResult<Binary> {
     let stories = STORIES.range(deps.storage, None, None, Order::Ascending);
-    let _stories: Vec<StoryOverviewItem> = stories.into_iter().map(|story| {
-        let (story_id, story) = story.unwrap();
-        let shares = SHARES.prefix(story_id.clone()).range(deps.storage, None, None, Order::Ascending);
-        let sections = SECTIONS.prefix(story_id.clone()).range(deps.storage, None, None, Order::Ascending);
-        let story_nfts = story.sections.clone().into_iter()
-            .filter_map(|section| if (*section.story_id == story.id) && section.nft.is_some() {
-                Some(section.nft.unwrap())
-            } else {
-                None
-            }).into_iter();
-        let dedupe_story_nfts = story_nfts.collect::<HashSet<NFT>>().into_iter().collect::<Vec<NFT>>();
-        let top_story_nfts = dedupe_story_nfts.into_iter().take(4).collect();
-        return StoryOverviewItem {
-            id: story.id.clone(),
-            name: story.name.clone(),
-            created: story.created.unwrap(),
-            last_section: story.last_section,
-            next_section: story.last_section + story.interval,
-            creator: story.creator.clone(),
-            sections: story.sections.len(),
-            owners: shares.count(),
-            proposals: sections.count(),
-            top_nfts: top_story_nfts,
-            first_section: story.sections.get(0).unwrap().content.clone(),
-        }
-    }).collect();
+    let _stories: Vec<StoryOverviewItem> = stories
+        .into_iter()
+        .map(|story| {
+            let (story_id, story) = story.unwrap();
+            let shares =
+                SHARES
+                    .prefix(story_id.clone())
+                    .range(deps.storage, None, None, Order::Ascending);
+            let sections =
+                SECTIONS
+                    .prefix(story_id.clone())
+                    .range(deps.storage, None, None, Order::Ascending);
+            let story_nfts = story
+                .sections
+                .clone()
+                .into_iter()
+                .filter_map(|section| {
+                    if (*section.story_id == story.id) && section.nft.is_some() {
+                        Some(section.nft.unwrap())
+                    } else {
+                        None
+                    }
+                })
+                .into_iter();
+            let dedupe_story_nfts = story_nfts
+                .collect::<HashSet<NFT>>()
+                .into_iter()
+                .collect::<Vec<NFT>>();
+            let top_story_nfts = dedupe_story_nfts.into_iter().take(4).collect();
+            return StoryOverviewItem {
+                id: story.id.clone(),
+                name: story.name.clone(),
+                created: story.created.unwrap(),
+                last_section: story.last_section,
+                next_section: story.last_section + story.interval,
+                creator: story.creator.clone(),
+                sections: story.sections.len(),
+                owners: shares.count(),
+                proposals: sections.count(),
+                top_nfts: top_story_nfts,
+                first_section: story.sections.get(0).unwrap().content.clone(),
+                first_section_cid: story.sections.get(0).unwrap().content_cid.clone(),
+            };
+        })
+        .collect();
     to_binary(&_stories)
 }
 
@@ -510,26 +631,27 @@ mod tests {
 
         let mut env = mock_env();
 
-        let msg = InstantiateMsg { };
+        let msg = InstantiateMsg {};
         let info = mock_info("creator", &coins(2, "token"));
         let _res = instantiate(deps.as_mut(), env.clone(), info.clone(), msg).unwrap();
 
-        let msg = ExecuteMsg::NewStory { 
-            id: "a".to_string(), 
-            name: "a".to_string(), 
-            first_section: Section { 
-                section_id: "b".to_string(), 
-                story_id: "a".to_string(), 
-                content: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.".to_string(), 
+        let msg = ExecuteMsg::NewStory {
+            id: "a".to_string(),
+            name: "a".to_string(),
+            first_section: Section {
+                section_id: "b".to_string(),
+                story_id: "a".to_string(),
+                content: None,
+                content_cid: Some("abc123".to_string()),
                 nft: Some(NFT {
-                    protocol: None, 
+                    protocol: None,
                     contract_address: "c".to_string(),
                     token_id: "d".to_string(),
-                }), 
-                proposer: None, 
-                added: None
-            }, 
-            interval: 10
+                }),
+                proposer: None,
+                added: None,
+            },
+            interval: 10,
         };
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         if res.is_err() {
@@ -537,29 +659,67 @@ mod tests {
         }
         assert!(res.is_ok());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStory { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetStory {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: GetStoryResponse = from_binary(&res).unwrap();
         assert_eq!(env.block.height, value.story.last_section);
 
-        let msg = ExecuteMsg::NewStorySection { section: Section { section_id: "b".to_string(), story_id: "a".to_string(), content: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.".to_string(), nft: None, proposer: None, added: None } };
+        let msg = ExecuteMsg::NewStorySection {
+            section: Section {
+                section_id: "b".to_string(),
+                story_id: "a".to_string(),
+                content: None,
+                content_cid: Some("abc123".to_string()),
+                nft: None,
+                proposer: None,
+                added: None,
+            },
+        };
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetSections { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetSections {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: Vec<Section> = from_binary(&res).unwrap();
         assert_eq!(1, value.len());
 
         env.block.height += 1;
 
-        let msg = ExecuteMsg::Cycle {  };
+        let msg = ExecuteMsg::Cycle {};
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetSections { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetSections {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: Vec<Section> = from_binary(&res).unwrap();
         assert_eq!(1, value.len());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStory { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetStory {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: GetStoryResponse = from_binary(&res).unwrap();
         assert_ne!(env.block.height, value.story.last_section);
 
@@ -567,38 +727,70 @@ mod tests {
         println!("{}", env.block.height);
 
         // without votes, not progressing
-        let msg = ExecuteMsg::Cycle {  };
+        let msg = ExecuteMsg::Cycle {};
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetSections { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetSections {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: Vec<Section> = from_binary(&res).unwrap();
         assert_eq!(1, value.len());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStory { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetStory {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: GetStoryResponse = from_binary(&res).unwrap();
         assert_eq!(env.block.height, value.story.last_section);
 
         env.block.height += 10;
 
         // when voted, progress
-        let msg = ExecuteMsg::Vote { story_id: "a".to_string(), section_id: "b".to_string(), vote: 1 };
+        let msg = ExecuteMsg::Vote {
+            story_id: "a".to_string(),
+            section_id: "b".to_string(),
+            vote: 1,
+        };
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
 
-        let msg = ExecuteMsg::Cycle {  };
+        let msg = ExecuteMsg::Cycle {};
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetSections { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetSections {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: Vec<Section> = from_binary(&res).unwrap();
         assert_eq!(0, value.len());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStory { story_id: "a".to_string() }).unwrap();
+        let res = query(
+            deps.as_ref(),
+            env.clone(),
+            QueryMsg::GetStory {
+                story_id: "a".to_string(),
+            },
+        )
+        .unwrap();
         let value: GetStoryResponse = from_binary(&res).unwrap();
         assert_eq!(env.block.height, value.story.last_section);
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStories {  }).unwrap();
+        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStories {}).unwrap();
         let value: Vec<StoryOverviewItem> = from_binary(&res).unwrap();
         assert_eq!("d".to_string(), value[0].top_nfts[0].token_id);
     }

@@ -24,7 +24,8 @@ pub struct NFT {
 pub struct Section {
     pub section_id: String,
     pub story_id: String,
-    pub content: String,
+    pub content: Option<String>, // depr
+    pub content_cid: Option<String>,
     pub nft: Option<NFT>,
     pub proposer: Option<String>,
     pub added: Option<u64>,
@@ -57,10 +58,11 @@ pub struct StoryOverviewItem {
     pub id: String,
     pub name: String,
     pub created: u64,
-    pub last_section: u64, // block height of last section
-    pub next_section: u64, // block height of next voting period
-    pub creator: String,   // user id
-    pub first_section: String,
+    pub last_section: u64,             // block height of last section
+    pub next_section: u64,             // block height of next voting period
+    pub creator: String,               // user id
+    pub first_section: Option<String>, // depr
+    pub first_section_cid: Option<String>,
     pub sections: usize,
     pub owners: usize,
     pub proposals: usize,

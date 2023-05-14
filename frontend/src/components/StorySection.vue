@@ -6,7 +6,7 @@
       style="float: left; padding: 0 0.5rem 0.5rem 0; box-sizing: content-box"
     />
     <p style="font-size: 14px; line-height: 21px; margin-top: 0">
-      {{ section.content }}
+      {{ content }}
     </p>
     <span
       style="
@@ -26,6 +26,7 @@
 import { useNameStore } from "@/store";
 import { useWalletStore } from "@/store/wallet";
 import { useNftStore } from "@/store/nfts";
+import { useStoryStore } from "@/store/story";
 import { IonGrid, IonRow, IonCol, IonCard } from "@ionic/vue";
 import { formatDistance } from "date-fns";
 import { computed, defineProps, onMounted } from "vue";
@@ -34,6 +35,7 @@ import NftElement from "./NftElement.vue";
 const walletStore = useWalletStore();
 const nftStore = useNftStore();
 const nameStore = useNameStore();
+const storyStore = useStoryStore();
 
 const props = defineProps({
   section: {
@@ -43,6 +45,7 @@ const props = defineProps({
 });
 
 const name = computed(() => nameStore.name(props.section.proposer));
+const content = computed(() => storyStore.cidLookup[props.section.content_cid]);
 
 onMounted(() => {
   nftStore.loadNft(props.section.nft);

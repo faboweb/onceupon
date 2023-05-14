@@ -27,7 +27,7 @@
         <div class="sections">
           <story-section
             v-for="section in story.sections || []"
-            :key="section.id"
+            :key="section.section_id"
             :section="section"
           />
         </div>

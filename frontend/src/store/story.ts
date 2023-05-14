@@ -2,6 +2,7 @@ import { useNameStore } from "./names";
 import { useNftStore } from "./nfts";
 import { defineStore } from "pinia";
 import { useWalletStore } from "./wallet";
+import axios from "axios";
 
 interface State {
   stories: any[] | null;
@@ -10,6 +11,7 @@ interface State {
   votes: any;
   error: null;
   blocks: any; // dictionary height -> block
+  cidLookup: any; // dictionary cid -> content
 }
 
 function generateUUID() {
@@ -44,6 +46,7 @@ export const useStoryStore = defineStore("storyStore", {
     shares: {},
     error: null,
     blocks: {},
+    cidLookup: {},
   }),
   getters: {
     allStories: (state) => state.stories,
@@ -65,6 +68,9 @@ export const useStoryStore = defineStore("storyStore", {
           (timeDiff / heightDiff) * story.interval
       );
       story.assumedNextSectionBlockTime = assumedNextSectionBlockTime;
+
+      this.loadContent(story.sections.map((section) => section.content_cid));
+
       return story;
     },
     async loadStories() {
@@ -73,13 +79,20 @@ export const useStoryStore = defineStore("storyStore", {
       const nameStore = useNameStore();
       const result = await walletStore.query({ get_stories: {} });
       this.stories = result;
-      result.forEach(async (story) => {
-        story.top_nfts.forEach((nft) => nftStore.loadNft(nft));
-        const lastSectionBlock = await walletStore.getBlock(story.last_section);
-        const _story = this.stories?.find((s) => s.id === story.id);
-        _story.lastUpdate = lastSectionBlock?.header.time;
-        nameStore.getName(story.creator);
-      });
+      const cids: string[] = [];
+      await Promise.all(
+        result.map(async (story) => {
+          story.top_nfts.forEach((nft) => nftStore.loadNft(nft));
+          const lastSectionBlock = await walletStore.getBlock(
+            story.last_section
+          );
+          const _story = this.stories?.find((s) => s.id === story.id);
+          _story.lastUpdate = lastSectionBlock?.header.time;
+          cids.push(_story.first_section_cid);
+          nameStore.getName(story.creator);
+        })
+      );
+      await this.loadContent(cids);
     },
     async loadProposals(storyId) {
       const walletStore = useWalletStore();
@@ -87,6 +100,12 @@ export const useStoryStore = defineStore("storyStore", {
         get_sections: { story_id: storyId },
       });
       this.proposals[storyId] = result;
+
+      const cids: string[] = [];
+      result.forEach((proposal) => {
+        cids.push(proposal.content_cid);
+      });
+      this.loadContent(cids);
     },
     async loadVotes(storyId) {
       const walletStore = useWalletStore();
@@ -106,6 +125,16 @@ export const useStoryStore = defineStore("storyStore", {
     async addStory(content, title, nft) {
       const walletStore = useWalletStore();
       const storyId = generateUUID();
+
+      const cid = await axios
+        .post(
+          "https://us-central1-onceupon-15dc8.cloudfunctions.net/web3upload",
+          {
+            content,
+          }
+        )
+        .then((res) => res.data);
+
       await walletStore.execute(walletStore.address, {
         new_story: {
           id: storyId,
@@ -113,7 +142,7 @@ export const useStoryStore = defineStore("storyStore", {
           first_section: {
             section_id: generateUUID(),
             story_id: storyId,
-            content,
+            content_cid: cid,
             nft: nft
               ? {
                   contract_address: nft.contract_address,
@@ -125,18 +154,29 @@ export const useStoryStore = defineStore("storyStore", {
           interval: 12000 * 7, // need to calculate this
         },
       });
+      this.loadContent([cid]);
       this.loadStories();
       return storyId;
     },
     async addSectionProposal(storyId, content, nft) {
       if (!content) throw new Error("You need to write something");
       const walletStore = useWalletStore();
+
+      const cid = await axios
+        .post(
+          "https://us-central1-onceupon-15dc8.cloudfunctions.net/web3upload",
+          {
+            content,
+          }
+        )
+        .then((res) => res.data);
+
       await walletStore.execute(walletStore.address, {
         new_story_section: {
           section: {
             section_id: generateUUID(),
             story_id: storyId,
-            content,
+            content_cid: cid,
             nft: nft
               ? {
                   contract_address: nft.contract_address,
@@ -147,6 +187,7 @@ export const useStoryStore = defineStore("storyStore", {
           },
         },
       });
+      this.loadContent([cid]);
       this.loadProposals(storyId);
     },
     async vote(storyId, proposalId, vote) {
@@ -174,6 +215,22 @@ export const useStoryStore = defineStore("storyStore", {
         },
       });
       this.stories = this.stories?.filter((s) => s.id !== storyId) || [];
+    },
+    async loadContent(cids: string[]) {
+      const missing = cids.filter((cid) => !!cid && !this.cidLookup[cid]);
+
+      if (missing.length === 0) return;
+
+      const cidLookup = await axios
+        .post(
+          "https://us-central1-onceupon-15dc8.cloudfunctions.net/resolveCIDs",
+          {
+            cids: missing,
+          }
+        )
+        .then((res) => res.data);
+
+      this.cidLookup = { ...this.cidLookup, ...cidLookup };
     },
   },
 });
