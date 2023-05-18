@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::contract::{execute, instantiate, query};
-    use crate::msg::{ExecuteMsg, GetStoryResponse, InstantiateMsg, QueryMsg};
-    use crate::types::{Section, StoryOverviewItem, UploadSection, NFT};
+    use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+    use crate::types::{Section, Story, StoryOverviewItem, UploadSection, NFT};
 
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{coins, from_binary};
@@ -47,8 +47,8 @@ mod tests {
             },
         )
         .unwrap();
-        let value: GetStoryResponse = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.story.last_section);
+        let value: Story = from_binary(&res).unwrap();
+        assert_eq!(env.block.height, value.last_section);
 
         let msg = ExecuteMsg::NewStorySection {
             section: UploadSection {
@@ -97,8 +97,8 @@ mod tests {
             },
         )
         .unwrap();
-        let value: GetStoryResponse = from_binary(&res).unwrap();
-        assert_ne!(env.block.height, value.story.last_section);
+        let value: Story = from_binary(&res).unwrap();
+        assert_ne!(env.block.height, value.last_section);
 
         env.block.height += 9;
         println!("{}", env.block.height);
@@ -127,8 +127,8 @@ mod tests {
             },
         )
         .unwrap();
-        let value: GetStoryResponse = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.story.last_section);
+        let value: Story = from_binary(&res).unwrap();
+        assert_eq!(env.block.height, value.last_section);
 
         env.block.height += 10;
 
@@ -164,8 +164,8 @@ mod tests {
             },
         )
         .unwrap();
-        let value: GetStoryResponse = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.story.last_section);
+        let value: Story = from_binary(&res).unwrap();
+        assert_eq!(env.block.height, value.last_section);
 
         let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStories {}).unwrap();
         let value: Vec<StoryOverviewItem> = from_binary(&res).unwrap();
