@@ -5,12 +5,11 @@ use serde::{Deserialize, Serialize};
 pub struct Story {
     pub id: String,
     pub name: String,
-    pub created: Option<u64>,
+    pub created: u64,
     pub last_section: u64, // block height of last section
     pub interval: u64,     // blocks till next round of voting
     pub creator: String,   // user id
     pub sections: Vec<Section>,
-    pub shares: Option<Vec<ShareBalance>>, // depr
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema, Hash, Eq)]
@@ -21,14 +20,21 @@ pub struct NFT {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
+pub struct UploadSection {
+    pub section_id: String,
+    pub story_id: String,
+    pub content_cid: String,
+    pub nft: Option<NFT>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
 pub struct Section {
     pub section_id: String,
     pub story_id: String,
-    pub content: Option<String>, // depr
-    pub content_cid: Option<String>,
+    pub content_cid: String,
     pub nft: Option<NFT>,
-    pub proposer: Option<String>,
-    pub added: Option<u64>,
+    pub proposer: String,
+    pub added: u64,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
@@ -49,7 +55,6 @@ pub struct SectionVotes {
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
 pub struct ShareBalance {
     pub user: String,
-    pub story_id: Option<String>, // depr Option
     pub balance: u64,
 }
 
@@ -58,11 +63,10 @@ pub struct StoryOverviewItem {
     pub id: String,
     pub name: String,
     pub created: u64,
-    pub last_section: u64,             // block height of last section
-    pub next_section: u64,             // block height of next voting period
-    pub creator: String,               // user id
-    pub first_section: Option<String>, // depr
-    pub first_section_cid: Option<String>,
+    pub last_section: u64, // block height of last section
+    pub next_section: u64, // block height of next voting period
+    pub creator: String,   // user id
+    pub first_section_cid: String,
     pub sections: usize,
     pub owners: usize,
     pub proposals: usize,

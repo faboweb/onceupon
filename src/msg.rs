@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Section, Story};
+use crate::types::{Story, UploadSection};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -15,11 +15,11 @@ pub enum ExecuteMsg {
     NewStory {
         id: String,
         name: String,
-        first_section: Section,
+        first_section: UploadSection,
         interval: u64, // how long until next section
     },
     NewStorySection {
-        section: Section,
+        section: UploadSection,
     },
     Vote {
         story_id: String,
