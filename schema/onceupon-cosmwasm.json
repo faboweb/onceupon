@@ -1,0 +1,713 @@
+{
+  "contract_name": "onceupon-cosmwasm",
+  "contract_version": "0.12.0",
+  "idl_version": "1.0.0",
+  "instantiate": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "InstantiateMsg",
+    "type": "object"
+  },
+  "execute": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "ExecuteMsg",
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "new_story"
+        ],
+        "properties": {
+          "new_story": {
+            "type": "object",
+            "required": [
+              "first_section",
+              "id",
+              "interval",
+              "name"
+            ],
+            "properties": {
+              "first_section": {
+                "$ref": "#/definitions/UploadSection"
+              },
+              "id": {
+                "type": "string"
+              },
+              "interval": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0.0
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "new_story_section"
+        ],
+        "properties": {
+          "new_story_section": {
+            "type": "object",
+            "required": [
+              "section"
+            ],
+            "properties": {
+              "section": {
+                "$ref": "#/definitions/UploadSection"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "vote"
+        ],
+        "properties": {
+          "vote": {
+            "type": "object",
+            "required": [
+              "section_id",
+              "story_id",
+              "vote"
+            ],
+            "properties": {
+              "section_id": {
+                "type": "string"
+              },
+              "story_id": {
+                "type": "string"
+              },
+              "vote": {
+                "type": "integer",
+                "format": "int8"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "cycle"
+        ],
+        "properties": {
+          "cycle": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "remove_story"
+        ],
+        "properties": {
+          "remove_story": {
+            "type": "object",
+            "required": [
+              "story_id"
+            ],
+            "properties": {
+              "story_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    ],
+    "definitions": {
+      "NFT": {
+        "type": "object",
+        "required": [
+          "contract_address",
+          "token_id"
+        ],
+        "properties": {
+          "contract_address": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "token_id": {
+            "type": "string"
+          }
+        }
+      },
+      "UploadSection": {
+        "type": "object",
+        "required": [
+          "content_cid",
+          "section_id",
+          "story_id"
+        ],
+        "properties": {
+          "content_cid": {
+            "type": "string"
+          },
+          "nft": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/NFT"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "section_id": {
+            "type": "string"
+          },
+          "story_id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "query": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "QueryMsg",
+    "oneOf": [
+      {
+        "type": "object",
+        "required": [
+          "get_stories"
+        ],
+        "properties": {
+          "get_stories": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "get_story"
+        ],
+        "properties": {
+          "get_story": {
+            "type": "object",
+            "required": [
+              "story_id"
+            ],
+            "properties": {
+              "story_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "get_sections"
+        ],
+        "properties": {
+          "get_sections": {
+            "type": "object",
+            "required": [
+              "story_id"
+            ],
+            "properties": {
+              "story_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "get_votes"
+        ],
+        "properties": {
+          "get_votes": {
+            "type": "object",
+            "required": [
+              "story_id"
+            ],
+            "properties": {
+              "story_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "get_shares"
+        ],
+        "properties": {
+          "get_shares": {
+            "type": "object",
+            "required": [
+              "story_id"
+            ],
+            "properties": {
+              "story_id": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "required": [
+          "get_new_sections"
+        ],
+        "properties": {
+          "get_new_sections": {
+            "type": "object",
+            "required": [
+              "after"
+            ],
+            "properties": {
+              "after": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0.0
+              }
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    ]
+  },
+  "migrate": null,
+  "sudo": null,
+  "responses": {
+    "get_new_sections": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Array_of_Section",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Section"
+      },
+      "definitions": {
+        "NFT": {
+          "type": "object",
+          "required": [
+            "contract_address",
+            "token_id"
+          ],
+          "properties": {
+            "contract_address": {
+              "type": "string"
+            },
+            "protocol": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "token_id": {
+              "type": "string"
+            }
+          }
+        },
+        "Section": {
+          "type": "object",
+          "required": [
+            "added",
+            "content_cid",
+            "proposer",
+            "section_id",
+            "story_id"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "content_cid": {
+              "type": "string"
+            },
+            "nft": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/NFT"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "proposer": {
+              "type": "string"
+            },
+            "section_id": {
+              "type": "string"
+            },
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "get_sections": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Array_of_Section",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Section"
+      },
+      "definitions": {
+        "NFT": {
+          "type": "object",
+          "required": [
+            "contract_address",
+            "token_id"
+          ],
+          "properties": {
+            "contract_address": {
+              "type": "string"
+            },
+            "protocol": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "token_id": {
+              "type": "string"
+            }
+          }
+        },
+        "Section": {
+          "type": "object",
+          "required": [
+            "added",
+            "content_cid",
+            "proposer",
+            "section_id",
+            "story_id"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "content_cid": {
+              "type": "string"
+            },
+            "nft": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/NFT"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "proposer": {
+              "type": "string"
+            },
+            "section_id": {
+              "type": "string"
+            },
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "get_shares": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Array_of_ShareBalance",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ShareBalance"
+      },
+      "definitions": {
+        "ShareBalance": {
+          "type": "object",
+          "required": [
+            "balance",
+            "user"
+          ],
+          "properties": {
+            "balance": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "user": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "get_stories": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Array_of_StoryOverviewItem",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/StoryOverviewItem"
+      },
+      "definitions": {
+        "NFT": {
+          "type": "object",
+          "required": [
+            "contract_address",
+            "token_id"
+          ],
+          "properties": {
+            "contract_address": {
+              "type": "string"
+            },
+            "protocol": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "token_id": {
+              "type": "string"
+            }
+          }
+        },
+        "StoryOverviewItem": {
+          "type": "object",
+          "required": [
+            "created",
+            "creator",
+            "first_section_cid",
+            "id",
+            "last_section",
+            "name",
+            "next_section",
+            "owners",
+            "proposals",
+            "sections",
+            "top_nfts"
+          ],
+          "properties": {
+            "created": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "creator": {
+              "type": "string"
+            },
+            "first_section_cid": {
+              "type": "string"
+            },
+            "id": {
+              "type": "string"
+            },
+            "last_section": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "name": {
+              "type": "string"
+            },
+            "next_section": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "owners": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            },
+            "proposals": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            },
+            "sections": {
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            },
+            "top_nfts": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NFT"
+              }
+            }
+          }
+        }
+      }
+    },
+    "get_story": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Story",
+      "type": "object",
+      "required": [
+        "created",
+        "creator",
+        "id",
+        "interval",
+        "last_section",
+        "name",
+        "sections"
+      ],
+      "properties": {
+        "created": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "creator": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "interval": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "last_section": {
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "name": {
+          "type": "string"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Section"
+          }
+        }
+      },
+      "definitions": {
+        "NFT": {
+          "type": "object",
+          "required": [
+            "contract_address",
+            "token_id"
+          ],
+          "properties": {
+            "contract_address": {
+              "type": "string"
+            },
+            "protocol": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "token_id": {
+              "type": "string"
+            }
+          }
+        },
+        "Section": {
+          "type": "object",
+          "required": [
+            "added",
+            "content_cid",
+            "proposer",
+            "section_id",
+            "story_id"
+          ],
+          "properties": {
+            "added": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "content_cid": {
+              "type": "string"
+            },
+            "nft": {
+              "anyOf": [
+                {
+                  "$ref": "#/definitions/NFT"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "proposer": {
+              "type": "string"
+            },
+            "section_id": {
+              "type": "string"
+            },
+            "story_id": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "get_votes": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Array_of_VoteEntry",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/VoteEntry"
+      },
+      "definitions": {
+        "VoteEntry": {
+          "type": "object",
+          "required": [
+            "section_id",
+            "story_id",
+            "user",
+            "vote"
+          ],
+          "properties": {
+            "section_id": {
+              "type": "string"
+            },
+            "story_id": {
+              "type": "string"
+            },
+            "user": {
+              "type": "string"
+            },
+            "vote": {
+              "type": "integer",
+              "format": "int8"
+            }
+          }
+        }
+      }
+    }
+  }
+}

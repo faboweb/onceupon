@@ -54,7 +54,7 @@ export const useStoryStore = defineStore("storyStore", {
   actions: {
     async getStory(storyId) {
       const walletStore = useWalletStore();
-      const { story } = await walletStore.query({
+      const story = await walletStore.query({
         get_story: { story_id: storyId },
       });
       const lastSectionBlock = await walletStore.getBlock(story.last_section);

@@ -1,4 +1,3 @@
-use crate::msg::GetStoryResponse;
 use crate::state::{SECTIONS, SHARES, STORIES, VOTES};
 use crate::types::{Section, ShareBalance, StoryOverviewItem, VoteEntry, NFT};
 use cosmwasm_std::{to_binary, Binary, Deps, Order, StdError, StdResult};
@@ -52,10 +51,7 @@ pub fn query_votes(deps: Deps, story_id: String) -> StdResult<Binary> {
 pub fn query_story(deps: Deps, story_id: String) -> StdResult<Binary> {
     let story = STORIES.may_load(deps.storage, story_id.clone())?;
     if story.is_some() {
-        let res = GetStoryResponse {
-            story: story.unwrap(),
-        };
-        to_binary(&res)
+        to_binary(&story)
     } else {
         return Err(StdError::generic_err("Story for id not found"));
     }

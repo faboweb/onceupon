@@ -1,7 +1,8 @@
+use cosmwasm_schema::QueryResponses;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Story, UploadSection};
+use crate::types::{Section, ShareBalance, Story, StoryOverviewItem, UploadSection, VoteEntry};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -32,25 +33,19 @@ pub enum ExecuteMsg {
     },
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema, QueryResponses)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
+    #[returns(Vec<StoryOverviewItem>)]
     GetStories {},
+    #[returns(Story)]
     GetStory { story_id: String },
+    #[returns(Vec<Section>)]
     GetSections { story_id: String },
+    #[returns(Vec<VoteEntry>)]
     GetVotes { story_id: String },
+    #[returns(Vec<ShareBalance>)]
     GetShares { story_id: String },
+    #[returns(Vec<Section>)]
     GetNewSections { after: u64 },
-}
-
-// We define a custom struct for each query response
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct GetCountResponse {
-    pub count: i32,
-}
-
-// We define a custom struct for each query response
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct GetStoryResponse {
-    pub story: Story,
 }
