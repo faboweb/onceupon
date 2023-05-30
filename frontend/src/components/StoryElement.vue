@@ -36,7 +36,7 @@
           {{ story.name || "No title" }}
         </h1>
         <p style="text-align: left; white-space: pre-wrap;">
-          {{ content.substr(0, 140) || "Loading" }}...
+          {{ content?.substr(0, 140) || "Loading" }}...
         </p>
         <div>
           <!-- <div style="flex-direction: row; display: flex">
