@@ -14,7 +14,8 @@
         <ion-header>
           <ion-toolbar>
             <ion-badge style="margin-left: 1rem" slot="start">
-              <span class="hide-xs">Stargaze&nbsp;</span>Testnet
+              <!-- <span class="hide-xs">Stargaze&nbsp;</span>Testnet -->
+              <span>Beta</span>
             </ion-badge>
             <!-- <ion-menu-toggle
               :auto-hide="false"

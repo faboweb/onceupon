@@ -5,7 +5,7 @@
       :nft="section.nft"
       style="float: left; padding: 0 0.5rem 0.5rem 0; box-sizing: content-box"
     />
-    <p style="font-size: 14px; line-height: 21px; margin-top: 0">
+    <p style="font-size: 14px; line-height: 21px; margin-top: 0; white-space: break-spaces;">
       {{ content }}
     </p>
     <span

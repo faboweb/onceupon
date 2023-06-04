@@ -35,6 +35,7 @@
                 v-model="content"
                 :rows="5"
                 style="margin-bottom: 1rem"
+                autoGrow="true"
               ></ion-textarea>
               <small
                 :style="{

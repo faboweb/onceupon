@@ -2,14 +2,20 @@
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
       <h1>Hello{{ walletStore.name ? ", " + walletStore.name : "" }}!</h1>
-      <a
-        href="https://twitter.com/OnceUponNft?ref_src=twsrc%5Etfw"
-        class="twitter-follow-button"
-        data-show-count="false"
-        style="position: absolute; top: 2rem; right: 1rem"
-        >Get Updates</a
-      >
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <div style="position: absolute; top: 2rem; right: 1.5rem">
+        <a
+          href="https://twitter.com/OnceUponNft?ref_src=twsrc%5Etfw"
+          class="twitter-follow-button"
+          data-show-count="false"
+          style="margin-right: 0.5rem"
+          >Updates</a
+        >
+        <a class="telegram-button" href="https://t.me/+-QjBZgq-shY5MGIy" target="_blank">
+            <i></i>
+            <span>Chat</span>
+        </a>
+      </div>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       <h1>Stories</h1>
       <div
         style="
@@ -60,5 +66,40 @@ onMounted(async () => {
 <style scoped>
 .story-outer:not(:last-child) ion-card {
   border-bottom: none;
+}
+.telegram-button{
+  background-color: #1b95e0;
+  color: #fff;
+  border-radius: 4px;
+  height: 28px;
+  font-weight: 500;
+  font-size: 13px;
+  line-height: 24px;
+  padding: 6px 8px 8px 8px;
+  text-decoration: none;
+}
+
+.telegram-button:hover{
+    background-color: #007dbb;
+}
+
+.telegram-button:active{
+    background-color: #026698;
+}
+
+.telegram-button i{
+    display: inline-block;
+    height: 12px;
+    width: 14px;
+    vertical-align: middle;
+    margin-right: 8px;
+    
+    background: url('https://telegram.org/img/oauth/tg_button_large.png') no-repeat;
+    background-size: contain;
+}
+
+.telegram-button span{
+    display: inline-block;
+    vertical-align: top;
 }
 </style>

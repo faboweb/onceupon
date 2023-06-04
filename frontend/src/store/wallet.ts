@@ -65,11 +65,12 @@ export const useWalletStore = defineStore("wallet", {
   }),
   getters: {
     isLoggedIn: (state) => state.address !== null,
-    isAdmin: (state) => state.address === process.env.VUE_APP_ADMIN_ADDRESS,
+    isAdmin: (state) =>
+      state.address === process.env.VUE_APP_ADMIN_ADDRESS_MAINNET,
     // @ts-ignore
     balance: (state) => (state.address ? state.balances[state.address] : 0),
     wallet: (state) => {
-      const walletRepo = state.walletManager.getWalletRepo("stargazetestnet");
+      const walletRepo = state.walletManager.getWalletRepo("stargaze");
 
       const parser = Bowser.getParser(window.navigator.userAgent);
       const env = {
@@ -137,7 +138,7 @@ export const useWalletStore = defineStore("wallet", {
       const cosmWasmClient = await this.wallet.getCosmWasmClient();
       // @ts-ignore
       return await cosmWasmClient.queryContractSmart(
-        process.env.VUE_APP_CONTRACT || "",
+        process.env.VUE_APP_CONTRACT_MAINNET || "",
         query
       );
     },
@@ -164,7 +165,7 @@ export const useWalletStore = defineStore("wallet", {
       const signingClient = await this.wallet.getSigningCosmWasmClient();
       await signingClient.execute(
         userAddress,
-        process.env.VUE_APP_CONTRACT || "",
+        process.env.VUE_APP_CONTRACT_MAINNET || "",
         entrypoint,
         fee
       );
