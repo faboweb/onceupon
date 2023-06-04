@@ -72,7 +72,7 @@
                   size="small"
                   :disabled="
                     nextSectionPending ||
-                    !walletStore.address ||
+                    !authStore.isSignedIn ||
                     processingVotes.includes(proposal.section_id)
                   "
                   @click="vote(proposal.section_id)"
@@ -90,7 +90,7 @@
                   color="danger"
                   :disabled="
                     nextSectionPending ||
-                    !walletStore.address ||
+                    !authStore.isSignedIn ||
                     processingVotes.includes(proposal.section_id)
                   "
                   @click="veto(proposal.section_id)"
@@ -184,11 +184,13 @@ import "swiper/css/pagination";
 import "swiper/css/scrollbar";
 import { formatDistance } from "date-fns";
 import { useWalletStore, useNameStore, useNavigationStore } from "@/store";
+import { useAuthStore } from "../store";
 
 const walletStore = useWalletStore();
 const storyStore = useStoryStore();
 const navigationStore = useNavigationStore();
 const nameStore = useNameStore();
+const authStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 const storyId = String(route?.params.id);

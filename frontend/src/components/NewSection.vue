@@ -32,7 +32,7 @@
       <ion-button v-else><nft-element :nft="nft" /> Change NFT</ion-button>
     </div>
     <ion-button
-      v-if="walletStore.address"
+      v-if="authStore.isSignedIn"
       @click="save"
       color="primary"
       :disabled="props.disabled || content.length < 240"
@@ -40,10 +40,10 @@
     >
     <ion-button
       v-else
-      @click="walletStore.logInUser()"
+      @click="authStore.showSignInModal = true"
       color="primary"
       :disabled="props.disabled"
-      >Connect Wallet</ion-button
+      >Sign In</ion-button
     >
   </div>
   <ion-modal :is-open="attachNftModal" @will-dismiss="attachNftModal = false">
@@ -60,11 +60,13 @@ import AttachNft from "@/components/AttachNft.vue";
 import { ref, defineProps, defineEmits, defineExpose } from "vue";
 import { useNftStore } from "@/store/nfts";
 import { useWalletStore } from "@/store/wallet";
+import { useAuthStore } from "../store";
 
 const content = ref("");
 const attachNftModal = ref(false);
 const nftStore = useNftStore();
 const walletStore = useWalletStore();
+const authStore = useAuthStore();
 const nft = ref();
 const reset = () => {
   content.value = "";

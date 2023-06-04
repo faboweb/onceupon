@@ -1,0 +1,119 @@
+import { defineStore } from "pinia";
+import firebase from "firebase/compat/app";
+import "firebaseui/dist/firebaseui.css";
+import { signInWithEmailLink } from "firebase/auth";
+import { useAuthStore } from "./auth";
+
+// interface State {}
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCmCL-z7KyGGBd-TA45OU3RwBrbdZZ5teU",
+  authDomain: "onceupon-15dc8.firebaseapp.com",
+  projectId: "onceupon-15dc8",
+  storageBucket: "onceupon-15dc8.appspot.com",
+  messagingSenderId: "810687001487",
+  appId: "1:810687001487:web:b0456babc8af3ce79a51fa",
+  measurementId: "G-G4C648Y9XP",
+};
+firebase.initializeApp(firebaseConfig);
+
+export const useWeb2AuthStore = defineStore("web2AuthStore", {
+  // convert to a function
+  // state: (): State => ({}),
+  actions: {
+    // async signInWithTwitter() {
+    //   const {
+    //     getAuth,
+    //     signInWithPopup,
+    //     TwitterAuthProvider,
+    //     useDeviceLanguage,
+    //   } = await import("firebase/auth");
+    //   const auth = getAuth();
+    //   useDeviceLanguage(auth);
+    //   const provider = new TwitterAuthProvider();
+    //   return signInWithPopup(auth, provider)
+    //     .then((result) => {
+    //       // This gives you a the Twitter OAuth 1.0 Access Token and Secret.
+    //       // You can use these server side with your app's credentials to access the Twitter API.
+    //       const credential = TwitterAuthProvider.credentialFromResult(result);
+    //       const token = credential?.accessToken;
+    //       const secret = credential?.secret;
+
+    //       // The signed-in user info.
+    //       const user = result.user;
+    //       // IdP data available using getAdditionalUserInfo(result)
+    //       // ...
+    //     })
+    //     .catch((error) => {
+    //       // Handle Errors here.
+    //       const errorCode = error.code;
+    //       const errorMessage = error.message;
+    //       // The email of the user's account used.
+    //       const email = error.customData.email;
+    //       // The AuthCredential type that was used.
+    //       const credential = TwitterAuthProvider.credentialFromError(error);
+    //       // ...
+    //     });
+    // },
+    async signInWithGoogle() {
+      const {
+        getAuth,
+        signInWithPopup,
+        GoogleAuthProvider,
+        setPersistence,
+        browserLocalPersistence,
+      } = await import("firebase/auth");
+      const auth = getAuth();
+      await setPersistence(auth, browserLocalPersistence);
+      const provider = new GoogleAuthProvider();
+      return signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
+
+          const authStore = useAuthStore();
+          authStore.setSignIn(
+            {
+              name: user.displayName,
+              image: user.photoURL,
+            },
+            "google"
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    // async signInWithGithub() {
+    //   const { getAuth, signInWithPopup, GithubAuthProvider } = await import(
+    //     "firebase/auth"
+    //   );
+    //   const auth = getAuth();
+    //   const provider = new GithubAuthProvider();
+    //   return signInWithPopup(auth, provider);
+    // },
+    // async signInWithFacebook() {
+    //   const { getAuth, signInWithPopup, FacebookAuthProvider } = await import(
+    //     "firebase/auth"
+    //   );
+    //   const auth = getAuth();
+    //   const provider = new FacebookAuthProvider();
+    //   return signInWithPopup(auth, provider);
+    // },
+    // async signInWithApple() {
+    //   const { getAuth, signInWithPopup, OAuthProvider } = await import(
+    //     "firebase/auth"
+    //   );
+    //   const auth = getAuth();
+    //   const provider = new OAuthProvider("apple.com");
+    //   return signInWithPopup(auth, provider);
+    // },
+    // async signInWithEmailLink(email) {
+    //   const { getAuth } = await import("firebase/auth");
+    //   const auth = getAuth();
+    //   const actionCodeSettings = {
+    //     url: "https://onceupon.app",
+    //     handleCodeInApp: true,
+    //   };
+    // },
+  },
+});

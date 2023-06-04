@@ -1,12 +1,5 @@
-import { useWalletStore } from "@/store/wallet";
 import { createRouter, createWebHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
-
-const logIn = async () => {
-  const walletStore = useWalletStore();
-
-  await walletStore.autoLogin();
-};
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -16,17 +9,14 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/stories",
     component: () => import("@/views/StoriesPage.vue"),
-    beforeEnter: logIn,
   },
   {
     path: "/story/new",
     component: () => import("@/views/NewStoryPage.vue"),
-    beforeEnter: logIn,
   },
   {
     path: "/story/:id",
     component: () => import("@/views/ReadStoryPage.vue"),
-    beforeEnter: logIn,
     children: [
       {
         path: "owners",
@@ -43,7 +33,6 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/story/:id/continue",
     component: () => import("@/views/ContinueStoryPage.vue"),
-    beforeEnter: logIn,
   },
   // {
   //   path: "/profile",

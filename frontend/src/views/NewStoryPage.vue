@@ -67,7 +67,7 @@
         </ion-modal>
       </ion-card>
       <ion-button
-        v-if="walletStore.address"
+        v-if="authStore.isSignedIn"
         @click="save"
         color="primary"
         :disabled="content.length < 240"
@@ -104,9 +104,11 @@ import { useStoryStore } from "@/store/story";
 import { useNftStore } from "@/store/nfts";
 import { useWalletStore } from "@/store/wallet";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "../store";
 
 const router = useRouter();
 const storyStore = useStoryStore();
+const authStore = useAuthStore();
 const content = ref("");
 const attachNftModal = ref(false);
 const nftStore = useNftStore();

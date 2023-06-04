@@ -17,6 +17,11 @@
               <!-- <span class="hide-xs">Stargaze&nbsp;</span>Testnet -->
               <span>Beta</span>
             </ion-badge>
+
+            <!-- <ion-select value="mainnet" slot="start" @ionChange="changeNetwork($event.detail.value)">
+              <ion-select-option value="testnet">Testnet</ion-select-option>
+              <ion-select-option value="mainnet">Mainnet</ion-select-option>
+            </ion-select> -->
             <!-- <ion-menu-toggle
               :auto-hide="false"
               style="margin-left: 1rem"
@@ -36,25 +41,38 @@
               <!-- <router-link :to="'/stories'">
             <ion-button>Stories</ion-button>
           </router-link> -->
-              <template v-if="walletStore.isLoggedIn">
-                <ion-chip @click="walletStore.logoutUser()">
+              <template v-if="authStore.isSignedIn">
+                <ion-chip @click="authStore.signOut()">
                   <nft-element
-                    v-if="nameStore.avatar(walletStore.address)"
+                    v-if="authStore.signInMethod === 'keplr' && nameStore.avatar(walletStore.address)"
                     :nft="nameStore.avatar(walletStore.address)"
                   />
-                  <ion-label>{{ walletStore.name }}</ion-label>
+                  <ion-avatar v-else-if="authStore.user.image">
+                    <img
+                      alt="User Avatar"
+                      referrerpolicy="no-referrer"
+                      :src="authStore.user.image"
+                    />
+                  </ion-avatar>
+                  <ion-avatar v-else>
+                    <img
+                      alt="Silhouette of a person's head"
+                      src="../public/assets/keplr-logo.png"
+                    />
+                  </ion-avatar>
+                  <ion-label>{{ authStore.user.name }}</ion-label>
                 </ion-chip>
               </template>
 
-              <ion-chip v-else @click="walletStore.logInUser()">
-                <ion-avatar>
+              <ion-chip v-else @click="authStore.showSignInModal = true">
+                <!-- <ion-avatar>
                   <img
                     alt="Silhouette of a person's head"
                     src="../public/assets/keplr-logo.png"
                   />
-                </ion-avatar>
+                </ion-avatar> -->
                 <ion-label
-                  >Connect<span class="hide-xs">&nbsp;Wallet</span></ion-label
+                  >Sign In</ion-label
                 >
               </ion-chip>
             </ion-buttons>
@@ -72,6 +90,51 @@
             >Armchair icons created by mynamepong - Flaticon</a
           >
         </ion-footer>
+        <ion-modal
+          id="sign-in-modal"
+          :is-open="authStore.showSignInModal"
+          @will-dismiss="authStore.showSignInModal = false"
+        >
+          <ion-content>
+            <div style="display: flex;
+    flex-direction: column;
+    align-items: center;">
+            <h1>Connect to OnceUpon</h1>
+            <ion-button
+              @click="walletStore.logInUser(); authStore.showSignInModal = false"
+              style="width: 250px; color: black"
+              color="white"
+              class="sign-in-button"
+             >
+                <ion-avatar>
+                  <img
+                    alt="Keplr logo"
+                    src="../public/assets/keplr-logo.png"
+                  />
+                </ion-avatar>
+                <ion-label
+                  >Connect<span class="hide-xs">&nbsp;Keplr</span></ion-label
+                >
+            </ion-button>
+            <ion-button
+              @click="web2AuthStore.signInWithGoogle(); authStore.showSignInModal = false"
+              style="width: 250px; color: black"
+              color="white"
+              class="sign-in-button"
+              >
+                <ion-avatar>
+                  <img
+                    alt="Google logo"
+                    src="../public/assets/google-logo.svg"
+                  />
+                </ion-avatar>
+                <ion-label
+                  >Connect Google</ion-label
+                >
+            </ion-button>
+            </div>
+          </ion-content>
+        </ion-modal>
       <!-- </div> -->
     <!-- </ion-split-pane> -->
   </ion-app>
@@ -95,12 +158,23 @@ import {
   IonIcon,
 } from "@ionic/vue";
 import NftElement from "./components/NftElement.vue";
-import { IonApp, IonRouterOutlet } from "@ionic/vue";
-import { useWalletStore } from "@/store/wallet";
-import { useNameStore } from "@/store/names";
+import { IonApp, IonRouterOutlet,
+  IonModal, } from "@ionic/vue";
+import { useWalletStore, useNameStore, useWeb2AuthStore, useAuthStore , useNetworkStore} from "./store";
 import { menu } from "ionicons/icons";
+import { onMounted, ref } from "vue";
 const walletStore = useWalletStore();
 const nameStore = useNameStore();
+const web2AuthStore = useWeb2AuthStore();
+const authStore = useAuthStore();
+const networkStore = useNetworkStore();
+
+authStore.loadFromLocalStorage();
+
+const changeNetwork = network => {
+  debugger
+  networkStore.setNetwork(network);
+};
 </script>
 <style lang="scss">
 @import "../public/fonts/style.css";
@@ -179,9 +253,22 @@ ion-app {
   --ion-font-family: Barlow, sans-serif;
 }
 
-// @media screen and (max-width: 768) {
-//   ion-app {
-//     max-width: 600px;
-//   }
-// }
+ion-button ion-avatar {
+    height: 24px;
+    width: 24px;
+    margin-right: 1rem;
+}
+
+.sign-in-button::part(native) .button-inner {
+  justify-content: left;
+}
+.sign-in-button ion-avatar {
+  position: absolute;
+  left: 1rem;
+}
+
+#sign-in-modal::part(content) {
+    width: 300px;
+    height: 200px;
+}
 </style>

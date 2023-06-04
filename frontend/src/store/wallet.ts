@@ -9,6 +9,9 @@ import { wallets as keplrWallet } from "@cosmos-kit/keplr-extension";
 import { wallets as keplrMobileWallet } from "@cosmos-kit/keplr-mobile";
 import { useNameStore } from "./names";
 import Bowser from "bowser";
+import { useAuthStore } from "./auth";
+import { useNetworkStore } from "./network";
+import { CosmWasmClient } from "cosmwasm";
 
 const _chains = chains
   .filter((chain) => chain.chain_name.startsWith("stargaze"))
@@ -62,6 +65,7 @@ export const useWalletStore = defineStore("wallet", {
     blocks: {},
     walletManager,
     balances: {}, // dict by address
+    clients: {}, // dict by chainId
   }),
   getters: {
     isLoggedIn: (state) => state.address !== null,
@@ -94,11 +98,6 @@ export const useWalletStore = defineStore("wallet", {
     },
   },
   actions: {
-    autoLogin() {
-      if (localStorage.getItem("signedIn")) {
-        this.logInUser();
-      }
-    },
     async logInUser() {
       await this.wallet.connect();
       try {
@@ -118,6 +117,15 @@ export const useWalletStore = defineStore("wallet", {
           // @ts-ignore
           this.balances[this.address] = starsBalance;
         });
+
+        const authStore = useAuthStore();
+        authStore.setSignIn(
+          {
+            name: this.name,
+            address: this.address,
+          },
+          "keplr"
+        );
       } catch (err) {
         console.log(err);
         throw err;
@@ -134,13 +142,25 @@ export const useWalletStore = defineStore("wallet", {
       this.address = null;
       localStorage.removeItem("signedIn");
     },
+    async getClient() {
+      const networkStore = useNetworkStore();
+      const network = networkStore.currentNetwork;
+
+      if (this.clients[network.name]) {
+        return this.clients[network.name];
+      }
+
+      const cosmWasmClient = await CosmWasmClient.connect(network.url);
+
+      this.clients[network.name] = cosmWasmClient;
+      return cosmWasmClient;
+    },
     async query(query) {
-      const cosmWasmClient = await this.wallet.getCosmWasmClient();
+      const networkStore = useNetworkStore();
+      const network = networkStore.currentNetwork;
+      const cosmWasmClient = await this.getClient();
       // @ts-ignore
-      return await cosmWasmClient.queryContractSmart(
-        process.env.VUE_APP_CONTRACT_MAINNET || "",
-        query
-      );
+      return await cosmWasmClient.queryContractSmart(network.contract, query);
     },
     async execute(userAddress, entrypoint) {
       const command = Object.keys(entrypoint)[0];
@@ -171,7 +191,7 @@ export const useWalletStore = defineStore("wallet", {
       );
     },
     async getBlock(height?) {
-      const client = await this.wallet.getStargateClient();
+      const client = await this.getClient();
 
       let block;
       if (!height) {
@@ -186,9 +206,13 @@ export const useWalletStore = defineStore("wallet", {
       return block;
     },
     async getBalance(address) {
-      const client = await this.wallet.getStargateClient();
+      const client = await this.getClient();
       const balance = await client.getBalance(address, "ustars");
       return Math.floor(Number(balance.amount) / 1000000);
+    },
+    async broadcast(txRaw) {
+      const client = await this.getClient();
+      return await client.broadcastTx(txRaw);
     },
   },
 });

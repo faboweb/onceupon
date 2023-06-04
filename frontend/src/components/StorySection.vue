@@ -1,5 +1,5 @@
 <template>
-  <ion-card>
+  <ion-card style="width: 100%">
     <nft-element
       v-if="section.nft"
       :nft="section.nft"
@@ -18,7 +18,10 @@
       "
       >{{ name }} - {{ time }}</span
     >
-    <slot name="buttons"></slot>
+    <div style="display: flex;
+    margin-top: 2rem;">
+      <slot name="buttons"></slot>
+    </div>
   </ion-card>
 </template>
 
