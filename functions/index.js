@@ -17,15 +17,19 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
 
+const rpc = "https://rpc.stargaze-apis.com";
+
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
 const cycle = async () => {
-  const rpc = "https://rpc.elgafar-1.stargaze-apis.com";
-  const signer = await Secp256k1HdWallet.fromMnemonic(process.env.MNEMONIC, {
-    hdPaths: [stringToPath("m/44'/118'/0'/0/0")],
-    prefix: "stars",
-  });
+  const signer = await Secp256k1HdWallet.fromMnemonic(
+    process.env.MNEMONIC_MAINNET,
+    {
+      hdPaths: [stringToPath("m/44'/118'/0'/0/0")],
+      prefix: "stars",
+    }
+  );
 
   const defaultGasPrice = GasPrice.fromString("0.5ustars");
 
@@ -103,8 +107,6 @@ async function tweet(text, image) {
 }
 
 async function checkNewSections() {
-  const rpc = "https://rpc.elgafar-1.stargaze-apis.com";
-
   const client = await CosmWasmClient.connect(rpc);
 
   const docSnap = await db.doc("functions/sections_last_check").get();
