@@ -83,13 +83,6 @@
             style="max-width: 600px; margin-left: auto; margin-right: auto"
           />
         </ion-content>
-        <ion-footer translucent style="font-size: 6px">
-          <a
-            href="https://www.flaticon.com/free-icons/armchair"
-            title="armchair icons"
-            >Armchair icons created by mynamepong - Flaticon</a
-          >
-        </ion-footer>
         <ion-modal
           id="sign-in-modal"
           :is-open="authStore.showSignInModal"

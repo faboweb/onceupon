@@ -1,19 +1,19 @@
-const webpack = require("webpack")
+const webpack = require("webpack");
 
 module.exports = {
   pwa: {
-    name: 'My App',
-    themeColor: '#4DBA87',
-    msTileColor: '#000000',
-    appleMobileWebAppCapable: 'yes',
-    appleMobileWebAppStatusBarStyle: 'black',
+    name: "My App",
+    themeColor: "#4DBA87",
+    msTileColor: "#000000",
+    appleMobileWebAppCapable: "yes",
+    appleMobileWebAppStatusBarStyle: "black",
     iconPaths: {
       faviconSVG: null,
-      favicon32: 'assets/armchair.png',
-      favicon16: 'assets/armchair.png',
-      appleTouchIcon: 'assets/armchair.png',
+      favicon32: "assets/onceupon-logo.png",
+      favicon16: "assets/onceupon-logo.png",
+      appleTouchIcon: "assets/onceupon-logo.png",
       maskIcon: null,
-      msTileImage: 'assets/armchair.png'
+      msTileImage: "assets/onceupon-logo.png",
     },
   },
   configureWebpack: {
@@ -24,15 +24,18 @@ module.exports = {
       }),
     ],
   },
-    chainWebpack: config => {
-      config.resolve.set('fallback', {"crypto": require.resolve('crypto-browserify'), "path": false, "stream": require.resolve("stream-browserify")});
-      config.module
-        .rule('vue')
-        .use('vue-loader')
-          .tap(options => {
-            // modify the options...
-            return options
-          })
-    },
-  }
-  
+  chainWebpack: (config) => {
+    config.resolve.set("fallback", {
+      crypto: require.resolve("crypto-browserify"),
+      path: false,
+      stream: require.resolve("stream-browserify"),
+    });
+    config.module
+      .rule("vue")
+      .use("vue-loader")
+      .tap((options) => {
+        // modify the options...
+        return options;
+      });
+  },
+};
