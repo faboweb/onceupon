@@ -3,7 +3,8 @@
     <nft-element
       v-if="section.nft"
       :nft="section.nft"
-      style="float: left; padding: 0 0.5rem 0.5rem 0; box-sizing: content-box"
+      style="float: left; padding: 0 0.5rem 0.5rem 0; box-sizing: content-box; cursor: pointer;"
+      @click.prevent="selectedNft = section.nft"
     />
     <p style="font-size: 14px; line-height: 21px; margin-top: 0; white-space: break-spaces;">
       {{ content }}
@@ -22,6 +23,12 @@
     margin-top: 2rem;">
       <slot name="buttons"></slot>
     </div>
+    <ion-modal :is-open="!!selectedNft" @ionModalDidDismiss="selectedNft = null">
+      <ion-content>
+        <nft-element :nft="selectedNft" style="    height: 100%;
+    width: 100%; max-height: none;" />
+      </ion-content>
+    </ion-modal>
   </ion-card>
 </template>
 
@@ -32,13 +39,15 @@ import { useNftStore } from "@/store/nfts";
 import { useStoryStore } from "@/store/story";
 import { IonGrid, IonRow, IonCol, IonCard } from "@ionic/vue";
 import { formatDistance } from "date-fns";
-import { computed, defineProps, onMounted } from "vue";
+import { computed, defineProps, onMounted, ref } from "vue";
 import NftElement from "./NftElement.vue";
 
 const walletStore = useWalletStore();
 const nftStore = useNftStore();
 const nameStore = useNameStore();
 const storyStore = useStoryStore();
+
+const selectedNft = ref();
 
 const props = defineProps({
   section: {

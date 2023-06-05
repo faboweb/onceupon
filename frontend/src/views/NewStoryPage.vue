@@ -150,6 +150,9 @@ const save = async () => {
       title.value,
       nft.value
     );
+    content.value = ''
+    title.value = ''
+    nft.value = undefined
     router.push("/story/" + storyId + "/read");
   } catch (error) {
     console.error(error);

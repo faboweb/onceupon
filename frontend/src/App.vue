@@ -132,6 +132,22 @@
                   >Connect Google</ion-label
                 >
             </ion-button>
+            <ion-button
+              @click="web2AuthStore.signInWithTwitter(); authStore.showSignInModal = false"
+              style="width: 250px; color: black"
+              color="white"
+              class="sign-in-button"
+              >
+                <ion-avatar>
+                  <img
+                    alt="Twitter logo"
+                    src="../public/assets/twitter-logo.png"
+                  />
+                </ion-avatar>
+                <ion-label
+                  >Connect Twitter</ion-label
+                >
+            </ion-button>
             </div>
           </ion-content>
         </ion-modal>
@@ -269,6 +285,6 @@ ion-button ion-avatar {
 
 #sign-in-modal::part(content) {
     width: 300px;
-    height: 200px;
+    height: 220px;
 }
 </style>

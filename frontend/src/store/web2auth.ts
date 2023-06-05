@@ -21,40 +21,33 @@ export const useWeb2AuthStore = defineStore("web2AuthStore", {
   // convert to a function
   // state: (): State => ({}),
   actions: {
-    // async signInWithTwitter() {
-    //   const {
-    //     getAuth,
-    //     signInWithPopup,
-    //     TwitterAuthProvider,
-    //     useDeviceLanguage,
-    //   } = await import("firebase/auth");
-    //   const auth = getAuth();
-    //   useDeviceLanguage(auth);
-    //   const provider = new TwitterAuthProvider();
-    //   return signInWithPopup(auth, provider)
-    //     .then((result) => {
-    //       // This gives you a the Twitter OAuth 1.0 Access Token and Secret.
-    //       // You can use these server side with your app's credentials to access the Twitter API.
-    //       const credential = TwitterAuthProvider.credentialFromResult(result);
-    //       const token = credential?.accessToken;
-    //       const secret = credential?.secret;
+    async signInWithTwitter() {
+      const {
+        getAuth,
+        signInWithPopup,
+        TwitterAuthProvider,
+        useDeviceLanguage,
+      } = await import("firebase/auth");
+      const auth = getAuth();
+      useDeviceLanguage(auth);
+      const provider = new TwitterAuthProvider();
+      return signInWithPopup(auth, provider)
+        .then((result) => {
+          const user = result.user;
 
-    //       // The signed-in user info.
-    //       const user = result.user;
-    //       // IdP data available using getAdditionalUserInfo(result)
-    //       // ...
-    //     })
-    //     .catch((error) => {
-    //       // Handle Errors here.
-    //       const errorCode = error.code;
-    //       const errorMessage = error.message;
-    //       // The email of the user's account used.
-    //       const email = error.customData.email;
-    //       // The AuthCredential type that was used.
-    //       const credential = TwitterAuthProvider.credentialFromError(error);
-    //       // ...
-    //     });
-    // },
+          const authStore = useAuthStore();
+          authStore.setSignIn(
+            {
+              name: user.displayName,
+              image: user.photoURL,
+            },
+            "twitter"
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     async signInWithGoogle() {
       const {
         getAuth,

@@ -161,8 +161,10 @@ async function checkNewSections() {
       const header = `New chapter!\n\n`;
       const link = `https://onceupon.community/story/${section.story_id}/read`;
       const footer = `\n\nRead more at ${link}`;
-      const text =
-        header + section.content.substr(0, 280 - 94) + "..." + footer;
+      const cid = section.content_cid;
+      const cidDoc = await db.doc("content/" + cid).get();
+      const content = cidDoc.data().content;
+      const text = header + content.substr(0, 280 - 94) + "..." + footer;
 
       const token = section.nft ? await loadNft(section.nft) : null;
       const imageUrl = token ? token.media.image.jpgLink : null;
