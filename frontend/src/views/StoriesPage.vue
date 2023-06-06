@@ -2,7 +2,7 @@
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
       <h1>Hello{{ authStore.user?.name ? ", " + authStore.user?.name : "" }}!</h1>
-      <div style="position: absolute; top: 2rem; right: 1.5rem">
+      <div style="position: absolute; top: 2rem; right: 1rem">
         <a
           href="https://twitter.com/OnceUponNft?ref_src=twsrc%5Etfw"
           class="twitter-follow-button"
@@ -15,9 +15,12 @@
             <span>Chat</span>
         </a>
       </div>
-      <iframe :hidden="!configStore.showVideo" width="560" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-      <small style="float: right; cursor: pointer;
-    margin-right: 0.5rem;" @click="configStore.setConfig('showVideo', !configStore.showVideo)">{{configStore.showVideo ? 'Hide' : 'Show'}} video</small>
+      <ion-badge v-if="['twitter', 'google'].includes(authStore.signInMethod)" style="white-space: break-spaces;">
+        You are currently signed in with a Web2 account. OnceUpon handles your account. You will soon be able to convert your account to a Web3 account.
+      </ion-badge>
+      <iframe :hidden="!configStore.showVideo" width="100%" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <small style="float: right; cursor: pointer;" @click="configStore.setConfig('showVideo', !configStore.showVideo)">{{configStore.showVideo ? 'Hide' : 'Show'}} video</small>
+      
       <h1>Stories</h1>
       <div
         style="
