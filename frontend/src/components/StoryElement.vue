@@ -35,7 +35,8 @@
         <h1 style="margin-bottom: 0.2rem; font-size: 20px">
           {{ story.name || "No title" }}
         </h1>
-        <p style="text-align: left; white-space: pre-wrap;">
+        <p style="text-align: left; white-space: pre-wrap; text-overflow: ellipsis;
+    overflow: hidden;">
           {{ content?.substr(0, 140) || "Loading" }}...
         </p>
         <div>
