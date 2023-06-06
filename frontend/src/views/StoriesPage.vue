@@ -15,7 +15,9 @@
             <span>Chat</span>
         </a>
       </div>
-      <iframe width="560" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <iframe :hidden="!configStore.showVideo" width="560" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      <small style="float: right; cursor: pointer;
+    margin-right: 0.5rem;" @click="configStore.setConfig('showVideo', !configStore.showVideo)">{{configStore.showVideo ? 'Hide' : 'Show'}} video</small>
       <h1>Stories</h1>
       <div
         style="
@@ -55,9 +57,11 @@ import { onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
 import Story from "../components/StoryElement.vue";
 import { useWalletStore } from "../store/wallet";
+import { useConfigStore } from "../store";
 
 const storyStore = useStoryStore();
 const walletStore = useWalletStore();
+const configStore = useConfigStore();
 
 onMounted(async () => {
   await storyStore.loadStories();

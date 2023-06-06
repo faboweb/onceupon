@@ -7,6 +7,7 @@ import { useStoryStore } from "./story";
 import { useWeb2AuthStore } from "./web2auth";
 import { useAuthStore } from "./auth";
 import { useNetworkStore } from "./network";
+import { useConfigStore } from "./config";
 
 export {
   useWalletStore,
@@ -17,4 +18,5 @@ export {
   useWeb2AuthStore,
   useAuthStore,
   useNetworkStore,
+  useConfigStore,
 };

@@ -38,10 +38,12 @@
               </router-link>
             </ion-title>
             <ion-buttons slot="end" style="display: block">
-              <!-- <router-link :to="'/stories'">
-            <ion-button>Stories</ion-button>
-          </router-link> -->
               <template v-if="authStore.isSignedIn">
+                <!-- <ion-chip>
+                  <ion-icon
+                    :icon="cartOutline"
+                  />
+                </ion-chip> -->
                 <ion-chip @click="authStore.signOut()">
                   <nft-element
                     v-if="authStore.signInMethod === 'keplr' && nameStore.avatar(walletStore.address)"
@@ -62,15 +64,10 @@
                   </ion-avatar>
                   <ion-label>{{ authStore.user.name }}</ion-label>
                 </ion-chip>
+              
               </template>
 
               <ion-chip v-else @click="authStore.showSignInModal = true">
-                <!-- <ion-avatar>
-                  <img
-                    alt="Silhouette of a person's head"
-                    src="../public/assets/keplr-logo.png"
-                  />
-                </ion-avatar> -->
                 <ion-label
                   >Sign In</ion-label
                 >
@@ -170,7 +167,7 @@ import NftElement from "./components/NftElement.vue";
 import { IonApp, IonRouterOutlet,
   IonModal, } from "@ionic/vue";
 import { useWalletStore, useNameStore, useWeb2AuthStore, useAuthStore , useNetworkStore} from "./store";
-import { menu } from "ionicons/icons";
+import { menu, cartOutline } from "ionicons/icons";
 import { onMounted, ref } from "vue";
 const walletStore = useWalletStore();
 const nameStore = useNameStore();
