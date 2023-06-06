@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true" class="ion-padding">
-      <h1>Hello{{ walletStore.name ? ", " + walletStore.name : "" }}!</h1>
+      <h1>Hello{{ authStore.user?.name ? ", " + authStore.user?.name : "" }}!</h1>
       <div style="position: absolute; top: 2rem; right: 1.5rem">
         <a
           href="https://twitter.com/OnceUponNft?ref_src=twsrc%5Etfw"
@@ -57,11 +57,12 @@ import { onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
 import Story from "../components/StoryElement.vue";
 import { useWalletStore } from "../store/wallet";
-import { useConfigStore } from "../store";
+import { useAuthStore, useConfigStore } from "../store";
 
 const storyStore = useStoryStore();
 const walletStore = useWalletStore();
 const configStore = useConfigStore();
+const authStore = useAuthStore();
 
 onMounted(async () => {
   await storyStore.loadStories();
