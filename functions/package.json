@@ -19,21 +19,27 @@
     "@cosmjs/stargate": "^0.29.5",
     "@google-cloud/storage": "^6.10.1",
     "@sparticuz/chromium": "^111.0.0",
+    "axios": "^1.4.0",
     "cors": "^2.8.5",
     "cosmjs-types": "^0.8.0",
     "cosmwasm": "^1.1.1",
+    "crypto": "^1.0.1",
     "firebase-admin": "^11.8.0",
     "firebase-functions": "^4.4.0",
     "got": "^12.6.0",
     "node-fetch": "2.6.1",
+    "oauth": "^0.10.0",
+    "oauth-1.0a": "^2.2.6",
     "puppeteer": "^19.6.3",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.1",
     "request": "^2.88.2",
+    "twitter-api-sdk": "^1.2.1",
     "web3.storage": "^4.5.4"
   },
   "devDependencies": {
-    "firebase-functions-test": "^0.2.0"
+    "firebase-functions-test": "^0.2.0",
+    "querystring": "^0.2.1"
   },
   "private": true
 }

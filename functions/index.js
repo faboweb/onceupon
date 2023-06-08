@@ -103,7 +103,7 @@ exports.cycle = functions
 exports.scheduleCheckNewSections = functions
   .runWith({
     timeoutSeconds: 300,
-    memory: "1GB",
+    memory: "2GB",
   })
   .pubsub.schedule("every hour")
   .onRun(async (context) => {
@@ -113,30 +113,12 @@ exports.scheduleCheckNewSections = functions
 exports.checkNewSectionsTrigger = functions
   .runWith({
     timeoutSeconds: 300,
-    memory: "1GB",
+    memory: "2GB",
   })
   .https.onRequest(async (req, res) => {
     const response = await checkNewSections();
     res.status(200).send(response);
   });
-
-async function tweet(text, image) {
-  const docSnap = await db.doc("functions/tweeter").get();
-  const cookies = docSnap.data()?.cookies;
-  const new_cookies = await sendTweet(
-    text,
-    image,
-    cookies ? JSON.parse(cookies) : null
-  );
-  await db.doc("functions/tweeter").set(
-    {
-      cookies: new_cookies,
-    },
-    {
-      merge: true,
-    }
-  );
-}
 
 async function checkNewSections() {
   const client = await CosmWasmClient.connect(rpc);
@@ -154,11 +136,9 @@ async function checkNewSections() {
     "auto"
   );
 
-  console.log(lastCheck, sections);
-
   await Promise.all(
     sections.map(async (section) => {
-      const header = `New chapter!\n\n`;
+      const header = `New chapter proposal!\n\n`;
       const link = `https://onceupon.community/story/${section.story_id}/read`;
       const footer = `\n\nRead more at ${link}`;
       const cid = section.content_cid;
@@ -168,7 +148,13 @@ async function checkNewSections() {
 
       const token = section.nft ? await loadNft(section.nft) : null;
       const imageUrl = token ? token.media.image.jpgLink : null;
-      await tweet(text, imageUrl);
+      const tweetId = await sendTweet(text, imageUrl, db);
+      await db.doc("sections/" + section.id).set(
+        {
+          tweetId,
+        },
+        { merge: true }
+      );
     })
   );
 

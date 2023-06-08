@@ -11,7 +11,7 @@ export const useNftStore = defineStore("nftStore", {
   }),
   getters: {
     getNfts: (state) => (address) =>
-      state.nfts[address].map((key) => state.nfts[key]),
+      state.nfts[address]?.map((key) => state.nfts[key]) || [],
     getNft: (state) => (nft) => {
       return (
         state.nfts[getNftKey(nft)] || {

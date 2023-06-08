@@ -1,161 +1,129 @@
-const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const fs = require("fs");
-const chromium = require("@sparticuz/chromium");
-const { promisify } = require("util");
-const writeFilePromise = promisify(fs.writeFile);
+const axios = require("axios");
+const OAuth = require("oauth-1.0a");
+const crypto = require("crypto");
+const { sha256 } = require("@cosmjs/crypto");
+const { createWriteStream } = require("fs");
 
-const username = process.env.TWITTER_USERNAME; // Recommended to use env vars for username and password
-const password = process.env.TWITTER_PASSWORD;
+async function downloadFile(fileUrl, outputLocationPath) {
+  const writer = createWriteStream(outputLocationPath);
 
-let loginUrl = "https://twitter.com/login";
-let homeUrl = "https://twitter.com";
-let browser = null;
-let page = null;
+  return axios({
+    method: "get",
+    url: fileUrl,
+    responseType: "stream",
+  }).then((response) => {
+    //ensure that the user can call `then()` only when the file has
+    //been downloaded entirely.
 
-puppeteer.use(StealthPlugin()); // Stealth plugin to avoid detection
-
-async function main(text, image, cookies) {
-  try {
-    console.log("[MAIN FUNCTION]");
-    const options = {
-      args: chromium.args,
-      defaultViewport: chromium.defaultViewport,
-      headless: "new",
-      executablePath: await chromium.executablePath(),
-      ignoreHTTPSErrors: true,
-    };
-    browser = await puppeteer.launch(options);
-    if ((await browser.pages()).length > 0) {
-      page = (await browser.pages())[0];
-    } else {
-      page = await browser.newPage();
-    }
-
-    await page.setUserAgent(
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36"
-    );
-
-    await loadCookies(page, cookies);
-    await page.goto(homeUrl, { waitUntil: "networkidle2" });
-
-    let isLoggedIn = await page.$('div[aria-label="Tweet text"]');
-    if (!isLoggedIn) {
-      await login(page);
-    }
-    await tweet(page, text, image);
-
-    cookies = await saveCookies(page);
-    await browser.close();
-    return { cookies: cookies };
-  } catch (err) {
-    console.log("[MAIN FUNCTION ERROR]: " + err);
-    await page?.screenshot({
-      path: "screenshot.jpg",
-    });
-    throw err;
-  }
-}
-
-async function saveCookies(page) {
-  try {
-    const cookies = await page.cookies();
-    const cookieJson = JSON.stringify(cookies, null, 2);
-    await fs.writeFile("cookies.json", cookieJson, (err) => {
-      if (err) console.log(err);
-    });
-    return cookieJson;
-  } catch (err) {
-    console.log("[SAVE COOKIES FUNCTION ERROR]: " + err);
-  }
-}
-
-async function loadCookies(page, cookies) {
-  try {
-    if (!cookies) {
-      const cookieJson = await fs.readFile(
-        "cookies.json",
-        "utf8",
-        (err, data) => {
-          if (err) console.log(err);
+    return new Promise((resolve, reject) => {
+      response.data.pipe(writer);
+      let error = null;
+      writer.on("error", (err) => {
+        error = err;
+        writer.close();
+        reject(err);
+      });
+      writer.on("close", () => {
+        if (!error) {
+          resolve(true);
         }
-      );
-      if (!cookieJson) return;
-      cookies = JSON.parse(cookieJson);
-    }
-    await page.setCookie(...cookies);
-  } catch (err) {
-    console.log("[LOAD COOKIES FUNCTION ERROR]: " + err);
-  }
-}
-
-async function login(page) {
-  try {
-    console.log("[LOGIN FUNCTION]");
-    await page.goto(loginUrl, { waitUntil: "networkidle2" });
-
-    await page.waitForSelector(
-      'input[autocomplete="username"]',
-      { visible: true },
-      { timeout: 8000 }
-    );
-    await page.type('input[autocomplete="username"]', username, { delay: 400 });
-    await page.keyboard.press("Enter");
-    await page.waitForSelector(
-      'input[autocomplete="current-password"]',
-      { visible: true },
-      { timeout: 8000 }
-    );
-    await page.type('input[autocomplete="current-password"]', password, {
-      delay: 300,
+        //no need to call the reject here, as it will have been called in the
+        //'error' stream;
+      });
     });
-    await page.keyboard.press("Enter");
-  } catch (err) {
-    console.log("[LOGIN FUNCTION ERROR]: " + err);
-    throw err;
-  }
+  });
 }
 
-function downloadFile(url, outputPath) {
-  return fetch(url)
-    .then((x) => x.arrayBuffer())
-    .then((x) => writeFilePromise(outputPath, Buffer.from(x)));
-}
+const oauth = OAuth({
+  consumer: {
+    key: process.env.TWITTER_CONSUMER_KEY,
+    secret: process.env.TWITTER_CONSUMER_SECRET,
+  },
+  signature_method: "HMAC-SHA1",
+  hash_function: (baseString, key) =>
+    crypto.createHmac("sha1", key).update(baseString).digest("base64"),
+});
 
-async function tweet(page, text, imageUrl) {
+async function tweet(text, imageUrl, db) {
   try {
-    console.log("[TWEET FUNCTION]");
-    await page.waitForSelector(
-      'div[aria-label="Tweet text"]',
-      { visible: true },
-      { timeout: 10000 }
-    );
-    await page.click('div[aria-label="Tweet text"]', { delay: 200 });
-    await page.keyboard.type(text, { delay: 270 }); // type your tweet
-    await page.waitForTimeout(500);
+    const token = {
+      key: process.env.TWITTER_OAUTH_KEY,
+      secret: process.env.TWITTER_OAUTH_SECRET,
+    };
 
+    let mediaId;
     if (imageUrl) {
-      await downloadFile(imageUrl, "/tmp/image.png"); // download image from url
-      const elementHandle = await page.$("input[type=file]");
-      await elementHandle.uploadFile("/tmp/image.png");
+      const hash = sha256(imageUrl);
+      const storedImage = db.doc("media/" + hash).get();
+      if (storedImage.exists) {
+        mediaId = storedImage.data().mediaId;
+      } else {
+        await downloadFile(imageUrl, "/tmp/image.jpg"); // download image from url
 
-      await page.waitForTimeout(2000);
-      await page.keyboard.down("ControlLeft");
-      await page.keyboard.press("Enter");
-      await page.keyboard.up("ControlLeft");
+        const authHeaderMedia = oauth.toHeader(
+          oauth.authorize(
+            {
+              url: "https://upload.twitter.com/1.1/media/upload.json",
+              method: "POST",
+            },
+            token
+          )
+        );
+
+        const encodedImage = fs.readFileSync("/tmp/image.jpg", {
+          encoding: "base64",
+        });
+        const form = new FormData();
+        form.append("media_data", encodedImage);
+        form.append("media-type", "image/jpeg");
+        const {
+          data: { media_id },
+        } = await axios
+          .post("https://upload.twitter.com/1.1/media/upload.json", form, {
+            headers: {
+              Authorization: authHeaderMedia["Authorization"],
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            console.log(response.data);
+          })
+          .catch((err) => console.error(err.response.data));
+
+        db.doc("media/" + hash).set({ mediaId, imageUrl });
+        mediaId = media_id;
+      }
     }
 
-    await page.click('div[data-testid="tweetButtonInline"]', { delay: 200 });
-    // await page.waitForSelector('div[data-testid="tweetButtonInline"][aria-disabled="disabled"]', {visible: true}, {timeout: 10000});
-
-    // when sent, the tweet button will be disabled
-    // await page.waitForSelector('//button[contains(., "Tweet")][aria-disabled="true"]', {visible: true}, {timeout: 10000})                      // click tweet button
-
-    await page.waitForTimeout(10000); // wait for 10 seconds before closing the browser (if your internet is slow or tweet media is large you can increase this time to avoid errors)
+    const authHeaderTweet = oauth.toHeader(
+      oauth.authorize(
+        {
+          url: `https://api.twitter.com/2/tweets`,
+          method: "POST",
+        },
+        token
+      )
+    );
+    const res = await axios.post(
+      "https://api.twitter.com/2/tweets",
+      {
+        text,
+        media_ids: mediaId ? [mediaId] : undefined,
+      },
+      {
+        headers: {
+          Authorization: authHeaderTweet["Authorization"],
+          "user-agent": "v2CreateTweetJS",
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+      }
+    );
+    return res.data.data.id; // tweet id
   } catch (err) {
-    console.log("[TWEET FUNCTION ERROR]: " + err);
     throw err;
   }
 }
 
-module.exports = main;
+module.exports = tweet;

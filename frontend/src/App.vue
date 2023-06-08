@@ -34,6 +34,7 @@
                 :to="'/stories'"
                 style="color: black; text-decoration: none; font-family: Ribeye"
               >
+                <!-- <img alt="OnceUpon logo" src="../public/assets/onceupon-logo.png" /> -->
                 ONCEUPON
               </router-link>
             </ion-title>

@@ -19,7 +19,7 @@
         You are currently signed in with a Web2 account. OnceUpon manages your account. You will soon be able to convert your account to a Web3 account.
       </ion-badge>
       <iframe :hidden="!configStore.showVideo" width="100%" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-      <small style="float: right; cursor: pointer;" @click="configStore.setConfig('showVideo', !configStore.showVideo)">{{configStore.showVideo ? 'Hide' : 'Show'}} video</small>
+      <small style="float: right; cursor: pointer; color: rgb(115,115,115);" @click="configStore.setConfig('showVideo', !configStore.showVideo)">{{configStore.showVideo ? 'Hide' : 'Show'}} video</small>
       
       <h1>Stories</h1>
       <div

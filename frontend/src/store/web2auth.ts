@@ -1,7 +1,6 @@
 import { defineStore } from "pinia";
 import firebase from "firebase/compat/app";
 import "firebaseui/dist/firebaseui.css";
-import { signInWithEmailLink } from "firebase/auth";
 import { useAuthStore } from "./auth";
 
 // interface State {}
