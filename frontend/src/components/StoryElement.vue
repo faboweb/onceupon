@@ -36,11 +36,11 @@
           {{ story.name || "No title" }}
         </h1>
         <p style="text-align: left; white-space: pre-wrap; text-overflow: ellipsis;
-    overflow: hidden;">
+    overflow: hidden; max-height: 40px">
           {{ content?.substr(0, 140) || "Loading" }}...
         </p>
-        <div>
-          <!-- <div style="flex-direction: row; display: flex">
+        <!-- <div>
+          <div style="flex-direction: row; display: flex">
             <ion-chip disabled>
               <ion-icon :icon="listOutline"></ion-icon>
               <ion-label>{{ story.sections }}</ion-label>
@@ -53,8 +53,8 @@
               <ion-icon :icon="documentOutline"></ion-icon>
               <ion-label>{{ story.proposals }}</ion-label>
             </ion-chip>
-          </div> -->
-        </div>
+          </div>
+        </div> -->
       </div>
     </ion-card-content>
   </ion-card>
