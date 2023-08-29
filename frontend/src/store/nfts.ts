@@ -51,6 +51,7 @@ export const getNftKey = (nft) => {
 export const parseNft = (nft) => {
   return {
     contract_address: nft.collection.contractAddress,
+    collection: nft.collection.name,
     token_id: nft.tokenId,
     name: nft.name,
     image: nft.media.image.jpgLink,

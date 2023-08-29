@@ -20,7 +20,7 @@ export const execute = async (command: string, data: any) => {
     }
     const token = await auth.currentUser.getIdToken();
     await axios.post(
-      process.env.VUE_APP_FUNCTIONS_URL + "executeWeb2",
+      process.env.VUE_APP_API_URL + "executeWeb2",
       {
         command,
         data,

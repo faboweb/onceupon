@@ -1,149 +1,65 @@
 <template>
   <ion-app>
-    <!-- <ion-split-pane when="md" content-id="main">
-      <ion-menu content-id="main">
-        <ion-header>
-          <ion-toolbar color="tertiary">
-            <ion-title>Menu</ion-title>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content class="ion-padding"> Menu Content </ion-content>
-      </ion-menu> -->
-
-      <!-- <div id="main"> -->
-        <ion-header>
-          <ion-toolbar>
-            <ion-badge style="margin-left: 1rem" slot="start">
-              <!-- <span class="hide-xs">Stargaze&nbsp;</span>Testnet -->
-              <span>Beta</span>
-            </ion-badge>
-
-            <!-- <ion-select value="mainnet" slot="start" @ionChange="changeNetwork($event.detail.value)">
-              <ion-select-option value="testnet">Testnet</ion-select-option>
-              <ion-select-option value="mainnet">Mainnet</ion-select-option>
-            </ion-select> -->
-            <!-- <ion-menu-toggle
-              :auto-hide="false"
-              style="margin-left: 1rem"
-              slot="start"
+    <ion-content id="main-content">
+      <ion-router-outlet
+        style="max-width: 600px; margin-left: auto; margin-right: auto"
+      />
+    </ion-content>
+    <ion-modal
+      id="sign-in-modal"
+      :is-open="authStore.showSignInModal"
+      @will-dismiss="authStore.showSignInModal = false"
+    >
+      <ion-content>
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <h1>Connect to OnceUpon</h1>
+          <ion-button
+            @click="
+              walletStore.logInUser();
+              authStore.showSignInModal = false;
+            "
+            style="width: 250px; color: black"
+            color="white"
+            class="sign-in-button"
+          >
+            <ion-avatar>
+              <img alt="Keplr logo" src="../public/assets/keplr-logo.png" />
+            </ion-avatar>
+            <ion-label
+              >Connect<span class="hide-xs">&nbsp;Keplr</span></ion-label
             >
-              <ion-button><ion-icon :icon="menu"></ion-icon></ion-button>
-            </ion-menu-toggle> -->
-            <ion-title class="ion-text-center">
-              <router-link
-                :to="'/stories'"
-                style="color: black; text-decoration: none; font-family: Ribeye"
-              >
-                <!-- <img alt="OnceUpon logo" src="../public/assets/onceupon-logo.png" /> -->
-                ONCEUPON
-              </router-link>
-            </ion-title>
-            <ion-buttons slot="end" style="display: block">
-              <template v-if="authStore.isSignedIn">
-                <!-- <ion-chip>
-                  <ion-icon
-                    :icon="cartOutline"
-                  />
-                </ion-chip> -->
-                <ion-chip @click="authStore.signOut()">
-                  <nft-element
-                    v-if="authStore.signInMethod === 'keplr' && nameStore.avatar(walletStore.address)"
-                    :nft="nameStore.avatar(walletStore.address)"
-                  />
-                  <ion-avatar v-else-if="authStore.user.image">
-                    <img
-                      alt="User Avatar"
-                      referrerpolicy="no-referrer"
-                      :src="authStore.user.image"
-                    />
-                  </ion-avatar>
-                  <ion-avatar v-else>
-                    <img
-                      alt="Silhouette of a person's head"
-                      src="../public/assets/keplr-logo.png"
-                    />
-                  </ion-avatar>
-                  <ion-label>{{ authStore.user.name }}</ion-label>
-                </ion-chip>
-              
-              </template>
-
-              <ion-chip v-else @click="authStore.showSignInModal = true">
-                <ion-label
-                  >Sign In</ion-label
-                >
-              </ion-chip>
-            </ion-buttons>
-          </ion-toolbar>
-        </ion-header>
-        <ion-content id="main-content">
-          <ion-router-outlet
-            style="max-width: 600px; margin-left: auto; margin-right: auto"
-          />
-        </ion-content>
-        <ion-modal
-          id="sign-in-modal"
-          :is-open="authStore.showSignInModal"
-          @will-dismiss="authStore.showSignInModal = false"
-        >
-          <ion-content>
-            <div style="display: flex;
-    flex-direction: column;
-    align-items: center;">
-            <h1>Connect to OnceUpon</h1>
-            <ion-button
-              @click="walletStore.logInUser(); authStore.showSignInModal = false"
-              style="width: 250px; color: black"
-              color="white"
-              class="sign-in-button"
-             >
-                <ion-avatar>
-                  <img
-                    alt="Keplr logo"
-                    src="../public/assets/keplr-logo.png"
-                  />
-                </ion-avatar>
-                <ion-label
-                  >Connect<span class="hide-xs">&nbsp;Keplr</span></ion-label
-                >
-            </ion-button>
-            <ion-button
-              @click="web2AuthStore.signInWithGoogle(); authStore.showSignInModal = false"
-              style="width: 250px; color: black"
-              color="white"
-              class="sign-in-button"
-              >
-                <ion-avatar>
-                  <img
-                    alt="Google logo"
-                    src="../public/assets/google-logo.svg"
-                  />
-                </ion-avatar>
-                <ion-label
-                  >Connect Google</ion-label
-                >
-            </ion-button>
-            <ion-button
-              @click="web2AuthStore.signInWithTwitter(); authStore.showSignInModal = false"
-              style="width: 250px; color: black"
-              color="white"
-              class="sign-in-button"
-              >
-                <ion-avatar>
-                  <img
-                    alt="Twitter logo"
-                    src="../public/assets/twitter-logo.png"
-                  />
-                </ion-avatar>
-                <ion-label
-                  >Connect Twitter</ion-label
-                >
-            </ion-button>
-            </div>
-          </ion-content>
-        </ion-modal>
-      <!-- </div> -->
-    <!-- </ion-split-pane> -->
+          </ion-button>
+          <ion-button
+            @click="
+              web2AuthStore.signInWithGoogle();
+              authStore.showSignInModal = false;
+            "
+            style="width: 250px; color: black"
+            color="white"
+            class="sign-in-button"
+          >
+            <ion-avatar>
+              <img alt="Google logo" src="../public/assets/google-logo.svg" />
+            </ion-avatar>
+            <ion-label>Connect Google</ion-label>
+          </ion-button>
+          <ion-button
+            @click="
+              web2AuthStore.signInWithTwitter();
+              authStore.showSignInModal = false;
+            "
+            style="width: 250px; color: black"
+            color="white"
+            class="sign-in-button"
+          >
+            <ion-avatar>
+              <img alt="Twitter logo" src="../public/assets/twitter-logo.png" />
+            </ion-avatar>
+            <ion-label>Connect Twitter</ion-label>
+          </ion-button>
+        </div>
+      </ion-content>
+    </ion-modal>
   </ion-app>
 </template>
 
@@ -165,11 +81,18 @@ import {
   IonIcon,
 } from "@ionic/vue";
 import NftElement from "./components/NftElement.vue";
-import { IonApp, IonRouterOutlet,
-  IonModal, } from "@ionic/vue";
-import { useWalletStore, useNameStore, useWeb2AuthStore, useAuthStore , useNetworkStore} from "./store";
+import { IonApp, IonRouterOutlet, IonModal } from "@ionic/vue";
+import {
+  useWalletStore,
+  useNameStore,
+  useWeb2AuthStore,
+  useAuthStore,
+  useNetworkStore,
+} from "./store";
 import { menu, cartOutline } from "ionicons/icons";
 import { onMounted, ref } from "vue";
+import MobileFooter from "./components/overview/MobileFooter.vue";
+
 const walletStore = useWalletStore();
 const nameStore = useNameStore();
 const web2AuthStore = useWeb2AuthStore();
@@ -178,8 +101,7 @@ const networkStore = useNetworkStore();
 
 authStore.loadFromLocalStorage();
 
-const changeNetwork = network => {
-  debugger
+const changeNetwork = (network) => {
   networkStore.setNetwork(network);
 };
 </script>
@@ -187,7 +109,7 @@ const changeNetwork = network => {
 @import "../public/fonts/style.css";
 
 html {
-  background-color: rgba(211, 211, 211, 0.29);
+  background-color: #fffdf2;
 }
 
 ion-card {
@@ -257,13 +179,13 @@ img {
 ion-app {
   background: rgba(211, 211, 211, 0.29);
   margin: auto;
-  --ion-font-family: Barlow, sans-serif;
+  // --ion-font-family: Barlow, sans-serif;
 }
 
 ion-button ion-avatar {
-    height: 24px;
-    width: 24px;
-    margin-right: 1rem;
+  height: 24px;
+  width: 24px;
+  margin-right: 1rem;
 }
 
 .sign-in-button::part(native) .button-inner {
@@ -275,7 +197,7 @@ ion-button ion-avatar {
 }
 
 #sign-in-modal::part(content) {
-    width: 300px;
-    height: 220px;
+  width: 300px;
+  height: 220px;
 }
 </style>

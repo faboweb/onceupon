@@ -13,7 +13,7 @@ interface State {
 export const useNetworkStore = defineStore("networkStore", {
   // convert to a function
   state: (): State => ({
-    network: "mainnet",
+    network: "testnet",
     networks: [
       {
         name: "mainnet",

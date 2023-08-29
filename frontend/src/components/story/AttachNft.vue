@@ -36,7 +36,7 @@ import { useWalletStore } from "@/store/wallet";
 import { useNftStore } from "@/store/nfts";
 import { fromBech32, toBech32 } from "cosmwasm";
 import { computed, defineEmits } from "vue";
-import { FALLBACK_AVATAR } from "../scripts/getAvatar";
+import { FALLBACK_AVATAR } from "../../scripts/getAvatar";
 
 const walletStore = useWalletStore();
 const { getNfts } = useNftStore();

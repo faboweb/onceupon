@@ -4,8 +4,8 @@ http://ionicframework.com/docs/theming/ */
 /** Ionic CSS Variables **/
 :root {
   /** primary **/
-  --ion-color-primary: #81b29a;
-  --ion-color-primary-rgb: 129, 178, 154;
+  --ion-color-primary: #016C84;
+  --ion-color-primary-rgb: 1, 108, 132;
   --ion-color-primary-contrast: #f4f1de;
   --ion-color-primary-contrast-rgb: 244, 241, 222;
   --ion-color-primary-shade: #76a48e;
@@ -74,6 +74,9 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-contrast-rgb: 0, 0, 0;
   --ion-color-light-shade: #d7d8da;
   --ion-color-light-tint: #f5f6f9;
+
+  --ion-background-color: #FFFDF2;
+  --ion-font-family: 'Lato', sans-serif;
 }
 
 @media (--prefers-color-scheme: dark) {

@@ -1,0 +1,92 @@
+<template>
+  <div
+    style="
+      display: flex;
+      justify-content: center;
+      position: fixed;
+      bottom: 2rem;
+      width: 100%;
+    "
+  >
+    <div
+      style="
+        display: flex;
+        background: rgba(2, 55, 67, 1);
+        padding: 0.5rem 2rem;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        border-radius: 8px;
+        max-width: 100%;
+        width: 400px;
+      "
+    >
+      <span
+        :style="{
+          opacity: route.path === '/' ? 1 : 0.6,
+        }"
+        @click="router.push('/')"
+        style="cursor: pointer"
+        >Explore</span
+      >
+      <div
+        style="
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          cursor: pointer;
+        "
+        @click="router.push('/story/new')"
+      >
+        <div
+          style="
+            position: relative;
+            top: -2rem;
+            background: rgba(242, 103, 9, 1);
+            border-radius: 8px;
+            height: 43px;
+            width: 43px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: -1.5rem;
+            font-size: 30px;
+          "
+        >
+          <ion-icon :icon="add"></ion-icon>
+        </div>
+
+        <span
+          :style="{
+            opacity: route.path === '/story/new' ? 1 : 0.6,
+          }"
+          >Create</span
+        >
+      </div>
+      <span
+        :style="{
+          opacity:
+            route.path === '/profile/' + authStore.user?.address ? 1 : 0.6,
+        }"
+        @click="
+          authStore.user?.address &&
+            router.push('/profile/' + authStore.user?.address)
+        "
+        style="cursor: pointer"
+        >Profile</span
+      >
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { add } from "ionicons/icons";
+import { useRoute, useRouter } from "vue-router";
+import { useAuthStore } from "../../store";
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
+</script>
+
+<style>
+</style>

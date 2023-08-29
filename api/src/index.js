@@ -92,19 +92,28 @@ app.post("/resolveCIDs", async (req, res) => {
   res.status(200).send(cidLookup);
 });
 
-app.get("/authors", async (req, res) => {
-    const network = getNetwork(req);
-  const body = req.body || {};
-    const queryClient = await CosmWasmClient.connect(network.url);
-    const stories = await queryClient.queryContractSmart(
-      network.contract,
-      { get_stories: {} }
-    );
-    const 
+// app.get("/contributions", async (req, res) => {
+//     const network = getNetwork(req);
+//   const body = req.body || {};
+//     const queryClient = await CosmWasmClient.connect(network.url);
+//     const stories = await queryClient.queryContractSmart(
+//       network.contract,
+//       { get_stories: {} }
+//     );
+//     const
+
+// app.get("/authors", async (req, res) => {
+//     const network = getNetwork(req);
+//   const body = req.body || {};
+//     const queryClient = await CosmWasmClient.connect(network.url);
+//     const stories = await queryClient.queryContractSmart(
+//       network.contract,
+//       { get_stories: {} }
+//     );
+//     const
 
 // app.post("/stories", async (req, res) => {
 //   const body = req.body || {};
-
 
 //   const stories = await queryClient.queryContractSmart(
 //     network.contract,
@@ -124,6 +133,8 @@ app.get("/authors", async (req, res) => {
 //   // returns the cid
 //   res.status(200).send(cidLookup);
 // });
+
+// TODO polling to db
 
 // Start the server
 app.listen(port, () => {

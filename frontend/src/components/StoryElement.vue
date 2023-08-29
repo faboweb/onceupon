@@ -1,15 +1,15 @@
 <template>
-  <ion-card
+  <div
     style="
       display: inline-block;
-      min-width: 150px;
+      width: 288px;
       flex: 1;
       margin-bottom: 1rem;
     "
   >
-    <ion-card-content style="flex-direction: row; display: flex; padding: 0">
+    <div style="flex-direction: row; display: flex; padding: 0">
       <div
-        style="margin-right: 0.5rem; width: 93px; display: flex; justify-content: space-between;"
+        style="width: 103px; height: 151px; display: flex; justify-content: space-between;"
         v-if="story.top_nfts.length > 0"
       >
         <nft-element
@@ -19,45 +19,41 @@
           :style="{
             height: story.top_nfts.length > 1 ? '45px' : '100%',
             width: story.top_nfts.length > 1 ? '45px' : '100%',
+            maxHeight: '100%'
           }"
           :nft="nft"
           :size="93"
         />
       </div>
-      <div style="display: inline-block;"
+      <div style="display: inline-block;     height: 123px;
+    margin-top: 14px; width: 185px; background: rgba(217, 217, 217, 0.2); border-radius: 0 4px 4px 0; padding: 0.5rem;    overflow: hidden; text-overflow: ellipsis;" 
     :style="{
       width: story.top_nfts.length > 0 ? 'calc(100% - 101px)' : '100%',
     }">
-        <span
-          style="font-size: 12px; color: gray; display: block; text-align: left"
-          >{{ name }} - {{ time(story) }}</span
-        >
-        <h1 style="margin-bottom: 0.2rem; font-size: 20px">
+        <b style="margin-bottom: 0.2rem; font-size: 14px; white-space: nowrap;">
           {{ story.name || "No title" }}
-        </h1>
+        </b>
+        <div
+          style="font-size: 14px; color: rgba(0, 0, 0, 0.4); display: block; text-align: left; display: flex;
+    align-items: center; margin-top: 0.5rem; margin-bottom: 0.5rem"
+          >
+          <ion-icon :icon="listOutline" style="margin-right: 0.5rem"></ion-icon>
+
+          <span>{{ story.sections }}</span>
+          <ion-icon :icon="eyeOutline" style="margin-right: 0.5rem; margin-left: 0.5rem"></ion-icon>
+
+          <span>{{ story.owners }}</span>
+          <ion-icon :icon="documentOutline" style="margin-right: 0.5rem; margin-left: 0.5rem"></ion-icon>
+
+          <span>{{ story.proposals }}</span>
+        </div>
         <p style="text-align: left; white-space: pre-wrap; text-overflow: ellipsis;
-    overflow: hidden; max-height: 40px">
+    overflow: hidden; max-height: 44px; font-size: 12px">
           {{ content?.substr(0, 140) || "Loading" }}...
         </p>
-        <!-- <div>
-          <div style="flex-direction: row; display: flex">
-            <ion-chip disabled>
-              <ion-icon :icon="listOutline"></ion-icon>
-              <ion-label>{{ story.sections }}</ion-label>
-            </ion-chip>
-            <ion-chip disabled>
-              <ion-icon :icon="eyeOutline"></ion-icon>
-              <ion-label>{{ story.owners }}</ion-label>
-            </ion-chip>
-            <ion-chip disabled>
-              <ion-icon :icon="documentOutline"></ion-icon>
-              <ion-label>{{ story.proposals }}</ion-label>
-            </ion-chip>
-          </div>
-        </div> -->
       </div>
-    </ion-card-content>
-  </ion-card>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">

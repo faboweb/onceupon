@@ -1,9 +1,11 @@
 <template>
-  <ion-card style="width: 100%">
+  <div style="width: 100%">
     <nft-element
       v-if="section.nft"
       :nft="section.nft"
-      style="float: left; padding: 0 0.5rem 0.5rem 0; box-sizing: content-box; cursor: pointer;"
+      :size="120"
+      style="float: right; padding: 0 0 0.5rem 0.5rem; box-sizing: content-box; cursor: pointer;     height: 120px;
+    width: 120px;"
       @click.prevent="selectedNft = section.nft"
     />
     <p style="font-size: 14px; line-height: 21px; margin-top: 0; white-space: break-spaces;" :class="{
@@ -46,7 +48,7 @@
         <nft-element :nft="selectedNft" style="height: 100%; width: 100%; max-height: none;" />
       </ion-content>
     </ion-modal>
-  </ion-card>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -57,7 +59,7 @@ import { useStoryStore } from "@/store/story";
 import { IonGrid, IonRow, IonCol, IonCard } from "@ionic/vue";
 import { formatDistance } from "date-fns";
 import { computed, defineProps, onMounted, ref } from "vue";
-import NftElement from "./NftElement.vue";
+import NftElement from "../NftElement.vue";
 
 const walletStore = useWalletStore();
 const nftStore = useNftStore();

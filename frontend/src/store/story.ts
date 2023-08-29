@@ -8,6 +8,7 @@ import { execute } from "@/scripts/execute";
 
 interface State {
   stories: any[] | null;
+  fullStories: any;
   proposals: any;
   shares: any;
   votes: any;
@@ -43,6 +44,7 @@ export const useStoryStore = defineStore("storyStore", {
   // convert to a function
   state: (): State => ({
     stories: [],
+    fullStories: {},
     proposals: {},
     votes: {},
     shares: {},
@@ -55,6 +57,9 @@ export const useStoryStore = defineStore("storyStore", {
   },
   actions: {
     async getStory(storyId) {
+      if (this.fullStories[storyId]) {
+        return this.fullStories[storyId];
+      }
       const walletStore = useWalletStore();
       const story = await walletStore.query({
         get_story: { story_id: storyId },
@@ -72,6 +77,8 @@ export const useStoryStore = defineStore("storyStore", {
       story.assumedNextSectionBlockTime = assumedNextSectionBlockTime;
 
       this.loadContent(story.sections.map((section) => section.content_cid));
+
+      this.fullStories[storyId] = story;
 
       return story;
     },

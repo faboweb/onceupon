@@ -98,7 +98,7 @@ import {
   IonPage,
   IonCard,
 } from "@ionic/vue";
-import AttachNft from "@/components/AttachNft.vue";
+import AttachNft from "@/components/story/AttachNft.vue";
 import { ref, computed } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useNftStore } from "@/store/nfts";

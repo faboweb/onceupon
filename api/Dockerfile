@@ -1,5 +1,5 @@
 # Set the base image
-FROM node:20
+FROM node:18
 
 # Set the working directory in the Docker image
 WORKDIR /usr/src/app

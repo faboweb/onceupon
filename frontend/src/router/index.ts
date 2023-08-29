@@ -4,11 +4,7 @@ import { RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    redirect: "/stories",
-  },
-  {
-    path: "/stories",
-    component: () => import("@/views/StoriesPage.vue"),
+    component: () => import("@/views/OverviewPage.vue"),
   },
   {
     path: "/story/new",
@@ -20,13 +16,23 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "owners",
-        component: () => import("@/views/OwnersTable.vue"),
+        component: () => import("@/views/story/OwnersTable.vue"),
         name: "owners",
       },
       {
         path: "read",
-        component: () => import("@/views/ReadStory.vue"),
+        component: () => import("@/views/story/ReadStory.vue"),
         name: "read",
+      },
+      {
+        path: "proposals",
+        component: () => import("@/views/story/ProposalsOverview.vue"),
+        name: "proposals",
+      },
+      {
+        path: "nfts",
+        component: () => import("@/views/story/NftOverview.vue"),
+        name: "nfts",
       },
     ],
   },
@@ -34,10 +40,10 @@ const routes: Array<RouteRecordRaw> = [
     path: "/story/:id/continue",
     component: () => import("@/views/ContinueStoryPage.vue"),
   },
-  // {
-  //   path: "/profile",
-  //   component: () => import("@/views/ProfilePage.vue"),
-  // },
+  {
+    path: "/profile/:address",
+    component: () => import("@/views/ProfilePage.vue"),
+  },
 ];
 
 const router = createRouter({

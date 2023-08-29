@@ -25,6 +25,7 @@ export async function loadNft(nft) {
                   tokenId
                   collection {
                     contractAddress
+                    name
                   }
                 }
               }
@@ -67,6 +68,7 @@ export async function loadNftsForAddress(address) {
                     tokenId
                     collection {
                       contractAddress
+                      name
                     }
                   }
                 }
