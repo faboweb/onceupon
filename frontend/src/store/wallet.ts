@@ -200,7 +200,10 @@ export const useWalletStore = defineStore("wallet", {
       }
       if (this.blocks[height]) return this.blocks[height];
 
-      block = await client.getBlock(height);
+      block = await client.getBlock(height).catch((err) => {
+        console.log(err);
+        return undefined;
+      });
       if (!block) return undefined;
       this.blocks[block.header.height] = block;
       return block;

@@ -18,6 +18,7 @@
     "@cosmjs/crypto": "^0.29.5",
     "@cosmjs/stargate": "^0.29.5",
     "@google-cloud/storage": "^6.10.1",
+    "@keplr-wallet/cosmos": "^0.12.9",
     "@sparticuz/chromium": "^111.0.0",
     "axios": "^1.4.0",
     "cors": "^2.8.5",

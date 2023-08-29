@@ -65,6 +65,7 @@ pub struct StoryOverviewItem {
     pub created: u64,
     pub last_section: u64, // block height of last section
     pub next_section: u64, // block height of next voting period
+    pub last_update: u64,  // block height of last section added
     pub creator: String,   // user id
     pub first_section_cid: String,
     pub sections: usize,

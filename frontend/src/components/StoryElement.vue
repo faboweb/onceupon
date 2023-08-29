@@ -9,7 +9,7 @@
   >
     <ion-card-content style="flex-direction: row; display: flex; padding: 0">
       <div
-        style="margin-right: 0.5rem; width: 93px; display: inline-block"
+        style="margin-right: 0.5rem; width: 93px; display: flex; justify-content: space-between;"
         v-if="story.top_nfts.length > 0"
       >
         <nft-element
@@ -17,8 +17,8 @@
           :key="nft.image"
           style="display: inline-block"
           :style="{
-            height: story.top_nfts.length > 1 ? '50%' : '100%',
-            width: '100%',
+            height: story.top_nfts.length > 1 ? '45px' : '100%',
+            width: story.top_nfts.length > 1 ? '45px' : '100%',
           }"
           :nft="nft"
           :size="93"

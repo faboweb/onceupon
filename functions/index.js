@@ -13,12 +13,14 @@ const sendTweet = require("./twitter");
 const { loadNft } = require("./stargaze");
 const { File, Web3Storage } = require("web3.storage");
 const { MsgExecuteContract } = require("cosmjs-types/cosmwasm/wasm/v1/tx");
+const { verifyArbitrary } = require("@keplr-wallet/cosmos");
 
 global.fetch = require("node-fetch"); // needed by stargaze
 
 const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
+const auth = admin.auth();
 
 const rpc = "https://rpc.stargaze-apis.com";
 const walletOptions = {
@@ -32,7 +34,7 @@ const adminSigningClient = async (network) => {
     walletOptions
   );
 
-  const defaultGasPrice = GasPrice.fromString("0.5ustars");
+  const defaultGasPrice = GasPrice.fromString("1ustars");
 
   const signingClient = await SigningCosmWasmClient.connectWithSigner(
     rpc,
@@ -46,14 +48,24 @@ const adminSigningClient = async (network) => {
   return signingClient;
 };
 
-const executeAdmin = async (command) => {
-  const signingClient = await adminSigningClient();
+const executeAdmin = async (command, network, fees = "auto") => {
+  const signingClient = await adminSigningClient(network);
   const res = await signingClient.execute(
     process.env.ADDRESS,
     process.env.CONTRACT,
     command,
-    "auto"
+    fees
   );
+  // .catch((err) => {
+  //   const msgRegExp =
+  //     /Broadcasting transaction failed with code 13 \(codespace: sdk\)\. Log: insufficient fees; got: (\d+)ustars required: (\d+)ustars: insufficient fee/;
+  //   const matches = msgRegExp.exec(err.message);
+  //   if (matches) {
+  //     console.log("Insufficient fees, retrying with higher fees");
+  //     return executeAdmin(command, network, Number(matches[2]) * 1.05);
+  //   }
+  //   throw err;
+  // });
 
   return res;
 };
@@ -79,8 +91,8 @@ const networks = {
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
-const cycle = async () => {
-  const res = await executeAdmin({ cycle: {} });
+const cycle = async (network) => {
+  const res = await executeAdmin({ cycle: {} }, network);
   return res;
 };
 exports.scheduledCycle = functions
@@ -89,14 +101,16 @@ exports.scheduledCycle = functions
   })
   .pubsub.schedule("every day 00:00")
   .onRun(async (context) => {
-    cycle();
+    const network = networks.mainnet;
+    cycle(network);
   });
 exports.cycle = functions
   .runWith({
     timeoutSeconds: 300,
   })
   .https.onRequest(async (req, res) => {
-    const response = await cycle();
+    const network = getNetwork(req);
+    const response = await cycle(network);
     res.status(200).send(response);
   });
 
@@ -284,7 +298,7 @@ exports.executeWeb2 = onRequest(
       address = (await wallet.getAccounts())[0].address;
     }
 
-    const defaultGasPrice = GasPrice.fromString("0ustars");
+    const defaultGasPrice = GasPrice.fromString("0.5ustars");
 
     const signingClient = await SigningCosmWasmClient.connectWithSigner(
       rpc,
@@ -306,37 +320,6 @@ exports.executeWeb2 = onRequest(
     );
 
     res.status(200).send(result.txHash);
-
-    // // we will create a signed tx, that then is sent from the client to not extend the execution of this function
-
-    // const signingClient = await SigningCosmWasmClient.connectWithSigner(
-    //   rpc,
-    //   wallet,
-    //   {
-    //     broadcastPollIntervalMs: 300,
-    //     broadcastTimeoutMs: 8_000,
-    //     gasPrice: defaultGasPrice,
-    //   }
-    // );
-
-    // const msgs = [
-    //   {
-    //     typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
-    //     value: MsgExecuteContract.fromPartial({
-    //       sender: address,
-    //       contract: network.contract,
-    //       msg: toUtf8(JSON.stringify({ [req.body.command]: req.body.data })),
-    //       funds: [],
-    //     }),
-    //   },
-    // ];
-
-    // const gasEstimation = await signingClient.simulate(address, msgs, "");
-    // const fee = calculateFee(Math.round(gasEstimation * 1.7), defaultGasPrice);
-
-    // const txRaw = await signingClient.sign(address, msgs, fee, "");
-
-    // res.status(200).send(txRaw);
   }
 );
 
@@ -348,3 +331,29 @@ exports.executeWeb2 = onRequest(
 //     const users = usersSnaps.docs.map((doc) => doc.data());
 //     const addressToUser = Object.fromEntries(users.map((user) => [user.address, user.name]));
 // });
+
+exports.web3Auth = onRequest(
+  { timeoutSeconds: 15, cors: true, maxInstances: 10 },
+  async (req, res) => {
+    const body = req.body || {};
+    const {
+      chainId,
+      signer,
+      data, // base64
+      signature,
+    } = body;
+    const verified = await verifyArbitrary(
+      chainId,
+      signer,
+      Buffer.from(data, "base64"),
+      signature
+    );
+    if (!verified) {
+      res.status(401).send("Unauthorized");
+      return;
+    }
+    const customToken = await auth.createCustomToken(signer);
+
+    res.status(200).send(customToken);
+  }
+);

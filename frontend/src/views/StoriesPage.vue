@@ -32,9 +32,7 @@
         class="story-outer"
       >
         <router-link
-          v-for="story in storyStore.stories?.sort(
-            (a, b) => b.last_section - a.last_section
-          )"
+          v-for="story in sortedStories"
           :key="story.id"
           :to="'/story/' + story.id + '/read'"
           style="display: flex; flex: 1; text-decoration: none; width: 100%"
@@ -56,7 +54,7 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonFabButton, IonIcon } from "@ionic/vue";
 import { add } from "ionicons/icons";
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
 import Story from "../components/StoryElement.vue";
 import { useWalletStore } from "../store/wallet";
@@ -69,6 +67,19 @@ const authStore = useAuthStore();
 
 onMounted(async () => {
   await storyStore.loadStories();
+});
+
+const sortedStories = computed(() =>{
+  if (!storyStore.stories) return [];
+  if (storyStore.stories[0].last_update) {
+    return storyStore.stories?.sort(
+      (a, b) => b.last_update - a.last_update
+    );
+  } else {
+    return storyStore.stories?.sort(
+      (a, b) => b.last_section - a.last_section
+    );
+  }
 });
 </script>
 <style scoped>

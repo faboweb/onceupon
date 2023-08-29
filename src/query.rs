@@ -74,6 +74,21 @@ pub fn query_shares(deps: Deps, story_id: String) -> StdResult<Binary> {
     )
 }
 
+pub fn query_authors(deps: Deps) -> StdResult<Binary> {
+    let shares = SHARES.range(deps.storage, None, None, Order::Ascending);
+    to_binary(
+        &shares
+            .map(|r| {
+                let (addr, balance) = r.unwrap();
+                ShareBalance {
+                    user: addr.to_string(),
+                    balance,
+                }
+            })
+            .collect::<Vec<ShareBalance>>(),
+    )
+}
+
 pub fn query_stories(deps: Deps) -> StdResult<Binary> {
     let stories = STORIES.range(deps.storage, None, None, Order::Ascending);
     let _stories: Vec<StoryOverviewItem> = stories
@@ -111,6 +126,7 @@ pub fn query_stories(deps: Deps) -> StdResult<Binary> {
                 created: story.created,
                 last_section: story.last_section,
                 next_section: story.last_section + story.interval,
+                last_update: story.sections.last().unwrap().added,
                 creator: story.creator,
                 sections: story.sections.len(),
                 owners: shares.count(),

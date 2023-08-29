@@ -2,18 +2,13 @@ import { defineStore } from "pinia";
 import firebase from "firebase/compat/app";
 import "firebaseui/dist/firebaseui.css";
 import { useAuthStore } from "./auth";
+import { firebaseConfig } from "@/scripts/firebase";
+// import { useWalletStore } from "./wallet";
+// import { signArbitrary } from "@keplr-wallet/cosmos";
+// import axios from "axios";
 
 // interface State {}
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCmCL-z7KyGGBd-TA45OU3RwBrbdZZ5teU",
-  authDomain: "onceupon-15dc8.firebaseapp.com",
-  projectId: "onceupon-15dc8",
-  storageBucket: "onceupon-15dc8.appspot.com",
-  messagingSenderId: "810687001487",
-  appId: "1:810687001487:web:b0456babc8af3ce79a51fa",
-  measurementId: "G-G4C648Y9XP",
-};
 firebase.initializeApp(firebaseConfig);
 
 export const useWeb2AuthStore = defineStore("web2AuthStore", {
@@ -75,6 +70,48 @@ export const useWeb2AuthStore = defineStore("web2AuthStore", {
           console.error(error);
         });
     },
+    // async signInWithKeplr() {
+    //   const {
+    //     getAuth,
+    //     signInWithCustomToken,
+    //     setPersistence,
+    //     browserLocalPersistence,
+    //   } = await import("firebase/auth");
+
+    //   const authStore = useAuthStore();
+    //   const walletStore = useWalletStore();
+    //   const signer = await walletStore.logInUser();
+    //   const data = Buffer.from("Signing into OnceUpon");
+    //   const signature = await signArbitrary("cosmoshub-4", signer, data);
+
+    //   const customToken = await axios
+    //     .post(process.env.VUE_APP_API_URL + "web3Auth", {
+    //       signer,
+    //       data: data.toString("base64"),
+    //       signature,
+    //     })
+    //     .then((res) => res.data);
+    //   const auth = getAuth();
+    //   await setPersistence(auth, browserLocalPersistence);
+
+    //   return signInWithCustomToken(auth, customToken)
+    //     .then((result) => {
+    //       const user = result.user;
+
+    //       const authStore = useAuthStore();
+    //       authStore.setSignIn(
+    //         {
+    //           name: user.displayName,
+    //           image: user.photoURL,
+    //         },
+    //         "keplrSignIn"
+    //       );
+    //     })
+    //     .catch((error) => {
+    //       console.error(error);
+    //     });
+    // },
+
     // async signInWithGithub() {
     //   const { getAuth, signInWithPopup, GithubAuthProvider } = await import(
     //     "firebase/auth"

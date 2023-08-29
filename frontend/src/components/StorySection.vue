@@ -6,8 +6,26 @@
       style="float: left; padding: 0 0.5rem 0.5rem 0; box-sizing: content-box; cursor: pointer;"
       @click.prevent="selectedNft = section.nft"
     />
-    <p style="font-size: 14px; line-height: 21px; margin-top: 0; white-space: break-spaces;">
-      {{ content }}
+    <p style="font-size: 14px; line-height: 21px; margin-top: 0; white-space: break-spaces;" :class="{
+      'skeleton-offset': !content
+    }">
+      <span v-if="content">
+        {{ content }}
+      </span>
+      <template v-else>
+        <ion-skeleton-text
+          :animated="true"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          :animated="true"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          :animated="true"
+        ></ion-skeleton-text>
+        <ion-skeleton-text
+          :animated="true"
+       ></ion-skeleton-text>
+      </template>
     </p>
     <span
       style="
@@ -25,8 +43,7 @@
     </div>
     <ion-modal :is-open="!!selectedNft" @ionModalDidDismiss="selectedNft = null">
       <ion-content>
-        <nft-element :nft="selectedNft" style="    height: 100%;
-    width: 100%; max-height: none;" />
+        <nft-element :nft="selectedNft" style="height: 100%; width: 100%; max-height: none;" />
       </ion-content>
     </ion-modal>
   </ion-card>
@@ -79,5 +96,9 @@ ion-card {
   box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
   border-radius: 15px;
   padding: 10px;
+}
+.skeleton-offset ion-skeleton-text {
+  width: calc(100% - 100px);
+  margin-left: 82px;
 }
 </style>

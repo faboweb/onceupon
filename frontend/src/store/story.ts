@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 import { useWalletStore } from "./wallet";
 import axios from "axios";
 import { execute } from "@/scripts/execute";
+// import { database } from "@/scripts/firebase";
 
 interface State {
   stories: any[] | null;
@@ -128,7 +129,7 @@ export const useStoryStore = defineStore("storyStore", {
 
       // TODO to script
       const cid = await axios
-        .post(process.env.VUE_APP_FUNCTIONS_URL + "web3upload", {
+        .post(process.env.VUE_APP_API_URL + "web3upload", {
           content,
         })
         .then((res) => res.data);
@@ -158,7 +159,7 @@ export const useStoryStore = defineStore("storyStore", {
       if (!content) throw new Error("You need to write something");
 
       const cid = await axios
-        .post(process.env.VUE_APP_FUNCTIONS_URL + "web3upload", {
+        .post(process.env.VUE_APP_API_URL + "web3upload", {
           content,
         })
         .then((res) => res.data);
@@ -206,7 +207,7 @@ export const useStoryStore = defineStore("storyStore", {
       if (missing.length === 0) return;
 
       const cidLookup = await axios
-        .post(process.env.VUE_APP_FUNCTIONS_URL + "resolveCIDs", {
+        .post(process.env.VUE_APP_API_URL + "resolveCIDs", {
           cids: missing,
         })
         .then((res) => res.data);
