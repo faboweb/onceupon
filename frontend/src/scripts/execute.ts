@@ -9,9 +9,20 @@ export const execute = async (command: string, data: any) => {
     throw new Error("User is not signed in");
   }
   if (authStore.signInMethod === "keplr") {
-    await walletStore.execute(walletStore.address, {
-      [command]: data,
-    });
+    try {
+      await walletStore.execute(walletStore.address, {
+        [command]: data,
+      });
+    } catch (err) {
+      console.log(err);
+      const regexp = /.*Custom Error val: "(.+)".*/;
+      const matches = regexp.exec(err.message);
+      if (matches && matches[1]) {
+        throw new Error(matches[1]);
+      } else {
+        throw err;
+      }
+    }
   } else {
     await callApiAuthenticated("executeWeb2", "POST", {
       command,

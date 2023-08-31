@@ -195,9 +195,8 @@ const proposeSection = async ({ content, nft }) => {
     await storyStore.addSectionProposal(props.storyId, content, nft);
     storyStore.loadProposals(props.storyId);
     reset();
-  } catch (error) {
-    debugger;
-    error.value = error.message;
+  } catch (_error) {
+    error.value = _error.message;
   }
 };
 </script>
