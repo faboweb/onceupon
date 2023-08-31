@@ -1,10 +1,7 @@
-// const graphql = 'https://galaxy-graphql-testnet.fly.dev'
-const graphql = "https://graphql.stargaze-apis.com";
-
-export async function loadNft(nft) {
+export async function loadNft(network, nft) {
   const {
     data: { token },
-  } = await fetch(graphql, {
+  } = await fetch(network.graphql, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -41,12 +38,12 @@ export async function loadNft(nft) {
   return token;
 }
 
-export async function loadNftsForAddress(address) {
+export async function loadNftsForAddress(network, address) {
   const {
     data: {
       tokens: { tokens },
     },
-  } = await fetch(graphql, {
+  } = await fetch(network.graphql, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -84,10 +81,10 @@ export async function loadNftsForAddress(address) {
   return tokens;
 }
 
-export async function getName(address) {
+export async function getName(network, address) {
   const {
     data: { names },
-  } = await fetch(graphql, {
+  } = await fetch(network.graphql, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

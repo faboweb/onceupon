@@ -10,6 +10,7 @@
             <nft-element
               :nft="getAvatar(share.user)"
               style="margin-right: 1rem"
+              class="author"
             />
             <ion-label>
               <b>{{ nameStore.name(share.user) }}</b>
@@ -90,5 +91,8 @@ const shares = computed(() => {
 <style scoped>
 ion-skeleton-text {
   border-radius: 10px;
+}
+.author img {
+  border-radius: 50%;
 }
 </style>

@@ -1,82 +1,79 @@
 <template>
   <ion-page>
-    <ion-content :fullscreen="true" class="ion-padding">
-      <h1>Start Your Story</h1>
-      <ion-card>
-        <ion-grid style="width: 100%">
-          <ion-row>
-            <ion-col
-              size="2"
-              @click="walletStore.address && (attachNftModal = true)"
-            >
-              <ion-avatar v-if="nft">
-                <img
-                  :src="nftStore.getNft(nft).image"
-                  :alt="nftStore.getNft(nft).name"
-                />
-              </ion-avatar>
-              <ion-button v-if="!nft" :disabled="!walletStore.address"
-                >+</ion-button
-              >
-            </ion-col>
-            <ion-col>
-              <ion-input
-                placeholder="The tales of..."
-                v-model="title"
-                :style="{
-                  border: dirty && titleError ? '1px solid red' : '',
-                }"
-              ></ion-input>
-              <small v-if="dirty && titleError" style="color: red"
-                >{{ title.length }}/5</small
-              >
-              <ion-textarea
-                placeholder="Once upon..."
-                v-model="content"
-                :rows="5"
-                style="margin-bottom: 1rem"
-                autoGrow="true"
-              ></ion-textarea>
-              <small
-                :style="{
-                  color: dirty && content.length < 240 ? 'red' : '',
-                }"
-                >Min 240 ({{ content.length }})</small
-              >
-              <ion-select
-                placeholder="Select Period"
-                interface="popover"
-                style="display: inline-flex; float: right; padding: 0"
-                :value="cycle"
-                disabled
-              >
-                <ion-select-option value="day">Dayly</ion-select-option>
-                <ion-select-option value="week">Weekly</ion-select-option>
-                <ion-select-option value="month">Monthly</ion-select-option>
-              </ion-select>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-        <ion-modal
-          :is-open="attachNftModal"
-          @will-dismiss="attachNftModal = false"
+    <ion-content
+      :fullscreen="true"
+      class="ion-padding"
+      style="display: flex; flex-direction: column"
+    >
+      <div style="margin-bottom: 0.5rem; width: 100%; text-align: center">
+        <b style="font-size: 16px; text-align: center">Create a story</b>
+      </div>
+      <div style="margin-bottom: 0.5rem">
+        <b style="color: rgba(0, 0, 0, 0.6)">Title</b>
+      </div>
+      <ion-input
+        placeholder="The tales of..."
+        v-model="title"
+        :style="{
+          border: dirty && titleError ? '1px solid red' : '',
+        }"
+        style="background: rgba(217, 217, 217, 0.5); border-radius: 4px"
+      ></ion-input>
+      <div style="margin-bottom: 0.5rem; margin-top: 1rem">
+        <b style="color: rgba(0, 0, 0, 0.6)">Write your first paragraph</b>
+      </div>
+      <ion-textarea
+        placeholder="Once upon..."
+        v-model="content"
+        :rows="5"
+        style="background: rgba(217, 217, 217, 0.5); border-radius: 4px"
+        autoGrow="true"
+      ></ion-textarea>
+      <div style="text-align: right; margin-top: -1.5rem; margin-right: 0.5rem">
+        <small
+          :style="{
+            color: dirty && content.length < 240 ? 'red' : '',
+          }"
+          >Min 240 ({{ content.length }})</small
         >
-          <ion-content>
-            <AttachNft @select-nft="attachNft" />
-          </ion-content>
-        </ion-modal>
-      </ion-card>
-      <ion-button
-        v-if="authStore.isSignedIn"
-        @click="save"
-        color="primary"
-        :disabled="content.length < 240"
-        style="margin-top: 1rem"
-        >Submit</ion-button
+      </div>
+      <div style="margin-bottom: 0.5rem; margin-top: 1rem">
+        <b style="color: rgba(0, 0, 0, 0.6)">Attach Nft</b>
+      </div>
+      <div @click="attachNftModal = true">
+        <ion-avatar v-if="nft">
+          <img
+            :src="nftStore.getNft(nft).image"
+            :alt="nftStore.getNft(nft).name"
+          />
+        </ion-avatar>
+        <ion-button v-if="!nft" :disabled="!authStore.isSignedIn">+</ion-button>
+      </div>
+
+      <ion-modal
+        :is-open="attachNftModal"
+        @will-dismiss="attachNftModal = false"
       >
-      <ion-button v-else @click="walletStore.logInUser()" color="primary"
-        >Connect Wallet</ion-button
-      >
+        <ion-content>
+          <AttachNft @select-nft="attachNft" />
+        </ion-content>
+      </ion-modal>
+
+      <div style="margin-top: 2rem; text-align: right">
+        <ion-button
+          v-if="authStore.isSignedIn"
+          @click="save"
+          color="primary"
+          :disabled="content.length < 240"
+          style="margin-top: 1rem"
+          >Submit</ion-button
+        >
+        <ion-button v-else @click="walletStore.logInUser()" color="primary"
+          >Connect Wallet</ion-button
+        >
+      </div>
+
+      <mobile-footer />
     </ion-content>
   </ion-page>
 </template>
@@ -105,6 +102,7 @@ import { useNftStore } from "@/store/nfts";
 import { useWalletStore } from "@/store/wallet";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store";
+import MobileFooter from "@/components/overview/MobileFooter.vue";
 
 const router = useRouter();
 const storyStore = useStoryStore();
@@ -150,9 +148,9 @@ const save = async () => {
       title.value,
       nft.value
     );
-    content.value = ''
-    title.value = ''
-    nft.value = undefined
+    content.value = "";
+    title.value = "";
+    nft.value = undefined;
     router.push("/story/" + storyId + "/read");
   } catch (error) {
     console.error(error);
@@ -161,10 +159,14 @@ const save = async () => {
   }
 };
 </script>
-<style scoped>
+<style>
 ion-card {
   box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
   border-radius: 15px;
   padding: 10px;
+}
+ion-input input,
+ion-textarea textarea {
+  padding-left: 1rem !important;
 }
 </style>

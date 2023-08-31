@@ -1,5 +1,5 @@
 import { useAuthStore, useWalletStore } from "../store";
-import axios from "axios";
+import { callApiAuthenticated } from "./api";
 
 export const execute = async (command: string, data: any) => {
   const authStore = useAuthStore();
@@ -13,29 +13,9 @@ export const execute = async (command: string, data: any) => {
       [command]: data,
     });
   } else {
-    const { getAuth } = await import("firebase/auth");
-    const auth = getAuth();
-    if (!auth.currentUser) {
-      throw new Error("User is not signed in");
-    }
-    const token = await auth.currentUser.getIdToken();
-    await axios.post(
-      process.env.VUE_APP_API_URL + "executeWeb2",
-      {
-        command,
-        data,
-      },
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          //   "x-network": "testnet", // TODO remove/use network store
-        },
-      }
-    );
-    //   .then((response) => response.data);
-
-    // await walletStore.broadcast(txRaw);
+    await callApiAuthenticated("executeWeb2", "POST", {
+      command,
+      data,
+    });
   }
 };

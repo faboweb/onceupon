@@ -3,6 +3,9 @@ import firebase from "firebase/compat/app";
 import "firebaseui/dist/firebaseui.css";
 import { useAuthStore } from "./auth";
 import { firebaseConfig } from "@/scripts/firebase";
+import axios from "axios";
+import { useNetworkStore } from "./network";
+import { callApiAuthenticated } from "@/scripts/api";
 // import { useWalletStore } from "./wallet";
 // import { signArbitrary } from "@keplr-wallet/cosmos";
 // import axios from "axios";
@@ -26,14 +29,17 @@ export const useWeb2AuthStore = defineStore("web2AuthStore", {
       useDeviceLanguage(auth);
       const provider = new TwitterAuthProvider();
       return signInWithPopup(auth, provider)
-        .then((result) => {
+        .then(async (result) => {
           const user = result.user;
+
+          const { address } = await callApiAuthenticated("web2Address", "GET");
 
           const authStore = useAuthStore();
           authStore.setSignIn(
             {
               name: user.displayName,
               image: user.photoURL,
+              address,
             },
             "twitter"
           );
@@ -54,14 +60,17 @@ export const useWeb2AuthStore = defineStore("web2AuthStore", {
       await setPersistence(auth, browserLocalPersistence);
       const provider = new GoogleAuthProvider();
       return signInWithPopup(auth, provider)
-        .then((result) => {
+        .then(async (result) => {
           const user = result.user;
+
+          const { address } = await callApiAuthenticated("web2Address", "GET");
 
           const authStore = useAuthStore();
           authStore.setSignIn(
             {
               name: user.displayName,
               image: user.photoURL,
+              address,
             },
             "google"
           );

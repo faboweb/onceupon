@@ -54,6 +54,7 @@ pub struct SectionVotes {
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
 pub struct ShareBalance {
+    pub story_id: String,
     pub user: String,
     pub balance: u64,
 }
@@ -72,4 +73,13 @@ pub struct StoryOverviewItem {
     pub owners: usize,
     pub proposals: usize,
     pub top_nfts: Vec<NFT>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
+pub struct Export {
+    // pub state: State,
+    pub stories: Vec<Story>,
+    pub sections: Vec<Section>,
+    pub votes: Vec<(String, String, String, i8)>,
+    pub shares: Vec<(String, String, u64)>,
 }

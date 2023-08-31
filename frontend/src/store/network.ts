@@ -5,8 +5,11 @@ interface State {
   network: string;
   networks: {
     name: string;
+    walletRepoName: string;
     contract: string;
     url: string;
+    graphql: string;
+    chainId: string;
   }[];
 }
 
@@ -17,13 +20,19 @@ export const useNetworkStore = defineStore("networkStore", {
     networks: [
       {
         name: "mainnet",
+        walletRepoName: "stargaze",
         contract: process.env.VUE_APP_CONTRACT_MAINNET || "",
         url: "https://rpc.stargaze-apis.com:443",
+        graphql: "https://graphql.mainnet.stargaze-apis.com/graphql",
+        chainId: "stargaze-1",
       },
       {
         name: "testnet",
+        walletRepoName: "stargazetestnet",
         contract: process.env.VUE_APP_CONTRACT || "",
         url: "https://rpc.elgafar-1.stargaze-apis.com",
+        graphql: "https://graphql.testnet.stargaze-apis.com/graphql",
+        chainId: "elgafar-1",
       },
     ],
   }),

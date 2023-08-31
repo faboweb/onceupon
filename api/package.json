@@ -5,20 +5,23 @@
   "main": "index.js",
   "scripts": {
     "deploy": "gcloud run deploy api --source .",
-    "serve": "node src/index.js"
+    "serve": "nodemon --watch src --watch .env src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@cosmjs/crypto": "^0.30.1",
     "@cosmjs/stargate": "^0.30.1",
+    "@cosmjs/tendermint-rpc": "^0.31.1",
     "@keplr-wallet/cosmos": "^0.12.10",
     "cors": "^2.8.5",
     "cosmjs-types": "^0.8.0",
     "cosmwasm": "^1.1.1",
     "express": "^4.18.2",
     "firebase-admin": "^11.9.0",
+    "lodash.debounce": "^4.0.8",
     "node-fetch": "^3.3.1",
+    "nodemon": "^3.0.1",
     "web3.storage": "^4.5.4"
   },
   "devDependencies": {

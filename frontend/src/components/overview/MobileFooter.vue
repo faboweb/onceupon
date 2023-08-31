@@ -23,9 +23,9 @@
     >
       <span
         :style="{
-          opacity: route.path === '/' ? 1 : 0.6,
+          opacity: route.path === '/overview' ? 1 : 0.6,
         }"
-        @click="router.push('/')"
+        @click="ionRouter.push('/overview')"
         style="cursor: pointer"
         >Explore</span
       >
@@ -36,7 +36,7 @@
           align-items: center;
           cursor: pointer;
         "
-        @click="router.push('/story/new')"
+        @click="ionRouter.push('/story/new')"
       >
         <div
           style="
@@ -70,7 +70,7 @@
         }"
         @click="
           authStore.user?.address &&
-            router.push('/profile/' + authStore.user?.address)
+            ionRouter.push('/profile/' + authStore.user.address)
         "
         style="cursor: pointer"
         >Profile</span
@@ -80,11 +80,12 @@
 </template>
 
 <script setup>
+import { useIonRouter } from "@ionic/vue";
 import { add } from "ionicons/icons";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../store";
 const route = useRoute();
-const router = useRouter();
+const ionRouter = useIonRouter();
 const authStore = useAuthStore();
 </script>
 

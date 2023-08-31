@@ -88,9 +88,10 @@ import {
   useWeb2AuthStore,
   useAuthStore,
   useNetworkStore,
+  useStoryStore,
 } from "./store";
 import { menu, cartOutline } from "ionicons/icons";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import MobileFooter from "./components/overview/MobileFooter.vue";
 
 const walletStore = useWalletStore();
@@ -199,5 +200,9 @@ ion-button ion-avatar {
 #sign-in-modal::part(content) {
   width: 300px;
   height: 220px;
+}
+
+ion-header {
+  box-shadow: none !important;
 }
 </style>

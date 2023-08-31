@@ -1,6 +1,6 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header style="box-shadow: none">
       <ion-toolbar style="--border-color: none; height: 40px">
         <span
           slot="start"
@@ -82,8 +82,9 @@ import {
   IonTabButton,
   IonLabel,
   IonRouterOutlet,
+  loadingController,
 } from "@ionic/vue";
-import { computed, onMounted, ref, Ref } from "vue";
+import { computed, onMounted, ref, Ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
@@ -100,6 +101,10 @@ const story: Ref<any> = ref(null);
 const overviewStory = computed(() => {
   return storyStore.stories.find((s) => s.id === storyId);
 });
+
+const loadData = async () => {
+  loadData();
+};
 
 onMounted(async () => {
   try {

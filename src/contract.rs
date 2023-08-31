@@ -11,7 +11,8 @@ use crate::state::{State, STATE};
 
 use crate::execute::{cycle, new_story, new_story_section, remove_story, voting};
 use crate::query::{
-    query_new_sections, query_sections, query_shares, query_stories, query_story, query_votes,
+    query_new_sections, query_sections, query_shares, query_state, query_stories, query_story,
+    query_votes,
 };
 
 // version info for migration info
@@ -104,5 +105,6 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
         QueryMsg::GetSections { story_id } => query_sections(deps, story_id),
         QueryMsg::GetShares { story_id } => query_shares(deps, story_id),
         QueryMsg::GetNewSections { after } => query_new_sections(deps, after),
+        QueryMsg::GetState {} => query_state(deps),
     }
 }

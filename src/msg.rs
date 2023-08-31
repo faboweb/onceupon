@@ -2,7 +2,9 @@ use cosmwasm_schema::QueryResponses;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::types::{Section, ShareBalance, Story, StoryOverviewItem, UploadSection, VoteEntry};
+use crate::types::{
+    Export, Section, ShareBalance, Story, StoryOverviewItem, UploadSection, VoteEntry,
+};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct InstantiateMsg {}
@@ -48,4 +50,6 @@ pub enum QueryMsg {
     GetShares { story_id: String },
     #[returns(Vec<Section>)]
     GetNewSections { after: u64 },
+    #[returns(Export)]
+    GetState {},
 }

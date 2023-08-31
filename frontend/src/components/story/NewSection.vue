@@ -16,7 +16,7 @@
       @click="expand = true"
     ></ion-icon>
     <ion-textarea
-      style="background: rgb(244 243 234)"
+      style="background: rgb(244 243 234); margin-top: 0.5rem"
       placeholder="Once upon..."
       v-model="content"
       :rows="5"
@@ -79,6 +79,12 @@
         >Sign In</ion-button
       >
     </div>
+    <div
+      v-if="error"
+      style="color: rgb(242 31 68 / 70%); text-align: right; width: 100%"
+    >
+      {{ error }}
+    </div>
     <ion-modal :is-open="attachNftModal" @will-dismiss="attachNftModal = false">
       <ion-content>
         <AttachNft @select-nft="attachNft" />
@@ -126,7 +132,7 @@ import {
 } from "vue";
 import { useNftStore } from "@/store/nfts";
 import { useWalletStore } from "@/store/wallet";
-import { useAuthStore, useStoryStore } from "../../store";
+import { useAuthStore, useNetworkStore, useStoryStore } from "../../store";
 import { add, expandOutline, closeOutline } from "ionicons/icons";
 import { useContinueStore } from "../../store/continue";
 import { debounce } from "lodash";
@@ -139,7 +145,9 @@ const walletStore = useWalletStore();
 const authStore = useAuthStore();
 const storyStore = useStoryStore();
 const continueStore = useContinueStore();
+const networkStore = useNetworkStore();
 const nft = ref();
+const error = ref();
 
 const props = defineProps<{
   disabled: boolean;
@@ -175,19 +183,21 @@ watch(() => continueStore.proposal(props.storyId), setProposal);
 
 const attachNft = async (_nft) => {
   nft.value = _nft;
-  nftStore.loadNft(_nft);
+  nftStore.loadNft(networkStore.currentNetwork, _nft);
   attachNftModal.value = false;
 };
 
 defineExpose({ reset });
 
 const proposeSection = async ({ content, nft }) => {
+  error.value = undefined;
   try {
     await storyStore.addSectionProposal(props.storyId, content, nft);
     storyStore.loadProposals(props.storyId);
     reset();
   } catch (error) {
-    console.error(error);
+    debugger;
+    error.value = error.message;
   }
 };
 </script>

@@ -1,5 +1,5 @@
-use crate::state::{SECTIONS, SHARES, STORIES, VOTES};
-use crate::types::{Section, ShareBalance, StoryOverviewItem, VoteEntry, NFT};
+use crate::state::{self, SECTIONS, SHARES, STATE, STORIES, VOTES};
+use crate::types::{Export, Section, ShareBalance, Story, StoryOverviewItem, VoteEntry, NFT};
 use cosmwasm_std::{to_binary, Binary, Deps, Order, StdError, StdResult};
 use std::collections::HashSet;
 
@@ -66,6 +66,7 @@ pub fn query_shares(deps: Deps, story_id: String) -> StdResult<Binary> {
             .map(|r| {
                 let (addr, balance) = r.unwrap();
                 ShareBalance {
+                    story_id: story_id.clone(),
                     user: addr.to_string(),
                     balance,
                 }
@@ -74,20 +75,54 @@ pub fn query_shares(deps: Deps, story_id: String) -> StdResult<Binary> {
     )
 }
 
-pub fn query_authors(deps: Deps) -> StdResult<Binary> {
-    let shares = SHARES.range(deps.storage, None, None, Order::Ascending);
-    to_binary(
-        &shares
-            .map(|r| {
-                let (addr, balance) = r.unwrap();
-                ShareBalance {
-                    user: addr.to_string(),
-                    balance,
-                }
+pub fn query_state(deps: Deps) -> StdResult<Binary> {
+    let export = Export {
+        stories: STORIES
+            .range(deps.storage, None, None, Order::Ascending)
+            .map(|story| story.unwrap().1)
+            .collect::<Vec<Story>>(),
+        sections: SECTIONS
+            .range(deps.storage, None, None, Order::Ascending)
+            .map(|section| section.unwrap().1)
+            .collect::<Vec<Section>>(),
+        votes: VOTES
+            .range(deps.storage, None, None, Order::Ascending)
+            .map(|vote| {
+                let _vote = vote.unwrap();
+                (
+                    _vote.0 .0, // story_id
+                    _vote.0 .1, // section_id
+                    _vote.0 .2, // user
+                    _vote.1,    // vote
+                )
             })
-            .collect::<Vec<ShareBalance>>(),
-    )
+            .collect::<Vec<(String, String, String, i8)>>(),
+        shares: SHARES
+            .range(deps.storage, None, None, Order::Ascending)
+            .map(|share| {
+                let _share = share.unwrap();
+                (_share.0 .0, _share.0 .1, _share.1)
+            })
+            .collect::<Vec<(String, String, u64)>>(),
+    };
+    to_binary(&export)
 }
+
+// pub fn query_authors(deps: Deps) -> StdResult<Binary> {
+//     let shares = SHARES.range(deps.storage, None, None, Order::Ascending);
+//     to_binary(
+//         &shares
+//             .map(|r| {
+//                 let (addr, balance) = r.unwrap();
+//                 ShareBalance {
+//                     story_id: story_id.clone(),
+//                     user: addr.to_string(),
+//                     balance,
+//                 }
+//             })
+//             .collect::<Vec<ShareBalance>>(),
+//     )
+// }
 
 pub fn query_stories(deps: Deps) -> StdResult<Binary> {
     let stories = STORIES.range(deps.storage, None, None, Order::Ascending);

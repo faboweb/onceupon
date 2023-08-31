@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <span slot="start" style="margin-left: 1rem">
+        <span slot="start">
           Hello<br />
           <b v-if="authStore.user">{{
             authStore.user?.name ? "" + authStore.user?.name : ""
@@ -14,12 +14,12 @@
             >Sign In</b
           >
         </span>
-        <div slot="end" style="margin-right: 1rem">
+        <div slot="end">
           <span><b>Cart</b></span>
         </div>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" class="ion-padding">
+    <ion-content>
       <!-- <h1>Hello{{ authStore.user?.name ? ", " + authStore.user?.name : "" }}!</h1>
       <div style="position: absolute; top: 2rem; right: 1rem">
         <a

@@ -1,31 +1,28 @@
 <template>
   <div style="padding-left: 1rem; padding-right: 1rem">
-    <h1 style="text-align: center">Choose NFT to add</h1>
-    <p style="    margin-bottom: 1rem;
-    font-size: 14px;
-    text-align: center;">
-      NFTS are linked to a section by it's ID. OnceUpon doesn't take ownership of your NFTs.
-    </p>
-    <ion-avatar
-      v-for="nft in nfts"
-      :key="nft.key"
-      @click="() => select(nft)"
-      button
-      class="nft"
-    >
-      <img :src="nft.image" @error="(e) => (e.target.src = FALLBACK_AVATAR)" />
-      <!-- <ion-card-header>
-        <ion-card-title>{{nft.name}}</ion-card-title>
-      </ion-card-header> -->
-    </ion-avatar>
+    <div style="text-align: center; margin-top: 1rem">
+      <b style="font-size: 16px">Choose NFT to add</b>
+      <p
+        style="
+          margin-bottom: 1rem;
+          font-size: 12px;
+          text-align: center;
+          color: rgb(255 255 255 60%);
+        "
+      >
+        NFTS are linked to a section by it's ID. OnceUpon doesn't take ownership
+        of your NFTs.
+      </p>
+    </div>
+    <nft-list :nfts="nfts" />
     <template v-if="nfts.length === 0">
-      <p style="text-align: center">
+      <p style="text-align: center; margin-top: 2rem">
         You don't own any NFT yet. Go to
         <a href="https://stargaze.zone">Stargaze</a> to buy an NFT.
       </p>
     </template>
     <br />
-    <div style="text-align: center">
+    <div style="text-align: center; margin-top: 2rem">
       <ion-button @click="() => noNft()">No NFT</ion-button>
     </div>
   </div>

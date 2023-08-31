@@ -4,11 +4,17 @@ import { RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
+    redirect: "/overview",
+  },
+  {
+    path: "/overview",
     component: () => import("@/views/OverviewPage.vue"),
+    name: "overview",
   },
   {
     path: "/story/new",
     component: () => import("@/views/NewStoryPage.vue"),
+    name: "new",
   },
   {
     path: "/story/:id",
@@ -36,13 +42,15 @@ const routes: Array<RouteRecordRaw> = [
       },
     ],
   },
-  {
-    path: "/story/:id/continue",
-    component: () => import("@/views/ContinueStoryPage.vue"),
-  },
+  // {
+  //   path: "/story/:id/continue",
+  //   component: () => import("@/views/ContinueStoryPage.vue"),
+  //   name: "continue",
+  // },
   {
     path: "/profile/:address",
     component: () => import("@/views/ProfilePage.vue"),
+    name: "profile",
   },
 ];
 
