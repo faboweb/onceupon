@@ -12,26 +12,60 @@ import Bowser from "bowser";
 import { useAuthStore } from "./auth";
 import { useNetworkStore } from "./network";
 import { CosmWasmClient } from "cosmwasm";
-import { connectKeplr } from "@/scripts/keplr";
 
-interface State {
-  name: string | null;
-  address: string | null;
-  blocks: any;
-  balances: any; // dict by address
-  clients: any; // dict by chainId
-  wallet: any | null;
-}
+const _chains = chains
+  .filter((chain) => chain.chain_name.startsWith("stargaze"))
+  .map((chain) => ({
+    ...chain,
+    fees: {
+      fee_tokens: [
+        {
+          denom: "ustars",
+          fixed_min_gas_price: 0,
+          low_gas_price: 0,
+          average_gas_price: 0,
+          high_gas_price: 0.04,
+        },
+      ],
+    },
+  }));
+
+const walletManager = new WalletManager(
+  _chains,
+  assets.filter((assets) => assets.chain_name.startsWith("stargaze")),
+  // @ts-ignore
+  [...keplrWallet, ...keplrMobileWallet],
+  new Logger("DEBUG"),
+  "stargaze",
+  {
+    signClient: {
+      projectId: "a8510432ebb71e6948cfd6cde54b70f7",
+      relayUrl: "wss://relay.walletconnect.org",
+    },
+  },
+  {
+    signingStargate: (chain: Chain) => {
+      switch (chain.chain_name) {
+        case "osmosis":
+          return {
+            gasPrice: new GasPrice(Decimal.zero(1), "uosmo"),
+          };
+        default:
+          return void 0;
+      }
+    },
+  }
+);
 
 export const useWalletStore = defineStore("wallet", {
   // convert to a function
-  state: (): State => ({
+  state: () => ({
     name: null,
     address: null,
     blocks: {},
+    walletManager,
     balances: {}, // dict by address
     clients: {}, // dict by chainId
-    wallet: null,
   }),
   getters: {
     isLoggedIn: (state) => state.address !== null,
@@ -39,16 +73,36 @@ export const useWalletStore = defineStore("wallet", {
       state.address === process.env.VUE_APP_ADMIN_ADDRESS_MAINNET,
     // @ts-ignore
     balance: (state) => (state.address ? state.balances[state.address] : 0),
+    wallet: (state) => {
+      const walletRepo = state.walletManager.getWalletRepo("stargaze");
+
+      const parser = Bowser.getParser(window.navigator.userAgent);
+      const env = {
+        browser: parser.getBrowserName(true),
+        device: (parser.getPlatform().type || "desktop") as DeviceType,
+        os: parser.getOSName(true) as OS,
+      };
+      const isMobile = env.device === "mobile";
+      const currentWallet = walletRepo.getWallet(
+        isMobile ? "keplr-mobile" : "keplr-extension"
+      );
+      currentWallet?.setEnv(env);
+
+      // ios: "https://apps.apple.com/us/app/keplr-wallet/id1567851089"
+      // android: "https://play.google.com/store/apps/details?id=com.chainapsis.keplr&hl=en&gl=US"
+
+      if (!currentWallet) {
+        throw new Error("No wallet selected");
+      }
+      return currentWallet;
+    },
   },
   actions: {
     async logInUser() {
-      const networkStore = useNetworkStore();
-      const network = networkStore.currentNetwork;
-
+      await this.wallet.connect();
       try {
-        this.wallet = await connectKeplr(network);
         // @ts-ignore
-        this.name = this.wallet.name;
+        this.name = this.wallet.username;
         // @ts-ignore
         this.address = this.wallet.address;
         localStorage.setItem("signedIn", "true");
@@ -82,7 +136,7 @@ export const useWalletStore = defineStore("wallet", {
      * @param data
      */
     async logoutUser() {
-      this.wallet.client.disconnect();
+      this.wallet.disconnect();
 
       this.name = null;
       this.address = null;
@@ -109,9 +163,6 @@ export const useWalletStore = defineStore("wallet", {
       return await cosmWasmClient.queryContractSmart(network.contract, query);
     },
     async execute(userAddress, entrypoint) {
-      if (!this.wallet) {
-        await this.logInUser();
-      }
       const networkStore = useNetworkStore();
       const network = networkStore.currentNetwork;
 
@@ -134,13 +185,14 @@ export const useWalletStore = defineStore("wallet", {
           fee = calculateFee(350_000, GasPrice.fromString("0.5ustars"));
           break;
       }
-      const signingClient = this.wallet.client;
-      await signingClient.execute(
+      const signingClient = await this.wallet.getSigningCosmWasmClient();
+      const result = await signingClient.execute(
         userAddress,
         network.contract,
         entrypoint,
         fee
       );
+      debugger;
     },
     async getBlock(height?) {
       const client = await this.getClient();

@@ -1,4 +1,4 @@
-use crate::state::{self, SECTIONS, SHARES, STATE, STORIES, VOTES};
+use crate::state::{SECTIONS, SHARES, STORIES, VOTES};
 use crate::types::{Export, Section, ShareBalance, Story, StoryOverviewItem, VoteEntry, NFT};
 use cosmwasm_std::{to_binary, Binary, Deps, Order, StdError, StdResult};
 use std::collections::HashSet;
@@ -159,8 +159,8 @@ pub fn query_stories(deps: Deps) -> StdResult<Binary> {
                 id: story.id,
                 name: story.name,
                 created: story.created,
-                last_section: story.last_section,
-                next_section: story.last_section + story.interval,
+                last_cycle: story.last_cycle.unwrap(),
+                next_cycle: story.last_cycle.unwrap() + story.interval,
                 last_update: story.sections.last().unwrap().added,
                 creator: story.creator,
                 sections: story.sections.len(),

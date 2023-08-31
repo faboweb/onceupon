@@ -8,7 +8,12 @@
             visibility: self ? 'visible' : 'hidden',
           }"
         >
-          <ion-button @click="authStore.signOut()">Sign Out</ion-button>
+          <ion-button
+            fill="flat"
+            @click="authStore.signOut()"
+            style="color: rgb(242, 103, 9)"
+            >Sign Out</ion-button
+          >
         </div>
         <!-- <div v-else style="text-align: right">
       <ion-button>Follow</ion-button>
@@ -35,7 +40,10 @@
           >
             {{ self ? "My " : "" }}Contributions
           </div>
-          <div style="display: flex; flex-direction: row">
+          <div
+            style="display: flex; flex-direction: row"
+            v-if="!contributionsLoaded"
+          >
             <ion-skeleton-text
               style="height: 103px; width: 151px; margin-right: 1rem"
             ></ion-skeleton-text>
@@ -46,8 +54,54 @@
               style="height: 103px; width: 151px; margin-right: 1rem"
             ></ion-skeleton-text>
           </div>
+
+          <div style="display: flex; margin-top: 0.5rem; flex-wrap: wrap">
+            <div
+              v-for="(section, i) of [].concat(...contributions)"
+              :key="i"
+              style="
+                background: rgba(217, 217, 217, 0.2);
+                border-radius: 8px;
+                padding: 0.5rem;
+                cursor: pointer;
+                width: 186px;
+                height: 123px;
+                margin-right: 1rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex-grow: 1;
+                margin-bottom: 0.5rem;
+              "
+              @click="router.push('/story/' + section.story_id + '/read/')"
+            >
+              <b
+                style="
+                  margin-bottom: 0.2rem;
+                  font-size: 14px;
+                  white-space: nowrap;
+                "
+              >
+                {{ section.story?.name }}
+              </b>
+              <span style="color: rgba(242, 103, 9, 0.6); font-size: 14px"
+                >Section</span
+              >
+              <p
+                style="
+                  text-align: left;
+                  white-space: pre-wrap;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  max-height: 70px;
+                  font-size: 12px;
+                "
+              >
+                {{ section.content }}...
+              </p>
+            </div>
+          </div>
         </div>
-        <div>
+        <!-- <div>
           <div
             style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
           >
@@ -64,7 +118,7 @@
               style="height: 103px; width: 151px; margin-right: 1rem"
             ></ion-skeleton-text>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <mobile-footer />
@@ -74,8 +128,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import { useAuthStore, useNameStore, useWalletStore } from "../store";
+import { useRoute, useRouter } from "vue-router";
+import {
+  useAuthStore,
+  useNameStore,
+  useStoryStore,
+  useWalletStore,
+} from "../store";
 import NftElement from "../components/NftElement.vue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import { IonPage, IonContent } from "@ionic/vue";
@@ -85,6 +144,8 @@ const address = String(route?.params.address);
 
 const authStore = useAuthStore();
 const nameStore = useNameStore();
+const storyStore = useStoryStore();
+const router = useRouter();
 const profileName = computed(() => {
   return nameStore.name(address);
 });
@@ -96,10 +157,24 @@ const self = computed(() => {
   return authStore.user?.address === address;
 });
 
+const contributions = computed(() => {
+  const contributions = storyStore.contributions[address];
+  if (!contributions) return [];
+  return contributions.map((c) => ({
+    ...c,
+    content: storyStore.cidLookup[c.content_cid],
+    story: storyStore.stories[c.story_id],
+  }));
+});
+const contributionsLoaded = computed(() => {
+  return storyStore.contributions[address] !== undefined;
+});
+
 watch(
   () => address,
   () => {
     nameStore.getName(address);
+    storyStore.loadContributions(address);
   },
   {
     immediate: true,

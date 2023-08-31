@@ -19,11 +19,13 @@
         :key="i"
         style="
           background: rgba(217, 217, 217, 0.2);
-          border-radius: 0 4px 4px 0;
+          border-radius: 8px;
           padding: 0.5rem;
           cursor: pointer;
-          width: 154px;
-          height: 100px;
+          width: 186px;
+          height: 123px;
+          overflow: hidden;
+          text-overflow: ellipsis;
         "
         @click="router.push('/story/' + proposal.storyId + '/read/')"
       >
@@ -63,7 +65,7 @@
       <div
         style="
           background: rgba(217, 217, 217, 0.2);
-          border-radius: 0 4px 4px 0;
+          border-radius: 8px;
           padding: 0.5rem;
           display: flex;
           flex-direction: column;

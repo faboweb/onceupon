@@ -15,7 +15,7 @@ export const connectKeplr = async (network) => {
   // It can return the array of address/public key.
   // But, currently, Keplr extension manages only one address/public key pair.
   // XXX: This line is needed to set the sender address for SigningCosmosClient.
-  const accounts = await offlineSigner.getAccounts();
+  //   const accounts = await offlineSigner.getAccounts();
 
   const defaultGasPrice = GasPrice.fromString("1ustars");
 
@@ -29,9 +29,13 @@ export const connectKeplr = async (network) => {
       gasPrice: defaultGasPrice,
     }
   );
+
+  // @ts-ignore
+  const key = await window.keplr.getKey(network.chainId);
+
   return {
     client: signingClient,
-    address: accounts[0].address,
-    name: accounts[0].name,
+    address: key.bech32Address,
+    name: key.name,
   };
 };

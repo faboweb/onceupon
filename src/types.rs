@@ -6,9 +6,10 @@ pub struct Story {
     pub id: String,
     pub name: String,
     pub created: u64,
-    pub last_section: u64, // block height of last section
-    pub interval: u64,     // blocks till next round of voting
-    pub creator: String,   // user id
+    pub last_section: Option<u64>, // depr
+    pub last_cycle: Option<u64>,   // block height of last cycle execution
+    pub interval: u64,             // blocks till next round of voting
+    pub creator: String,           // user id
     pub sections: Vec<Section>,
 }
 
@@ -64,10 +65,10 @@ pub struct StoryOverviewItem {
     pub id: String,
     pub name: String,
     pub created: u64,
-    pub last_section: u64, // block height of last section
-    pub next_section: u64, // block height of next voting period
-    pub last_update: u64,  // block height of last section added
-    pub creator: String,   // user id
+    pub last_cycle: u64,  // block height of last cycle
+    pub next_cycle: u64,  // block height of next cycle
+    pub last_update: u64, // block height of last section added
+    pub creator: String,  // user id
     pub first_section_cid: String,
     pub sections: usize,
     pub owners: usize,

@@ -22,7 +22,9 @@
     "lodash.debounce": "^4.0.8",
     "node-fetch": "^3.3.1",
     "nodemon": "^3.0.1",
-    "web3.storage": "^4.5.4"
+    "uuid": "^9.0.0",
+    "web3.storage": "^4.5.4",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0"

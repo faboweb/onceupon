@@ -101,7 +101,8 @@ pub fn new_story(
     let story = Story {
         id: id.clone(),
         name: name.clone(),
-        last_section: env.block.height,
+        last_cycle: Some(env.block.height),
+        last_section: Some(env.block.height),
         interval,
         created: env.block.height,
         creator: info.sender.to_string(),
@@ -131,7 +132,7 @@ pub fn new_story_section(
     }
     let unwrapped_story = story.unwrap();
 
-    if env.block.height >= unwrapped_story.last_section + unwrapped_story.interval {
+    if env.block.height >= unwrapped_story.last_cycle.unwrap() + unwrapped_story.interval {
         return Err(ContractError::CustomError {
             val: "Section submit interval is claused. Call 'cycle' or wait till someone calls it."
                 .to_string(),
@@ -273,8 +274,8 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
         })
         .collect();
     unvoted_stories.into_iter().for_each(|mut story| {
-        if story.last_section + story.interval <= env.block.height {
-            story.last_section = env.block.height;
+        if story.last_cycle.unwrap() + story.interval <= env.block.height {
+            story.last_cycle = Some(env.block.height);
             let res = STORIES.save(storage, story.id.clone(), &story);
             if res.is_err() {
                 panic!(
@@ -290,7 +291,7 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
         .into_iter()
         .for_each(|(story_id, section_votes)| {
             let mut story = STORIES.load(storage, story_id.clone()).unwrap();
-            if (story.last_section + story.interval) > env.block.height {
+            if (story.last_cycle.unwrap() + story.interval) > env.block.height {
                 println!("skip");
                 return;
             }
@@ -305,7 +306,7 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
 
             if top_section_votes.is_none() {
                 // if no winner decided, we open voting again
-                story.last_section = env.block.height;
+                story.last_cycle = Some(env.block.height);
                 let res = STORIES.save(storage, story_id.clone(), &story);
                 if res.is_err() {
                     panic!(
@@ -362,7 +363,7 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
             });
 
             // update story
-            story.last_section = env.block.height;
+            story.last_cycle = Some(env.block.height);
             story.sections = [story.sections.clone(), [top_section.clone()].to_vec()].concat();
             let res = STORIES.save(storage, story_id.clone(), &story);
             if res.is_err() {

@@ -48,7 +48,7 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.last_section);
+        assert_eq!(env.block.height, value.last_cycle);
 
         let msg = ExecuteMsg::NewStorySection {
             section: UploadSection {
@@ -98,7 +98,7 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_ne!(env.block.height, value.last_section);
+        assert_ne!(env.block.height, value.last_cycle);
 
         env.block.height += 9;
         println!("{}", env.block.height);
@@ -128,7 +128,7 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.last_section);
+        assert_eq!(env.block.height, value.last_cycle);
 
         env.block.height += 10;
 
@@ -165,7 +165,7 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.last_section);
+        assert_eq!(env.block.height, value.last_cycle);
 
         let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStories {}).unwrap();
         let value: Vec<StoryOverviewItem> = from_binary(&res).unwrap();

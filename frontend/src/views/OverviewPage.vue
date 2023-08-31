@@ -84,7 +84,7 @@ const sortedStories = computed(() => {
     return storyStore.stories?.sort((a, b) => b.last_update - a.last_update);
   } else {
     // eslint-disable-next-line
-    return storyStore.stories?.sort((a, b) => b.last_section - a.last_section);
+    return storyStore.stories?.sort((a, b) => b.last_cycle - a.last_cycle);
   }
 });
 </script>

@@ -41,9 +41,15 @@ dependencies:
   nodemon:
     specifier: ^3.0.1
     version: 3.0.1
+  uuid:
+    specifier: ^9.0.0
+    version: 9.0.0
   web3.storage:
     specifier: ^4.5.4
     version: 4.5.4(node-fetch@3.3.1)
+  ws:
+    specifier: ^8.13.0
+    version: 8.13.0
 
 devDependencies:
   env-cmd:
@@ -4475,6 +4481,19 @@ packages:
     peerDependencies:
       bufferutil: ^4.0.1
       utf-8-validate: ^5.0.2
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
+    dev: false
+
+  /ws@8.13.0:
+    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
     peerDependenciesMeta:
       bufferutil:
         optional: true

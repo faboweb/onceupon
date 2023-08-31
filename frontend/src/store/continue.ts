@@ -30,13 +30,18 @@ export const useContinueStore = defineStore("continueStore", {
       const storyStore = useStoryStore();
       const story = await storyStore.getStory(storyId);
       this.removeProposal(storyId);
+
+      if (content.length === 0) return;
+
       this.$state.proposals.push({ storyId, content, title: story.name });
       localStorage.setItem("proposals", JSON.stringify(this.$state.proposals));
     },
     loadProposals() {
       const proposals = localStorage.getItem("proposals");
       if (proposals) {
-        this.$patch({ proposals: JSON.parse(proposals) });
+        this.$patch({
+          proposals: JSON.parse(proposals).filter((p) => p.content.length > 0),
+        });
       }
     },
     removeProposal(storyId) {

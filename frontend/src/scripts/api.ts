@@ -1,6 +1,19 @@
 import { useNetworkStore } from "@/store";
 import axios from "axios";
 
+export const callApi = async (path, method, body?) => {
+  const networkStore = useNetworkStore();
+  return await axios(process.env.VUE_APP_API_URL + path, {
+    method,
+    data: body,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "x-network": networkStore.currentNetwork.name,
+    },
+  }).then((res) => res.data);
+};
+
 export const callApiAuthenticated = async (path, method, body?) => {
   const networkStore = useNetworkStore();
   const { getAuth } = await import("firebase/auth");

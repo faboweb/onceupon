@@ -1,19 +1,20 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError, StdResult};
+use cosmwasm_std::{Binary, Deps, DepsMut, Env, MessageInfo, Order, Response, StdError, StdResult};
 use cw2::set_contract_version;
 use semver::Version;
 use std::env;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
-use crate::state::{State, STATE};
+use crate::state::{State, STATE, STORIES};
 
 use crate::execute::{cycle, new_story, new_story_section, remove_story, voting};
 use crate::query::{
     query_new_sections, query_sections, query_shares, query_state, query_stories, query_story,
     query_votes,
 };
+use crate::types::Story;
 
 // version info for migration info
 const COMPATIBLE_MIGRATION_CONTRACT_NAME: &str = "crates.io:onceupon-cosmwasm";
@@ -48,8 +49,30 @@ pub fn migrate(deps: DepsMut, _env: Env, _msg: MigrateMsg) -> Result<Response, C
         return Ok(Response::new());
     }
 
+    // migrate data
+    let storage = deps.storage;
+    let stories = STORIES.range(storage, None, None, Order::Ascending);
+    let updated_stories = stories
+        .into_iter()
+        .map(|_story| {
+            let mut story = _story.unwrap().1.clone();
+            story.last_cycle = story.last_section;
+            return story;
+        })
+        .collect::<Vec<Story>>();
+    updated_stories.into_iter().for_each(|story| {
+        let res = STORIES.save(storage, story.clone().id, &story);
+        if res.is_err() {
+            panic!(
+                "Error saving story. {},{}",
+                res.err().unwrap(),
+                story.id.clone()
+            );
+        }
+    });
+
     // set new contract version
-    set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    set_contract_version(storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     Ok(Response::new())
 }
 

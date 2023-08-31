@@ -2,9 +2,8 @@ import { useNameStore } from "./names";
 import { useNftStore } from "./nfts";
 import { defineStore } from "pinia";
 import { useWalletStore } from "./wallet";
-import axios from "axios";
 import { execute } from "@/scripts/execute";
-// import { database } from "@/scripts/firebase";
+import { callApi } from "@/scripts/api";
 
 interface State {
   stories: any[] | null;
@@ -15,6 +14,7 @@ interface State {
   error: null;
   blocks: any; // dictionary height -> block
   cidLookup: any; // dictionary cid -> content
+  contributions: any; // dictionary address -> story ids
 }
 
 function generateUUID() {
@@ -51,6 +51,7 @@ export const useStoryStore = defineStore("storyStore", {
     error: null,
     blocks: {},
     cidLookup: {},
+    contributions: {},
   }),
   getters: {
     allStories: (state) => state.stories,
@@ -64,9 +65,9 @@ export const useStoryStore = defineStore("storyStore", {
       const story = await walletStore.query({
         get_story: { story_id: storyId },
       });
-      const lastSectionBlock = await walletStore.getBlock(story.last_section);
+      const lastSectionBlock = await walletStore.getBlock(story.last_cycle);
       const currentBlock = await walletStore.getBlock();
-      const heightDiff = currentBlock?.header.height - story.last_section;
+      const heightDiff = currentBlock?.header.height - story.last_cycle;
       const timeDiff =
         new Date(currentBlock?.header.time).getTime() -
         new Date(lastSectionBlock.header.time).getTime();
@@ -135,11 +136,9 @@ export const useStoryStore = defineStore("storyStore", {
       const storyId = generateUUID();
 
       // TODO to script
-      const cid = await axios
-        .post(process.env.VUE_APP_API_URL + "web3upload", {
-          content,
-        })
-        .then((res) => res.data);
+      const cid = await callApi("web3upload", "POST", {
+        content,
+      });
 
       await execute("new_story", {
         id: storyId,
@@ -165,11 +164,9 @@ export const useStoryStore = defineStore("storyStore", {
     async addSectionProposal(storyId, content, nft) {
       if (!content) throw new Error("You need to write something");
 
-      const cid = await axios
-        .post(process.env.VUE_APP_API_URL + "web3upload", {
-          content,
-        })
-        .then((res) => res.data);
+      const cid = await callApi("web3upload", "POST", {
+        content,
+      });
 
       await execute("new_story_section", {
         section: {
@@ -192,6 +189,7 @@ export const useStoryStore = defineStore("storyStore", {
       const voteToInt = {
         yes: 1,
         veto: 2,
+        no: 0,
       }[vote];
       if (!voteToInt)
         throw new Error("vote " + vote + " is not an allowed value");
@@ -213,13 +211,17 @@ export const useStoryStore = defineStore("storyStore", {
 
       if (missing.length === 0) return;
 
-      const cidLookup = await axios
-        .post(process.env.VUE_APP_API_URL + "resolveCIDs", {
-          cids: missing,
-        })
-        .then((res) => res.data);
+      const cidLookup = await callApi("resolveCIDs", "POST", {
+        cids: missing,
+      });
 
       this.cidLookup = { ...this.cidLookup, ...cidLookup };
+    },
+    async loadContributions(address) {
+      const sections = await callApi("contributions/" + address, "GET");
+
+      this.contributions[address] = sections;
+      this.loadContent(sections.map((section) => section.content_cid));
     },
   },
 });

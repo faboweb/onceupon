@@ -3,16 +3,10 @@ const {
   SigningCosmWasmClient,
   Secp256k1HdWallet,
   CosmWasmClient,
-  toUtf8,
-  calculateFee,
 } = require("cosmwasm");
 const { GasPrice } = require("@cosmjs/stargate");
-const { Tendermint34Client } = require("@cosmjs/tendermint-rpc");
 const { stringToPath, sha256 } = require("@cosmjs/crypto");
-// const sendTweet = require("./twitter");
-// const { loadNft } = require("./stargaze");
 const { File, Web3Storage } = require("web3.storage");
-const { MsgExecuteContract } = require("cosmjs-types/cosmwasm/wasm/v1/tx");
 const { verifyArbitrary } = require("@keplr-wallet/cosmos");
 var cors = require("cors");
 const debounce = require("lodash.debounce");
@@ -23,20 +17,20 @@ const admin = require("firebase-admin");
 
 // TODO put in config file
 const networks = {
-  mainnet: {
-    id: "mainnet",
-    contract:
-      "stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq",
-    admin: "stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv",
-    url: "https://rpc-stargaze.pupmos.network",
-    mnemonic: process.env.MNEMONIC_MAINNET,
-  },
+  // mainnet: {
+  //   id: "mainnet",
+  //   contract:
+  //     "stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq",
+  //   admin: "stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv",
+  //   url: "https://rpc-stargaze.pupmos.network",
+  //   mnemonic: process.env.MNEMONIC_MAINNET,
+  // },
   testnet: {
     id: "testnet",
     contract:
       "stars1j64pe4hsr6ptmleapqnax7fdl39a0nw0dwayvgz0d7cmkaezyuzst0n7us",
-    admin: "stars1gxqu5nm55jqwnrzsachesczntqd0fd8xwd5nx8",
-    url: "https://rpc.elgafar-1.stargaze-apis.com/",
+    admin: "stars17cv7tkzteht4pxggrgf3jynstsasdf8pv07d3z",
+    url: "https://rpc.elgafar-1.stargaze-apis.com",
     mnemonic: process.env.MNEMONIC,
   },
 };
@@ -96,15 +90,22 @@ app.post("/resolveCIDs", async (req, res) => {
   res.status(200).send(cidLookup);
 });
 
-// app.get("/contributions", async (req, res) => {
-//     const network = getNetwork(req);
-//   const body = req.body || {};
-//     const queryClient = await CosmWasmClient.connect(network.url);
-//     const stories = await queryClient.queryContractSmart(
-//       network.contract,
-//       { get_stories: {} }
-//     );
-//     const
+app.get("/contributions/:user", async (req, res) => {
+  try {
+    const network = getNetwork(req);
+    const body = req.body || {};
+    const user = req.params.user;
+    const userStories = await db
+      .collection("networks/" + network.id + "/sections")
+      .where("proposer", "==", user)
+      .get();
+    const sections = userStories.docs.map((doc) => doc.data());
+    res.status(200).send(sections);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
 
 // app.get("/authors", async (req, res) => {
 //     const network = getNetwork(req);
@@ -138,71 +139,23 @@ app.post("/resolveCIDs", async (req, res) => {
 //   res.status(200).send(cidLookup);
 // });
 
-// TODO polling to db
-const getBlock = async (client) => {
-  const block = await client.getBlock();
-  return block;
-};
-
-let height = 0;
-const pollHeight = async (client, network) => {
-  if (!height) {
-    const state = (
-      await db.doc("networks/" + network.name + "/state").get()
-    ).data();
-    height = state.height;
-  }
-  const block = await client.getBlock();
-  while (block.header.height > height) {
-    height++;
-    const blockForHeight =
-      block.header.height === height ? block : await client.getBlock(height);
-    await processBlock(blockForHeight);
-    await db.doc("networks/" + network.name + "/state").set(
-      {
-        height,
-      },
-      {
-        merge: true,
-      }
-    );
-  }
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-  pollHeight(client, network);
-};
-
-const processBlock = async (client, network, block) => {
-  const txs = client.searchTx(
-    `tx.height=${block.header.height} AND message.action='/cosmwasm.wasm.v1.MsgExecuteContract' AND execute._contract_address='${network.address}'`
-  );
-};
-
 const DEBOUNCE = 1000;
 const subscribeTxs = async (network, cb) => {
-  const tendermintClient = await Tendermint34Client.connect(
-    network.url.replace("https://", "")
-  );
-  const txStream = tendermintClient.subscribeTx(
-    `message.action='/cosmwasm.wasm.v1.MsgExecuteContract' AND execute._contract_address='${network.address}'`
-  );
-  // const debouncedCb = debounce(cb, DEBOUNCE);
-
-  txStream.subscribe((event) => {
-    console.log(event);
-  });
-};
-
-Object.values(networks).forEach(async (network) => {
+  const debouncedIndex = debounce(async (height) => {
+    index(network, height);
+  }, DEBOUNCE);
   try {
-    await subscribeTxs(network, async (event) => {
-      index(network);
+    subscribe(network, (height) => {
+      debouncedIndex(height);
     });
   } catch (err) {
     console.error(err);
   }
-});
+};
 
-const index = async (network) => {
+const index = async (network, height) => {
+  console.log("Indexing");
+  const queryClient = await CosmWasmClient.connect(network.url);
   const { stories, shares, sections, votes } =
     await queryClient.queryContractSmart(
       network.contract,
@@ -210,15 +163,27 @@ const index = async (network) => {
       "block"
     );
 
-  const storyDocs = stories.map((story) => {
+  const batch = db.batch();
+  stories.map((story) => {
     const doc = db.doc("networks/" + network.id + "/stories/" + story.id);
-    return doc.set(story, { merge: true });
-  });
-  await Promise.all(storyDocs);
+    const sections = story.sections;
+    delete story.sections;
+    batch.set(doc, story, { merge: true });
 
-  const shareDocs = shares.map(([storyId, user, amount]) => {
+    // TODO optimize
+    sections.forEach((section) =>
+      batch.set(
+        db.doc("networks/" + network.id + "/sections/" + section.section_id),
+        section,
+        { merge: true }
+      )
+    );
+  });
+
+  shares.map(([storyId, user, amount]) => {
     const doc = db.doc("networks/" + network.id + "/shares/" + user);
-    return doc.set(
+    batch.set(
+      doc,
       {
         user,
         storyId,
@@ -227,8 +192,62 @@ const index = async (network) => {
       { merge: true }
     );
   });
-  await Promise.all(shareDocs);
+
+  await batch.commit();
+
+  console.log("Indexing done");
 };
+
+const cycle = async (network) => {
+  const client = await adminSigningClient(network);
+  const block = await client.getBlock();
+  const height = block.header.height;
+
+  const stories = await (
+    await db.collection("networks/" + network.id + "/stories").get()
+  ).docs.map((doc) => doc.data());
+  const cycleNeeded = stories.find((story) => {
+    return story.last_cycle + story.interval <= height;
+  });
+
+  if (cycleNeeded) {
+    console.log("Triggering cycle");
+    await client.execute(
+      network.admin,
+      network.contract,
+      {
+        cycle: {},
+      },
+      "auto"
+    );
+    console.log("Done cycle");
+    await index(network, height);
+  }
+};
+
+Object.values(networks).forEach(async (network) => {
+  try {
+    const client = await CosmWasmClient.connect(network.url);
+    const block = await client.getBlock();
+    await index(network, block.header.height);
+    // setInterval(async () => {
+    //   const block = await client.getBlock();
+    //   index(network, block.header.height);
+    // }, 1000 * 60 * 60 * 1); // every hour
+    subscribeTxs(network, async (event) => {
+      const block = await client.getBlock();
+      // TODO get heigth from event
+      index(network, block.header.height);
+    });
+
+    cycle(network);
+    setInterval(async () => {
+      cycle(network);
+    }, 1000 * 60 * 60 * 24);
+  } catch (err) {
+    console.error(err);
+  }
+});
 
 // Start the server
 app.listen(port, () => {
@@ -236,6 +255,7 @@ app.listen(port, () => {
 });
 
 var serviceAccount = require("../serviceAccountKey.json");
+const { subscribe } = require("./websocket");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
