@@ -6,31 +6,7 @@
     }"
   >
     <div style="flex-direction: row; display: flex; padding: 0">
-      <div
-        style="
-          width: 103px;
-          height: 151px;
-          display: flex;
-          justify-content: space-between;
-        "
-        :style="{
-          width: extended ? '151px' : '103px',
-        }"
-        v-if="story.top_nfts.length > 0"
-      >
-        <nft-element
-          v-for="nft in story.top_nfts"
-          :key="nft.image"
-          style="display: inline-block"
-          :style="{
-            height: story.top_nfts.length > 1 ? '45px' : '100%',
-            width: story.top_nfts.length > 1 ? '45px' : '100%',
-            maxHeight: '100%',
-          }"
-          :nft="nft"
-          :size="93"
-        />
-      </div>
+      <story-nft-preview :nfts="story.top_nfts" :extended="extended" />
       <div
         style="
           display: inline-block;
@@ -108,7 +84,7 @@ import {
   IonChip,
   IonLabel,
 } from "@ionic/vue";
-import NftElement from "./NftElement.vue";
+import StoryNftPreview from "./StoryNftPreview.vue";
 
 const nameStore = useNameStore();
 const storyStore = useStoryStore();
@@ -124,9 +100,7 @@ const time = (story) => {
 
 const name = computed(() => nameStore.name(props.story.creator));
 const content = computed(
-  () =>
-    props.story.first_section ||
-    storyStore.cidLookup[props.story.first_section_cid]
+  () => storyStore.cidLookup[props.story.first_section.content_cid]
 );
 </script>
 

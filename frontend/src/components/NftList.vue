@@ -43,9 +43,15 @@ const contracts = computed(() => {
   return Array.from(new Set(props.nfts.map((nft) => nft.contract_address)));
 });
 const loadedNfts = ref([]);
-watch(props.nfts, async () => {
-  loadedNfts.value = await Promise.all(props.nfts.map(nftStore.getNft));
-});
+watch(
+  props.nfts,
+  async () => {
+    loadedNfts.value = await Promise.all(props.nfts.map(nftStore.getNft));
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 
 <style>

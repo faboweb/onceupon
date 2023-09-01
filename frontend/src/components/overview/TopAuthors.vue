@@ -13,15 +13,15 @@
         >See all</span
       >
     </div>
-    <div v-if="authors.length > 0" style="display: flex">
+    <div v-if="loaded" style="display: flex">
       <nft-element
         class="author"
         v-for="author in authors"
         :size="69"
-        :key="author"
-        :nft="getAvatar(author)"
+        :key="author.user"
+        :nft="getAvatar(author.user)"
         style="margin-right: 1rem; cursor: pointer"
-        @click="router.push('/profile/' + author)"
+        @click="router.push('/profile/' + author.user)"
       />
     </div>
     <div v-else style="display: flex">
@@ -71,17 +71,17 @@
             ></ion-icon>
           </div>
         </div>
-        <template v-if="authors.length > 0">
+        <template v-if="loaded">
           <div
             style="display: flex"
             v-for="author in authors"
-            @click="router.push('/profile/' + author)"
+            @click="router.push('/profile/' + author.user)"
             :key="author"
           >
             <nft-element
               class="author"
               :size="69"
-              :nft="getAvatar(author)"
+              :nft="getAvatar(author.user)"
               style="margin-right: 1rem; cursor: pointer"
             />
             <div
@@ -91,8 +91,10 @@
                 flex-direction: column;
               "
             >
-              <b>{{ nameStore.name(author) }}</b>
-              <p v-if="nameStore.name(author) !== author">{{ author }}</p>
+              <b>{{ nameStore.name(author.user) }}</b>
+              <p v-if="nameStore.name(author.user) !== author.user">
+                {{ author.user }}
+              </p>
             </div>
           </div>
         </template>
@@ -116,7 +118,7 @@
 
 <script setup>
 import StoryElement from "@/components/StoryElement.vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useNameStore, useStoryStore } from "../../store";
 import { getAvatar } from "@/scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
@@ -129,19 +131,25 @@ const router = useRouter();
 const nameStore = useNameStore();
 
 const seeAll = ref(false);
+const loaded = ref(false);
+const loadedAll = ref(false);
+const authors = ref([]);
 
-const authors = computed(() => {
-  const authors = new Set();
-  // TODO get all proposal writer but do via query
-  storyStore.stories.forEach((story) => {
-    authors.add(story.creator);
-  });
-  return Array.from(authors);
+watch(seeAll, async () => {
+  if (seeAll.value && !loadedAll.value) {
+    authors.value = await storyStore.loadAuthors();
+    loadedAll.value = true;
+  }
+});
+
+onMounted(async () => {
+  authors.value = await storyStore.loadAuthors(5);
+  loaded.value = true;
 });
 </script>
 
 <style>
-.author img {
+.user img {
   border-radius: 50%;
 }
 </style>

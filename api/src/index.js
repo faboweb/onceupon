@@ -42,6 +42,35 @@ app.use(express.json()); // for parsing application/json
 
 const port = process.env.PORT || 3000;
 
+const clients = {};
+const getClient = async (network) => {
+  if (clients[network.id]) return clients[network.id];
+
+  const queryClient = await CosmWasmClient.connect(network.url);
+  clients[network.id] = queryClient;
+  return queryClient;
+};
+
+const blocks = {};
+const getBlock = async (network, height) => {
+  const client = await getClient(network);
+
+  let block;
+  if (!height) {
+    block = await client.getBlock();
+    height = block.header.height;
+  }
+  if (blocks[height]) return blocks[height];
+
+  block = await client.getBlock(height).catch((err) => {
+    console.log(err);
+    return undefined;
+  });
+  if (!block) return undefined;
+  blocks[block.header.height] = block;
+  return block;
+};
+
 app.post("/web3upload", async (req, res) => {
   const body = req.body || {};
   const { content } = body;
@@ -90,6 +119,42 @@ app.post("/resolveCIDs", async (req, res) => {
   res.status(200).send(cidLookup);
 });
 
+app.get("/story/:id", async (req, res) => {
+  const network = getNetwork(req);
+  const storyId = req.params.id;
+  const story = await db
+    .collection("networks/" + network.id + "/stories")
+    .doc(storyId)
+    .get();
+  if (!story.exists) {
+    res.status(404).send("Story not found");
+    return;
+  }
+  const storyData = story.data();
+  const sections = await db
+    .collection("networks/" + network.id + "/sections")
+    .where("story_id", "==", storyId)
+    .get();
+  const sectionData = sections.docs.map((doc) => doc.data());
+
+  const lastSectionBlock = await getBlock(network, story.last_cycle);
+  const currentBlock = await getBlock(network); // TODO take last?
+  const heightDiff = currentBlock?.header.height - story.last_cycle;
+  const timeDiff =
+    new Date(currentBlock?.header.time).getTime() -
+    new Date(lastSectionBlock.header.time).getTime();
+  const assumedNextSectionBlockTime = new Date(
+    new Date(lastSectionBlock.header.time).getTime() +
+      (timeDiff / heightDiff) * story.interval
+  );
+
+  res.status(200).send({
+    ...storyData,
+    assumedNextSectionBlockTime,
+    sections: sectionData,
+  });
+});
+
 app.get("/contributions/:user", async (req, res) => {
   try {
     const network = getNetwork(req);
@@ -107,37 +172,94 @@ app.get("/contributions/:user", async (req, res) => {
   }
 });
 
-// app.get("/authors", async (req, res) => {
-//     const network = getNetwork(req);
-//   const body = req.body || {};
-//     const queryClient = await CosmWasmClient.connect(network.url);
-//     const stories = await queryClient.queryContractSmart(
-//       network.contract,
-//       { get_stories: {} }
-//     );
-//     const
+app.get("/author/:address", async (req, res) => {
+  const network = getNetwork(req);
+  const shares = await db
+    .collection("networks/" + network.id + "/shares")
+    .where("user", "==", req.params.address)
+    .get();
+  const authorShares = shares.docs
+    .map((doc) => doc.data())
+    .reduce(
+      (acc, curr) => {
+        acc.shares += curr.amount;
+        acc.stories += 1;
+        return acc;
+      },
+      {
+        shares: 0,
+        stories: 0,
+      }
+    );
+  res.status(200).send(authorShares);
+});
 
-// app.post("/stories", async (req, res) => {
-//   const body = req.body || {};
+app.get("/authors", async (req, res) => {
+  const network = getNetwork(req);
+  const { limit } = req.query;
+  const shares = await db
+    .collection("networks/" + network.id + "/shares")
+    .get();
+  const sharesDict = shares.docs
+    .map((doc) => doc.data())
+    .reduce((acc, curr) => {
+      if (!acc[curr.user]) {
+        acc[curr.user] = {
+          user: curr.user,
+          shares: 0,
+          stories: 0,
+        };
+      }
+      acc[curr.user].shares += curr.amount;
+      acc[curr.user].stories += 1;
+      return acc;
+    }, {});
+  let authors = Object.values(sharesDict).sort((a, b) => b.shares - a.shares);
+  if (limit) {
+    authors = authors.slice(0, limit);
+  }
+  res.status(200).send(authors);
+});
 
-//   const stories = await queryClient.queryContractSmart(
-//     network.contract,
-//     { get_stories: {} }
-//   );
-//   const cids = [];
-//   await Promise.all(
-//     stories.map(async (story) => {
-//       story.top_nfts.forEach((nft) => nftStore.loadNft(nft));
-//       const lastSectionBlock = await walletStore.getBlock(story.last_section);
-//       const _story = this.stories?.find((s) => s.id === story.id);
-//       _story.lastUpdate = lastSectionBlock?.header.time;
-//       cids.push(_story.first_section_cid);
-//       nameStore.getName(story.creator);
-//     })
-//   );
-//   // returns the cid
-//   res.status(200).send(cidLookup);
-// });
+app.get("/stories", async (req, res) => {
+  const body = req.body || {};
+  let { limit } = req.query;
+  const network = getNetwork(req);
+  const shares = await db
+    .collection("networks/" + network.id + "/shares")
+    .get();
+  const sharesDict = shares.docs
+    .map((doc) => doc.data())
+    .reduce((acc, curr) => {
+      if (!acc[curr.storyId]) {
+        acc[curr.storyId] = {
+          storyId: curr.storyId,
+          shares: 0,
+        };
+      }
+      acc[curr.storyId].shares += curr.amount;
+      return acc;
+    }, {});
+  const storyIds = Object.values(sharesDict);
+  const stories = await db
+    .collection("networks/" + network.id + "/stories")
+    .get();
+  let topStories = stories.docs
+    .map((doc) => doc.data())
+    .filter((story) => storyIds.find((_s) => _s.storyId === story.id))
+    .map((story) => {
+      return {
+        ...story,
+        shares: sharesDict[story.id].shares,
+      };
+    })
+    .sort((a, b) => b.shares - a.shares);
+  if (limit) {
+    topStories = topStories.slice(0, limit);
+  }
+
+  return res.status(200).send(topStories);
+});
 
 const DEBOUNCE = 1000;
 const subscribeTxs = async (network, cb) => {
@@ -155,30 +277,72 @@ const subscribeTxs = async (network, cb) => {
 
 const index = async (network, height) => {
   console.log("Indexing");
-  const queryClient = await CosmWasmClient.connect(network.url);
-  const { stories, shares, sections, votes } =
-    await queryClient.queryContractSmart(
-      network.contract,
-      { get_state: {} },
-      "block"
-    );
+  const queryClient = await getClient(network);
+  const {
+    stories,
+    shares,
+    sections: proposals,
+    votes,
+  } = await queryClient.queryContractSmart(
+    network.contract,
+    { get_state: {} },
+    "block"
+  );
 
   const batch = db.batch();
-  stories.map((story) => {
-    const doc = db.doc("networks/" + network.id + "/stories/" + story.id);
-    const sections = story.sections;
-    delete story.sections;
-    batch.set(doc, story, { merge: true });
-
-    // TODO optimize
-    sections.forEach((section) =>
+  await Promise.all(
+    stories.map(async (story) => {
+      const doc = db.doc("networks/" + network.id + "/stories/" + story.id);
+      const sections = story.sections;
+      delete story.sections;
       batch.set(
-        db.doc("networks/" + network.id + "/sections/" + section.section_id),
-        section,
+        doc,
+        {
+          ...story,
+          first_section: sections[0],
+          last_section: sections[sections.length - 1],
+          sections: sections.length,
+          owners: shares.filter(({ story_id }) => story_id === story.id).length,
+          proposals: proposals.filter(({ story_id }) => story_id === story.id)
+            .length,
+          shares: shares
+            .filter(({ story_id }) => story_id === story.id)
+            .reduce((acc, curr) => acc + curr.amount, 0),
+          lastUpdate: (await getBlock(network, story.last_cycle)).header.time,
+          top_nfts: Object.entries(
+            sections.reduce((acc, curr) => {
+              if (curr.nft) {
+                acc[curr.nft.contract_address + "_" + curr.nft.token_id] =
+                  (acc[curr.nft.contract_address + "_" + curr.nft.token_id] ||
+                    0) + 1;
+              }
+              return acc;
+            }, {})
+          )
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 4)
+            .map(([nft, count]) => {
+              const [contract_address, token_id] = nft.split("_");
+              return {
+                contract_address,
+                token_id,
+                count,
+              };
+            }),
+        },
         { merge: true }
-      )
-    );
-  });
+      );
+
+      // TODO optimize
+      sections.forEach((section) =>
+        batch.set(
+          db.doc("networks/" + network.id + "/sections/" + section.section_id),
+          section,
+          { merge: true }
+        )
+      );
+    })
+  );
 
   shares.map(([storyId, user, amount]) => {
     const doc = db.doc("networks/" + network.id + "/shares/" + user);

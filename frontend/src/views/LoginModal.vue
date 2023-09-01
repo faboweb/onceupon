@@ -8,6 +8,21 @@
     <ion-content style="text-align: center">
       <div
         style="
+          text-align: right;
+          width: 100%;
+          padding-right: 1rem;
+          padding-top: 0.5rem;
+          font-size: 24px;
+        "
+      >
+        <ion-icon
+          :icon="closeOutline"
+          style="cursor: pointer"
+          @click="authStore.showSignInModal = false"
+        ></ion-icon>
+      </div>
+      <div
+        style="
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -75,8 +90,15 @@
 </template>
 
 <script setup>
-import { IonModal, IonButton, IonContent, IonAvatar } from "@ionic/vue";
+import {
+  IonModal,
+  IonButton,
+  IonContent,
+  IonAvatar,
+  IonIcon,
+} from "@ionic/vue";
 import { useAuthStore, useWalletStore, useWeb2AuthStore } from "../store";
+import { closeOutline } from "ionicons/icons";
 
 const authStore = useAuthStore();
 const web2AuthStore = useWeb2AuthStore();

@@ -18,6 +18,7 @@ import {
 import { computed, onMounted, Ref, ref, defineProps, watch } from "vue";
 import NftElement from "../../components/NftElement.vue";
 import NftList from "@/components/NftList.vue";
+import { getNftKey } from "../../store/nfts";
 
 const storyStore = useStoryStore();
 const route = useRoute();
@@ -35,10 +36,10 @@ const nfts = computed(() => {
     .map((section) => section.nft)
     .filter((nft) => !!nft)
     .reduce((all, cur) => {
-      all[cur.id] = all[cur.id]
+      all[getNftKey(cur)] = all[getNftKey(cur)]
         ? {
-            ...all[cur.id],
-            sections: all[cur.id].sections + 1,
+            ...all[getNftKey(cur)],
+            sections: all[getNftKey(cur)].sections + 1,
           }
         : {
             ...cur,

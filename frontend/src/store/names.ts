@@ -17,7 +17,9 @@ export const useNameStore = defineStore("nameStore", {
     names: {},
   }),
   getters: {
-    name: (state) => (name) => state.names[name]?.name || name,
+    name: (state) => (name) =>
+      state.names[name]?.name ||
+      name.substr(0, 10) + "..." + name.substr(name.length - 4, 4),
     avatar: (state) => (name) => state.names[name]?.nft,
   },
   actions: {
@@ -55,7 +57,7 @@ export const useNameStore = defineStore("nameStore", {
           nft,
         };
       } catch (err) {
-        this.names[address] = { name: address };
+        this.names[address] = { name: undefined };
       }
     },
   },

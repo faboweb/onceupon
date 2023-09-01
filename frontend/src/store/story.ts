@@ -61,21 +61,7 @@ export const useStoryStore = defineStore("storyStore", {
       if (this.fullStories[storyId]) {
         return this.fullStories[storyId];
       }
-      const walletStore = useWalletStore();
-      const story = await walletStore.query({
-        get_story: { story_id: storyId },
-      });
-      const lastSectionBlock = await walletStore.getBlock(story.last_cycle);
-      const currentBlock = await walletStore.getBlock();
-      const heightDiff = currentBlock?.header.height - story.last_cycle;
-      const timeDiff =
-        new Date(currentBlock?.header.time).getTime() -
-        new Date(lastSectionBlock.header.time).getTime();
-      const assumedNextSectionBlockTime = new Date(
-        new Date(lastSectionBlock.header.time).getTime() +
-          (timeDiff / heightDiff) * story.interval
-      );
-      story.assumedNextSectionBlockTime = assumedNextSectionBlockTime;
+      const story = await callApi("story/" + storyId, "GET");
 
       this.loadContent(story.sections.map((section) => section.content_cid));
 
@@ -83,26 +69,26 @@ export const useStoryStore = defineStore("storyStore", {
 
       return story;
     },
-    async loadStories() {
-      const walletStore = useWalletStore();
+    async loadStories(limit?) {
+      const stories = await callApi(
+        "stories" + (limit ? "?limit" + limit : ""),
+        "GET"
+      );
       const nftStore = useNftStore();
       const nameStore = useNameStore();
-      const result = await walletStore.query({ get_stories: {} });
-      this.stories = result;
+      if (!limit) {
+        this.stories = stories;
+      }
       const cids: string[] = [];
       await Promise.all(
-        result.map(async (story) => {
+        stories.map(async (story) => {
           story.top_nfts.forEach((nft) => nftStore.loadNft(nft));
-          const lastSectionBlock = await walletStore.getBlock(
-            story.last_section
-          );
-          const _story = this.stories?.find((s) => s.id === story.id);
-          _story.lastUpdate = lastSectionBlock?.header.time;
-          cids.push(_story.first_section_cid);
+          cids.push(story.first_section.content_cid);
           nameStore.getName(story.creator);
         })
       );
       await this.loadContent(cids);
+      return stories;
     },
     async loadProposals(storyId) {
       const walletStore = useWalletStore();
@@ -222,6 +208,16 @@ export const useStoryStore = defineStore("storyStore", {
 
       this.contributions[address] = sections;
       this.loadContent(sections.map((section) => section.content_cid));
+    },
+    async loadAuthors(limit) {
+      const nameStore = useNameStore();
+      const authors = await callApi(
+        "authors" + (limit ? "?limit=" + limit : ""),
+        "GET"
+      );
+      authors.forEach((author) => nameStore.getName(author.address));
+
+      return authors;
     },
   },
 });

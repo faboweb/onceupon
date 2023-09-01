@@ -5,7 +5,7 @@
         <span
           slot="start"
           style="margin-left: 1rem; cursor: pointer"
-          @click="router.push('/')"
+          @click="router.push('/overview')"
         >
           {{ "<" }} Back
         </span>

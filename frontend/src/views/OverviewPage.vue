@@ -15,7 +15,7 @@
           >
         </span>
         <div slot="end">
-          <span><b>Votes</b></span>
+          <b style="opacity: 0.6">Votes</b>
         </div>
       </ion-toolbar>
     </ion-header>
