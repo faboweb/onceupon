@@ -32,6 +32,7 @@ onMounted(async () => {
 
 const nfts = computed(() => {
   if (!story.value) return [];
+
   const countedNfts = story.value.sections
     .map((section) => section.nft)
     .filter((nft) => !!nft)
@@ -47,7 +48,10 @@ const nfts = computed(() => {
           };
       return all;
     }, {});
-  return Object.values(countedNfts).sort((a, b) => a.sections - b.sections);
+  const nfts = Object.values(countedNfts).sort(
+    (a, b) => a.sections - b.sections
+  );
+  return nfts;
 });
 </script>
 

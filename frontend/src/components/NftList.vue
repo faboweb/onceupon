@@ -44,7 +44,7 @@ const contracts = computed(() => {
 });
 const loadedNfts = ref([]);
 watch(
-  props.nfts,
+  () => props.nfts,
   async () => {
     loadedNfts.value = await Promise.all(props.nfts.map(nftStore.getNft));
   },

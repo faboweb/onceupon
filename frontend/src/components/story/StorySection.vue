@@ -115,7 +115,8 @@ const content = computed(() => storyStore.cidLookup[props.section.content_cid]);
 const liked = computed(() => likeStore.like(props.section));
 
 onMounted(() => {
-  nftStore.loadNft(networkStore.currentNetwork, props.section.nft);
+  props.section.nft &&
+    nftStore.loadNft(networkStore.currentNetwork, props.section.nft);
   walletStore.getBlock(props.section.added);
 });
 

@@ -1,41 +1,45 @@
 export async function loadNft(network, nft) {
-  const {
-    data: { token },
-  } = await fetch(network.graphql, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: `
-              query TokenMedia($collectionAddr: String!, $tokenId: String!, $size: ImageSize) {
-                token(collectionAddr: $collectionAddr, tokenId: $tokenId) {
-                  media {
-                    image(size: $size) {
-                      height
-                      width
-                      jpgLink
-                      isAnimated
+  try {
+    const {
+      data: { token },
+    } = await fetch(network.graphql, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: `
+                query TokenMedia($collectionAddr: String!, $tokenId: String!, $size: ImageSize) {
+                  token(collectionAddr: $collectionAddr, tokenId: $tokenId) {
+                    media {
+                      image(size: $size) {
+                        height
+                        width
+                        jpgLink
+                        isAnimated
+                      }
+                    }
+                    name
+                    tokenId
+                    collection {
+                      contractAddress
+                      name
                     }
                   }
-                  name
-                  tokenId
-                  collection {
-                    contractAddress
-                    name
-                  }
                 }
-              }
-            `,
-      variables: {
-        collectionAddr: nft.contract_address,
-        tokenId: nft.token_id,
-        size: "MD",
-      },
-    }),
-  }).then((res) => res.json());
+              `,
+        variables: {
+          collectionAddr: nft.contract_address,
+          tokenId: nft.token_id,
+          size: "MD",
+        },
+      }),
+    }).then((res) => res.json());
 
-  return token;
+    return token;
+  } catch (err) {
+    return undefined;
+  }
 }
 
 export async function loadNftsForAddress(network, address) {
