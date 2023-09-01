@@ -14,6 +14,22 @@
       "
       @click.prevent="selectedNft = section.nft"
     />
+    <div
+      class="like-button"
+      style="
+        float: left;
+        padding-right: 0.5rem;
+        margin-top: 4px;
+        font-size: 30px;
+        cursor: pointer;
+      "
+      :class="{
+        liked,
+      }"
+      @click="likeStore.toggleLike(section)"
+    >
+      <ion-icon :icon="liked ? heart : heartOutline"></ion-icon>
+    </div>
     <p
       style="
         font-size: 14px;
@@ -69,11 +85,13 @@ import { useNameStore } from "@/store";
 import { useWalletStore } from "@/store/wallet";
 import { useNftStore } from "@/store/nfts";
 import { useStoryStore } from "@/store/story";
+import { useLikeStore } from "@/store/likes";
 import { IonGrid, IonRow, IonCol, IonCard, useIonRouter } from "@ionic/vue";
 import { formatDistance } from "date-fns";
 import { computed, defineProps, onMounted, ref } from "vue";
 import NftElement from "../NftElement.vue";
 import { useNetworkStore } from "../../store";
+import { heart, heartOutline } from "ionicons/icons";
 
 const walletStore = useWalletStore();
 const nftStore = useNftStore();
@@ -81,6 +99,7 @@ const nameStore = useNameStore();
 const storyStore = useStoryStore();
 const router = useIonRouter();
 const networkStore = useNetworkStore();
+const likeStore = useLikeStore();
 
 const selectedNft = ref();
 
@@ -93,6 +112,7 @@ const props = defineProps({
 
 const name = computed(() => nameStore.name(props.section.proposer));
 const content = computed(() => storyStore.cidLookup[props.section.content_cid]);
+const liked = computed(() => likeStore.like(props.section));
 
 onMounted(() => {
   nftStore.loadNft(networkStore.currentNetwork, props.section.nft);
@@ -109,7 +129,7 @@ const time = computed(() => {
   );
 });
 </script>
-<style scoped>
+<style scoped lang="scss">
 ion-card {
   box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
   border-radius: 15px;
@@ -121,5 +141,13 @@ ion-skeleton-text {
 }
 .skeleton-offset ion-skeleton-text {
   width: calc(100% - 133px);
+}
+.like-button {
+  &.liked {
+    color: rgba(242, 103, 9, 1);
+  }
+  &:hover {
+    color: rgba(242, 103, 9, 1);
+  }
 }
 </style>

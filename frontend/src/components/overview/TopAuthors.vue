@@ -152,4 +152,7 @@ onMounted(async () => {
 .user img {
   border-radius: 50%;
 }
+.author img {
+  border-radius: 50%;
+}
 </style>

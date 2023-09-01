@@ -40,12 +40,14 @@ import { menu, cartOutline } from "ionicons/icons";
 import { onMounted, ref, watch } from "vue";
 import MobileFooter from "./components/overview/MobileFooter.vue";
 import LoginModal from "./views/LoginModal.vue";
+import { useLikeStore } from "@/store/likes";
 
 const walletStore = useWalletStore();
 const nameStore = useNameStore();
 const web2AuthStore = useWeb2AuthStore();
 const authStore = useAuthStore();
 const networkStore = useNetworkStore();
+const likeStore = useLikeStore();
 
 authStore.loadFromLocalStorage();
 

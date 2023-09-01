@@ -156,11 +156,14 @@
             "
           >
             <b style="font-size: 20px">{{ story.name }}</b>
-            <span
-              style="font-size: 14px; cursor: pointer"
-              @click="router.push('/profile/' + story.creator)"
-              >By {{ nameStore.name(story.creator) }}</span
-            >
+            <div>
+              <span
+                style="font-size: 14px; cursor: pointer"
+                @click="router.push('/profile/' + story.creator)"
+                >By {{ nameStore.name(story.creator) }}</span
+              >
+              - <span style="font-size: 14px">{{ story.owners }} Owners</span>
+            </div>
             <p style="margin-bottom: 1rem">{{ content.substr(0, 240) }}...</p>
             <div>
               <ion-button
@@ -212,9 +215,9 @@
         "
       >
         <div>
-          <div style="display: flex; flex-direction: column">
+          <div style="display: flex; flex-direction: column; text-align: left">
             <b>ONCE UPON</b>
-            <span>Made with love</span>
+            <span style="font-size: 14px">Own your story</span>
           </div>
         </div>
         <div>

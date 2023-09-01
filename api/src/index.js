@@ -7,9 +7,11 @@ const {
 const { GasPrice } = require("@cosmjs/stargate");
 const { stringToPath, sha256 } = require("@cosmjs/crypto");
 const { File, Web3Storage } = require("web3.storage");
-const { verifyArbitrary } = require("@keplr-wallet/cosmos");
+const { verifyADR36Amino } = require("@keplr-wallet/cosmos");
+const amino = require("@cosmjs/amino");
 var cors = require("cors");
 const debounce = require("lodash.debounce");
+var crypto = require("crypto");
 
 // global.fetch = require("node-fetch"); // needed by stargaze
 
@@ -302,11 +304,11 @@ const index = async (network, height) => {
           first_section: sections[0],
           last_section: sections[sections.length - 1],
           sections: sections.length,
-          owners: shares.filter(({ story_id }) => story_id === story.id).length,
+          owners: shares.filter(([story_id]) => story_id === story.id).length,
           proposals: proposals.filter(({ story_id }) => story_id === story.id)
             .length,
           shares: shares
-            .filter(({ story_id }) => story_id === story.id)
+            .filter(([story_id]) => story_id === story.id)
             .reduce((acc, curr) => acc + curr.amount, 0),
           lastUpdate: (await getBlock(network, story.last_cycle)).header.time,
           top_nfts: Object.entries(
@@ -558,27 +560,105 @@ app.post("/executeWeb2", async (req, res) => {
   }
 });
 
-app.get("/web3Auth", async (req, res) => {
+app.post("/web3AuthNonce", async (req, res) => {
   const body = req.body || {};
-  const {
-    chainId,
-    signer,
-    data, // base64
-    signature,
-  } = body;
-  const verified = await verifyArbitrary(
-    chainId,
-    signer,
-    Buffer.from(data, "base64"),
-    signature
-  );
+  const { address } = body;
+  const nonce = (Math.random() + 1).toString(36).substring(7);
+  await db.doc("/nonces/" + address).set({
+    nonce,
+    address,
+  });
+  res.send(nonce).status(200);
+});
+
+app.post("/web3Auth", async (req, res) => {
+  const network = getNetwork(req);
+  const body = req.body || {};
+  const { address, signature } = body;
+
+  const { nonce } = (await db.doc("/nonces/" + address).get()).data();
+  const data = JSON.stringify({
+    message: "Signing into OnceUpon",
+    nonce,
+  });
+
+  const { pubkey: decodedPubKey, signature: decodedSignature } =
+    amino.decodeSignature(signature);
+
+  let verified = false;
+  try {
+    verified = verifyADR36Amino(
+      "stars",
+      address,
+      data,
+      decodedPubKey,
+      decodedSignature
+    );
+  } catch (err) {
+    console.error(err);
+  }
   if (!verified) {
-    res.status(401).send("Unauthorized");
+    res.status(403).send("Unauthorized");
     return;
   }
-  const customToken = await auth.createCustomToken(signer);
+  const customToken = await auth.createCustomToken(address);
 
   res.status(200).send(customToken);
+});
+
+const getUserAddress = async (user) => {
+  if (user.firebase.sign_in_provider === "custom") {
+    return user.uid;
+  }
+  const walletPath = "users/" + user.uid + "/networks/" + network.id;
+  const { address } = (await db.doc(walletPath).get()).data();
+  return address;
+};
+
+app.post("/like", async (req, res) => {
+  try {
+    const idToken = await getToken(req);
+    const user = await admin.auth().verifyIdToken(idToken);
+    const network = getNetwork(req);
+
+    const body = req.body || {};
+    const { story_id, section_id } = body;
+    const key = story_id + section_id + user.uid;
+
+    // TODO add address as claim
+    const address = await getUserAddress(user);
+
+    const hash = crypto.createHash("md5").update(key).digest("hex");
+    const like = db.collection("networks/" + network.id + "/likes").doc(hash);
+    if ((await like.get()).exists) {
+      await like.delete();
+    } else {
+      await like.set({
+        address,
+        story_id: story_id,
+        section_id: section_id,
+      });
+    }
+    res.status(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+app.get("/likes/:address", async (req, res) => {
+  const network = getNetwork(req);
+
+  const address = req.params.address;
+  const likes = await db
+    .collection("networks/" + network.id + "/likes")
+    .where("address", "==", address)
+    .get();
+  const result = [];
+  likes.forEach((like) => {
+    result.push(like.data());
+  });
+  res.status(200).send(result);
 });
 
 function getToken(request) {

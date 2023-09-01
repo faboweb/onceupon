@@ -34,8 +34,20 @@ export const connectKeplr = async (network) => {
   const key = await window.keplr.getKey(network.chainId);
 
   return {
+    signer: offlineSigner,
     client: signingClient,
     address: key.bech32Address,
     name: key.name,
   };
+};
+
+export const signArbitrary = async (network, data) => {
+  const { address } = await connectKeplr(network);
+  // @ts-ignore
+  const signature = await window.keplr.signArbitrary(
+    network.chainId,
+    address,
+    data
+  );
+  return { address, signature };
 };

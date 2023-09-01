@@ -6,24 +6,33 @@
         height: 151px;
         display: flex;
         justify-content: space-between;
+        border-radius: 8px;
+        overflow: hidden;
       "
       :style="{
         width: props.extended ? '151px' : '103px',
       }"
       v-if="props.nfts.length > 0"
     >
-      <nft-element
-        v-for="nft in props.nfts"
-        :key="nft.image"
-        style="display: inline-block"
+      <div
         :style="{
-          height: props.nfts.length > 1 ? '45px' : '100%',
-          width: props.nfts.length > 1 ? '45px' : '100%',
-          maxHeight: '100%',
+          //marginLeft: !props.extended ? '-25px' : '',
+          maxWidth: !props.extended ? 'inherit' : '100%',
         }"
-        :nft="nft"
-        :size="93"
-      />
+      >
+        <nft-element
+          v-for="nft in props.nfts"
+          :key="nft.image"
+          style="display: inline-block"
+          :style="{
+            height: props.nfts.length > 1 ? '45px' : '100%',
+            width: props.nfts.length > 1 ? '45px' : '100%',
+            maxHeight: '100%',
+          }"
+          :nft="nft"
+          :size="93"
+        />
+      </div>
     </div>
   </div>
 </template>

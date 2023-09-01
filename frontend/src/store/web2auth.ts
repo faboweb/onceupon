@@ -5,7 +5,10 @@ import { useAuthStore } from "./auth";
 import { firebaseConfig } from "@/scripts/firebase";
 import axios from "axios";
 import { useNetworkStore } from "./network";
-import { callApiAuthenticated } from "@/scripts/api";
+import { callApi, callApiAuthenticated } from "@/scripts/api";
+import { useWalletStore } from "./wallet";
+import { signArbitrary } from "@/scripts/keplr";
+import { updateProfile } from "firebase/auth";
 // import { useWalletStore } from "./wallet";
 // import { signArbitrary } from "@keplr-wallet/cosmos";
 // import axios from "axios";
@@ -79,47 +82,63 @@ export const useWeb2AuthStore = defineStore("web2AuthStore", {
           console.error(error);
         });
     },
-    // async signInWithKeplr() {
-    //   const {
-    //     getAuth,
-    //     signInWithCustomToken,
-    //     setPersistence,
-    //     browserLocalPersistence,
-    //   } = await import("firebase/auth");
+    async signInWithKeplr() {
+      const {
+        getAuth,
+        signInWithCustomToken,
+        setPersistence,
+        browserLocalPersistence,
+      } = await import("firebase/auth");
 
-    //   const authStore = useAuthStore();
-    //   const walletStore = useWalletStore();
-    //   const signer = await walletStore.logInUser();
-    //   const data = Buffer.from("Signing into OnceUpon");
-    //   const signature = await signArbitrary("cosmoshub-4", signer, data);
+      const networkStore = useNetworkStore();
+      const walletStore = useWalletStore();
 
-    //   const customToken = await axios
-    //     .post(process.env.VUE_APP_API_URL + "web3Auth", {
-    //       signer,
-    //       data: data.toString("base64"),
-    //       signature,
-    //     })
-    //     .then((res) => res.data);
-    //   const auth = getAuth();
-    //   await setPersistence(auth, browserLocalPersistence);
+      await walletStore.logInUser();
 
-    //   return signInWithCustomToken(auth, customToken)
-    //     .then((result) => {
-    //       const user = result.user;
+      const address = walletStore.address;
 
-    //       const authStore = useAuthStore();
-    //       authStore.setSignIn(
-    //         {
-    //           name: user.displayName,
-    //           image: user.photoURL,
-    //         },
-    //         "keplrSignIn"
-    //       );
-    //     })
-    //     .catch((error) => {
-    //       console.error(error);
-    //     });
-    // },
+      const nonce = await callApi("web3AuthNonce", "POST", {
+        address,
+      });
+      const data = JSON.stringify({
+        message: "Signing into OnceUpon",
+        nonce,
+      });
+      const { signature } = await signArbitrary(
+        networkStore.currentNetwork,
+        data
+      );
+
+      const customToken = await callApi("web3Auth", "POST", {
+        chainId: networkStore.currentNetwork.chainId,
+        address,
+        signature,
+      });
+      const auth = getAuth();
+      await setPersistence(auth, browserLocalPersistence);
+
+      return signInWithCustomToken(auth, customToken)
+        .then((result) => {
+          const user = result.user;
+
+          updateProfile(user, {
+            displayName: walletStore.name,
+          });
+
+          const authStore = useAuthStore();
+          authStore.setSignIn(
+            {
+              name: walletStore.name,
+              image: user.photoURL,
+              address,
+            },
+            "keplrSignIn"
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
 
     // async signInWithGithub() {
     //   const { getAuth, signInWithPopup, GithubAuthProvider } = await import(

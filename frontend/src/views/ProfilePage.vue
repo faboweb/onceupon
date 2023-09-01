@@ -37,6 +37,7 @@
         <div style="margin-top: 1rem">
           <div
             style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
+            v-if="!(contributionsLoaded && contributions.length === 0)"
           >
             {{ self ? "My " : "" }}Contributions
           </div>
@@ -57,7 +58,7 @@
 
           <div style="display: flex; margin-top: 0.5rem; flex-wrap: wrap">
             <div
-              v-for="(section, i) of [].concat(...contributions)"
+              v-for="(section, i) of contributions"
               :key="i"
               style="
                 background: rgba(217, 217, 217, 0.2);
@@ -127,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   useAuthStore,
@@ -138,6 +139,7 @@ import {
 import NftElement from "../components/NftElement.vue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import { IonPage, IonContent } from "@ionic/vue";
+import { useLikeStore } from "../store/likes";
 
 const route = useRoute();
 const address = String(route?.params.address);
@@ -145,7 +147,10 @@ const address = String(route?.params.address);
 const authStore = useAuthStore();
 const nameStore = useNameStore();
 const storyStore = useStoryStore();
+const likeStore = useLikeStore();
 const router = useRouter();
+const likes = ref([]);
+
 const profileName = computed(() => {
   return nameStore.name(address);
 });
@@ -172,9 +177,10 @@ const contributionsLoaded = computed(() => {
 
 watch(
   () => address,
-  () => {
+  async () => {
     nameStore.getName(address);
     storyStore.loadContributions(address);
+    likes.value = await likeStore.getLikes(address);
   },
   {
     immediate: true,
@@ -191,7 +197,7 @@ ion-button {
   font-weight: 600;
 }
 </style>
-<style>
+<style scoped>
 .author img {
   border-radius: 50%;
 }
