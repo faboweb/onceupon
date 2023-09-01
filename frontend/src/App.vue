@@ -5,61 +5,7 @@
         style="max-width: 600px; margin-left: auto; margin-right: auto"
       />
     </ion-content>
-    <ion-modal
-      id="sign-in-modal"
-      :is-open="authStore.showSignInModal"
-      @will-dismiss="authStore.showSignInModal = false"
-    >
-      <ion-content>
-        <div style="display: flex; flex-direction: column; align-items: center">
-          <h1>Connect to OnceUpon</h1>
-          <ion-button
-            @click="
-              walletStore.logInUser();
-              authStore.showSignInModal = false;
-            "
-            style="width: 250px; color: black"
-            color="white"
-            class="sign-in-button"
-          >
-            <ion-avatar>
-              <img alt="Keplr logo" src="../public/assets/keplr-logo.png" />
-            </ion-avatar>
-            <ion-label
-              >Connect<span class="hide-xs">&nbsp;Keplr</span></ion-label
-            >
-          </ion-button>
-          <ion-button
-            @click="
-              web2AuthStore.signInWithGoogle();
-              authStore.showSignInModal = false;
-            "
-            style="width: 250px; color: black"
-            color="white"
-            class="sign-in-button"
-          >
-            <ion-avatar>
-              <img alt="Google logo" src="../public/assets/google-logo.svg" />
-            </ion-avatar>
-            <ion-label>Connect Google</ion-label>
-          </ion-button>
-          <ion-button
-            @click="
-              web2AuthStore.signInWithTwitter();
-              authStore.showSignInModal = false;
-            "
-            style="width: 250px; color: black"
-            color="white"
-            class="sign-in-button"
-          >
-            <ion-avatar>
-              <img alt="Twitter logo" src="../public/assets/twitter-logo.png" />
-            </ion-avatar>
-            <ion-label>Connect Twitter</ion-label>
-          </ion-button>
-        </div>
-      </ion-content>
-    </ion-modal>
+    <login-modal />
   </ion-app>
 </template>
 
@@ -93,6 +39,7 @@ import {
 import { menu, cartOutline } from "ionicons/icons";
 import { onMounted, ref, watch } from "vue";
 import MobileFooter from "./components/overview/MobileFooter.vue";
+import LoginModal from "./views/LoginModal.vue";
 
 const walletStore = useWalletStore();
 const nameStore = useNameStore();
@@ -195,11 +142,6 @@ ion-button ion-avatar {
 .sign-in-button ion-avatar {
   position: absolute;
   left: 1rem;
-}
-
-#sign-in-modal::part(content) {
-  width: 300px;
-  height: 220px;
 }
 
 ion-header {

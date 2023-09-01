@@ -1,9 +1,9 @@
 <template>
-  <ion-page>
+  <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-content>
       <div style="padding-top: 1rem">
         <div
-          style="text-align: right; float: right"
+          style="position: absolute; right: 0.5rem"
           :style="{
             visibility: self ? 'visible' : 'hidden',
           }"
@@ -182,7 +182,7 @@ watch(
 );
 </script>
 
-<style>
+<style scoped>
 ion-button {
   background: rgba(242, 103, 9, 1);
   border-radius: 8px;
@@ -190,6 +190,8 @@ ion-button {
   font-size: 14px;
   font-weight: 600;
 }
+</style>
+<style>
 .author img {
   border-radius: 50%;
 }

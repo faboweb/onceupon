@@ -9,11 +9,11 @@ module.exports = {
     appleMobileWebAppStatusBarStyle: "black",
     iconPaths: {
       faviconSVG: null,
-      favicon32: "assets/onceupon-logo.png",
-      favicon16: "assets/onceupon-logo.png",
-      appleTouchIcon: "assets/onceupon-logo.png",
+      favicon32: "assets/onceupon-logo-feather-lite.png",
+      favicon16: "assets/onceupon-logo-feather-lite.png",
+      appleTouchIcon: "assets/onceupon-logo-feather-lite.png",
       maskIcon: null,
-      msTileImage: "assets/onceupon-logo.png",
+      msTileImage: "assets/onceupon-logo-feather-lite.png",
     },
   },
   configureWebpack: {

@@ -31,7 +31,11 @@
       ></ion-skeleton-text>
     </div>
 
-    <ion-modal :is-open="seeAll" @will-dismiss="seeAll = false">
+    <ion-modal
+      :is-open="seeAll"
+      @will-dismiss="seeAll = false"
+      style="--height: 100%"
+    >
       <ion-content
         style="display: flex; flex-direction: column"
         class="ion-padding"

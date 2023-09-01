@@ -1,5 +1,5 @@
 <template>
-  <ion-page>
+  <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-header>
       <ion-toolbar>
         <span slot="start">
@@ -15,7 +15,7 @@
           >
         </span>
         <div slot="end">
-          <span><b>Cart</b></span>
+          <span><b>Votes</b></span>
         </div>
       </ion-toolbar>
     </ion-header>

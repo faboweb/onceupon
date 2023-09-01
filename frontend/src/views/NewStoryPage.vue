@@ -1,5 +1,5 @@
 <template>
-  <ion-page>
+  <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-content
       :fullscreen="true"
       class="ion-padding"
