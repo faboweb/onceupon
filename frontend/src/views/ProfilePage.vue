@@ -102,24 +102,38 @@
             </div>
           </div>
         </div>
-        <!-- <div>
+        <div v-if="likes === undefined || likes.length > 0">
           <div
             style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
           >
             {{ self ? "My " : "" }}Likes
           </div>
-          <div style="display: flex; flex-direction: row">
+          <div
+            style="display: flex; flex-direction: row; margin-top: 0.5rem"
+            v-if="!doneLoadingLikes"
+          >
             <ion-skeleton-text
               style="height: 103px; width: 151px; margin-right: 1rem"
+              :animated="true"
             ></ion-skeleton-text>
             <ion-skeleton-text
               style="height: 103px; width: 151px; margin-right: 1rem"
+              :animated="true"
             ></ion-skeleton-text>
             <ion-skeleton-text
               style="height: 103px; width: 151px; margin-right: 1rem"
+              :animated="true"
             ></ion-skeleton-text>
           </div>
-        </div> -->
+          <div v-else style="margin-top: 0.5rem">
+            <abstract-element
+              v-for="section of loadedLikes"
+              :key="section.section_id"
+              :proposal="section"
+              caption="Section"
+            />
+          </div>
+        </div>
       </div>
 
       <mobile-footer />
@@ -138,6 +152,7 @@ import {
 } from "../store";
 import NftElement from "../components/NftElement.vue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
+import AbstractElement from "../components/AbstractElement.vue";
 import { IonPage, IonContent } from "@ionic/vue";
 import { useLikeStore } from "../store/likes";
 
@@ -149,7 +164,9 @@ const nameStore = useNameStore();
 const storyStore = useStoryStore();
 const likeStore = useLikeStore();
 const router = useRouter();
-const likes = ref([]);
+const likes = ref();
+const loadedLikes = ref([]);
+const doneLoadingLikes = ref(false);
 
 const profileName = computed(() => {
   return nameStore.name(address);
@@ -178,14 +195,30 @@ const contributionsLoaded = computed(() => {
 watch(
   () => address,
   async () => {
+    doneLoadingLikes.value = false;
+    loadedLikes.value = [];
     nameStore.getName(address);
     storyStore.loadContributions(address);
     likes.value = await likeStore.getLikes(address);
+    await Promise.all(
+      likes.value.map(async ({ story_id, section_id }) => {
+        const story = await storyStore.getStory(story_id);
+        const section = story.sections.find(
+          (section) => section.section_id === section_id
+        );
+        loadedLikes.value.push(section);
+      })
+    );
+    doneLoadingLikes.value = true;
   },
   {
     immediate: true,
   }
 );
+
+onMounted(() => {
+  storyStore.loadStories();
+});
 </script>
 
 <style scoped>

@@ -14,40 +14,12 @@
       <span>Continue where you left off</span>
     </div>
     <div>
-      <div
+      <abstract-element
         v-for="(proposal, i) of continueStore.proposals"
         :key="i"
-        style="
-          background: rgba(217, 217, 217, 0.2);
-          border-radius: 8px;
-          padding: 0.5rem;
-          cursor: pointer;
-          width: 186px;
-          height: 123px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        "
-        @click="router.push('/story/' + proposal.storyId + '/read/')"
-      >
-        <b style="margin-bottom: 0.2rem; font-size: 14px; white-space: nowrap">
-          {{ proposal.title }}
-        </b>
-        <span style="color: rgba(242, 103, 9, 0.6); font-size: 14px"
-          >Proposal</span
-        >
-        <p
-          style="
-            text-align: left;
-            white-space: pre-wrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-height: 70px;
-            font-size: 12px;
-          "
-        >
-          {{ proposal.content.substr(0, 140) }}...
-        </p>
-      </div>
+        :proposal="proposal"
+        caption="Proposal"
+      />
     </div>
   </div>
   <div v-else>
@@ -62,41 +34,14 @@
       <span>Become a writer</span>
     </div>
     <div v-if="randomStoryEnding">
-      <div
-        style="
-          background: rgba(217, 217, 217, 0.2);
-          border-radius: 8px;
-          padding: 0.5rem;
-          display: flex;
-          flex-direction: column;
-          cursor: pointer;
-          width: 186px;
-          height: 123px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        "
-        @click="router.push('/story/' + randomStory.id + '/read/')"
-      >
-        <b style="margin-bottom: 0.2rem; font-size: 12px; white-space: nowrap">
-          {{ randomStory.name }}
-        </b>
-        <span style="color: rgba(0, 128, 0, 0.6); font-size: 12px"
-          >Continue the story</span
-        >
-        <p
-          style="
-            text-align: left;
-            white-space: pre-wrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-height: 70px;
-            font-size: 12px;
-            margin-top: 4px;
-          "
-        >
-          {{ randomStoryEnding }}
-        </p>
-      </div>
+      <abstract-element
+        :proposal="{
+          title: randomStory.name,
+          content: randomStoryEnding,
+          storyId: randomStory.id,
+        }"
+        caption="Continue the story"
+      />
     </div>
     <div v-else>
       <ion-skeleton-text
@@ -113,6 +58,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useContinueStore } from "../../store/continue";
 import { useStoryStore } from "../../store";
 import { useRouter } from "vue-router";
+import AbstractElement from "../AbstractElement.vue";
 
 const storyStore = useStoryStore();
 const continueStore = useContinueStore();
