@@ -92,7 +92,4 @@ const shares = computed(() => {
 ion-skeleton-text {
   border-radius: 10px;
 }
-.author img {
-  border-radius: 50%;
-}
 </style>

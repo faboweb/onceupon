@@ -63,11 +63,11 @@
           allowfullscreen
           style="max-width: 702px"
         ></iframe>
-        <small
+        <!-- <small
           style="float: right; cursor: pointer; color: rgb(115, 115, 115)"
           @click="configStore.setConfig('showVideo', !configStore.showVideo)"
           >{{ configStore.showVideo ? "Hide" : "Show" }} video</small
-        >
+        > -->
       </div>
       <div
         style="
@@ -182,17 +182,94 @@
         </div>
       </template>
 
-      <!-- <b
-        style="
-          font-size: 32px;
-          color: rgba(1, 40, 49, 1);
+      <template v-if="topAuthors.length > 0">
+        <b
+          style="
+            font-size: 32px;
+            color: rgba(1, 40, 49, 1);
 
-          margin-bottom: 46px;
-          display: block;
-          margin-top: 86px;
-        "
-        >Leaderboard</b
-      >
+            margin-bottom: 20px;
+            display: block;
+            margin-top: 86px;
+          "
+          >Leaderboard</b
+        >
+        <div
+          style="
+            background: rgba(255, 245, 233, 1);
+            border: 1px solid rgba(204, 111, 0, 1);
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            border-radius: 8px;
+          "
+        >
+          <div>
+            <div class="leader">
+              <span>#2</span>
+              <template v-if="topAuthors[1]">
+                <nft-element
+                  :nft="getAvatar(topAuthors[1].user)"
+                  class="author"
+                  style="width: 147px; height: 147px"
+                  :size="147"
+                  @click="router.push('/profile/' + topAuthors[1].user)"
+                />
+                <b>{{ nameStore.name(topAuthors[1].user) }}</b>
+              </template>
+            </div>
+            <div
+              class="leader"
+              style="margin-left: 0.5rem; margin-right: 0.5rem"
+            >
+              <span>#1</span>
+              <nft-element
+                :nft="getAvatar(topAuthors[0].user)"
+                class="author"
+                style="width: 177px; height: 177px"
+                :size="177"
+                @click="router.push('/profile/' + topAuthors[0].user)"
+              />
+              <b>{{ nameStore.name(topAuthors[0].user) }}</b>
+            </div>
+            <div class="leader">
+              <span>#3</span>
+              <template v-if="topAuthors[2]">
+                <nft-element
+                  :nft="getAvatar(topAuthors[2].user)"
+                  class="author"
+                  style="width: 147px; height: 147px"
+                  :size="147"
+                  @click="router.push('/profile/' + topAuthors[2].user)"
+                />
+                <b>{{ nameStore.name(topAuthors[2].user) }}</b>
+              </template>
+            </div>
+
+            <ion-grid style="margin-top: 40px; margin-bottom: 24px">
+              <ion-row style="padding-bottom: 0.5rem; font-weight: 700">
+                <ion-col></ion-col>
+                <ion-col></ion-col>
+                <ion-col>Author</ion-col>
+                <ion-col>Shares</ion-col>
+              </ion-row>
+              <ion-row
+                v-for="(author, i) in topAuthors"
+                :key="author.user"
+                @click="router.push('/profile/' + author.user)"
+              >
+                <ion-col>#{{ i + 1 }}</ion-col>
+                <ion-col>{{ nameStore.name(author.user) }}</ion-col>
+                <ion-col>{{ author.stories }}</ion-col>
+                <ion-col>{{ author.shares }}</ion-col>
+              </ion-row>
+            </ion-grid>
+          </div>
+          <ion-button @click="router.push('/overview')"
+            >Explore top stories</ion-button
+          >
+        </div>
+      </template>
+
       <div
         style="
           background: rgba(255, 245, 233, 1);
@@ -200,8 +277,63 @@
           padding-top: 2rem;
           padding-bottom: 2rem;
           border-radius: 8px;
+          margin-top: 3rem;
         "
-      ></div> -->
+      >
+        <b style="font-size: 20px">People love ONCE UPON</b>
+        <div
+          style="
+            width: 100%;
+            height: 400px;
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            flex-wrap: wrap;
+          "
+        >
+          <div class="quote">
+            <b>Lorem ipsum dolor sit amet, c</b>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <span>Alisha</span>
+          </div>
+          <div class="quote">
+            <b>Lorem ipsum dolor sit amet, c</b>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <span>Alisha</span>
+          </div>
+          <div class="quote">
+            <b>Lorem ipsum dolor sit amet, c</b>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <span>Alisha</span>
+          </div>
+          <div class="quote">
+            <b>Lorem ipsum dolor sit amet, c</b>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <span>Alisha</span>
+          </div>
+          <div class="quote">
+            <b>Lorem ipsum dolor sit amet, c</b>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+            <span>Alisha</span>
+          </div>
+        </div>
+      </div>
 
       <login-modal />
       <div
@@ -220,7 +352,7 @@
             <span style="font-size: 14px">Own your story</span>
           </div>
         </div>
-        <div>
+        <div style="display: flex; align-items: center">
           <div class="links">
             <a href="/overview" style="margin-right: 1rem">Explore</a>
             <a href="/story/new">Write Stories</a>
@@ -229,15 +361,23 @@
         <div style="display: flex; flex-direction: column">
           <b>Follow</b>
           <div class="follow-buttons">
-            <ion-avatar style="background: white; margin-right: 4px">
-              <img src="@/../public/assets/twitter-logo.png" alt="" />
-            </ion-avatar>
-            <ion-avatar style="background: #1b95e0">
-              <img
-                src="https://telegram.org/img/oauth/tg_button_large.png"
-                alt=""
-              />
-            </ion-avatar>
+            <a href="https://twitter.com/OnceUponNft">
+              <div style="margin-right: 8px; background: white">
+                <ion-avatar style="">
+                  <img src="@/../public/assets/twitter-logo.png" alt="" />
+                </ion-avatar>
+              </div>
+            </a>
+            <a href="https://t.me/+-QjBZgq-shY5MGIy">
+              <div style="background: #1b95e0">
+                <ion-avatar style="">
+                  <img
+                    src="https://telegram.org/img/oauth/tg_button_large.png"
+                    alt=""
+                  />
+                </ion-avatar>
+              </div>
+            </a>
           </div>
         </div>
       </div>
@@ -272,15 +412,19 @@ import {
 import LoginModal from "./LoginModal.vue";
 import StoryNftPreview from "@/components/StoryNftPreview.vue";
 import { useRouter } from "vue-router";
+import { useNftStore } from "../store/nfts";
+import { getAvatar } from "../scripts/getAvatar";
+import NftElement from "@/components/NftElement.vue";
 
 const configStore = useConfigStore();
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const authStore = useAuthStore();
+const nftStore = useNftStore();
 const router = useRouter();
 
 const story = ref();
-const topAuthors = ref();
+const topAuthors = ref([]);
 
 const content = computed(() =>
   story.value ? storyStore.cidLookup[story.value.first_section.content_cid] : ""
@@ -288,7 +432,8 @@ const content = computed(() =>
 
 onMounted(async () => {
   story.value = (await storyStore.loadStories(1))[0];
-  topAuthors.value = await storyStore.loadAuthors(3);
+  const authors = await storyStore.loadAuthors(5);
+  topAuthors.value = [...authors, ...authors, ...authors];
 });
 </script>
 
@@ -314,11 +459,66 @@ a {
 .follow-buttons {
   display: flex;
   flex-direction: row;
+  margin-top: 0.5rem;
+
+  > a > div {
+    height: 37px;
+    width: 37px;
+    cursor: pointer;
+    border-radius: 50%;
+  }
 
   ion-avatar {
-    height: 30px;
-    width: 30px;
-    padding: 4px;
+    padding: 6px;
+    display: flex;
+    height: 100%;
+    cursor: pointer;
+    img {
+      border-radius: 0;
+    }
+  }
+}
+
+.leader {
+  display: inline-block;
+  position: relative;
+
+  .author {
+    border: 2px solid rgba(242, 103, 9, 1);
+  }
+
+  > span {
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+}
+
+ion-row:nth-child(even) {
+  background: rgba(255, 215, 168, 0.2);
+}
+
+.quote {
+  width: 33%;
+  background: rgba(255, 215, 168, 0.2);
+  text-align: left;
+  padding: 0.5rem;
+  flex: 1;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+  border-radius: 8px;
+
+  b {
+    font-size: 14px;
+  }
+
+  p {
+    font-size: 12px;
+    padding-bottom: 4px;
+  }
+  span {
+    font-size: 12px;
+    float: right;
   }
 }
 </style>

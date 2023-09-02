@@ -149,4 +149,8 @@ ion-button ion-avatar {
 ion-header {
   box-shadow: none !important;
 }
+
+.author img {
+  border-radius: 50%;
+}
 </style>
