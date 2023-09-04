@@ -6,7 +6,10 @@
     }"
   >
     <div style="flex-direction: row; display: flex; padding: 0">
-      <story-nft-preview :nfts="story.top_nfts" :extended="extended" />
+      <story-nft-preview
+        :nfts="[...story.top_nfts, ...story.top_nfts, ...story.top_nfts]"
+        :extended="extended"
+      />
       <div
         style="
           display: inline-block;

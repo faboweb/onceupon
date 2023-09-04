@@ -15,6 +15,9 @@
       v-if="props.nfts.length > 0"
     >
       <div
+        :class="{
+          multiple: props.nfts.length > 1,
+        }"
         :style="{
           //marginLeft: !props.extended ? '-25px' : '',
           maxWidth: !props.extended ? 'inherit' : '100%',
@@ -25,8 +28,6 @@
           :key="nft.image"
           style="display: inline-block"
           :style="{
-            height: props.nfts.length > 1 ? '45px' : '100%',
-            width: props.nfts.length > 1 ? '45px' : '100%',
             maxHeight: '100%',
           }"
           :nft="nft"
@@ -47,5 +48,22 @@ const props = defineProps({
 });
 </script>
 
-<style>
+<style scoped lang="scss">
+ion-avatar {
+  width: 100%;
+  height: 100%;
+}
+
+.multiple {
+  margin-left: -24px;
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  margin-right: -24px;
+
+  ion-avatar {
+    height: 73px;
+    width: 73px;
+  }
+}
 </style>
