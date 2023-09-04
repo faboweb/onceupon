@@ -14,7 +14,7 @@
         of your NFTs.
       </p>
     </div>
-    <nft-list :nfts="nfts" />
+    <nft-list :nfts="nfts" @click="(nft) => select(nft)" :clickable="true" />
     <template v-if="nfts.length === 0">
       <p style="text-align: center; margin-top: 2rem">
         You don't own any NFT yet. Go to

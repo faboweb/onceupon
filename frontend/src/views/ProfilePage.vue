@@ -222,7 +222,7 @@ watch(
     loadedLikes.value = [];
     nameStore.getName(address);
     storyStore.loadContributions(address);
-    likes.value = await likeStore.getLikes(address);
+    likes.value = await likeStore.getLikes(address); // TODO update likes on like
     storyStore.getAuthor(address).then((_author) => (author.value = _author));
     await Promise.all(
       likes.value.map(async ({ story_id, section_id }) => {
