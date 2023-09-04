@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; flex-direction: column">
+  <div style="display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap">
     <div v-for="contract in contracts" :key="contract" style="margin-top: 1rem">
       <span
         style="

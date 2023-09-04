@@ -48,13 +48,13 @@
     >
       <div
         @click="
-          !props.disabled && walletStore.address && (attachNftModal = true)
+          !props.disabled && authStore.user?.address && (attachNftModal = true)
         "
       >
         <ion-button
           fill="outline"
           v-if="!nft"
-          :disabled="props.disabled || !walletStore.address"
+          :disabled="props.disabled || !authStore.user?.address"
           style="text-transform: none"
           ><ion-icon :icon="add"></ion-icon> Add NFT</ion-button
         >

@@ -29,24 +29,25 @@
 </template>
 
 <script setup lang="ts">
-import { useWalletStore } from "@/store/wallet";
 import { useNftStore } from "@/store/nfts";
 import { fromBech32, toBech32 } from "cosmwasm";
-import { computed, defineEmits } from "vue";
+import { computed, defineEmits, onMounted, watch } from "vue";
 import { FALLBACK_AVATAR } from "../../scripts/getAvatar";
+import { useAuthStore } from "../../store";
+import NftList from "../NftList.vue";
 
-const walletStore = useWalletStore();
-const { getNfts } = useNftStore();
+const authStore = useAuthStore();
+const nftStore = useNftStore();
 
 const emit = defineEmits(["selectNft"]);
 
 const nfts = computed(() => {
-  if (walletStore.address) {
+  if (authStore.user.address) {
     const starsAddress = toBech32(
       "stars",
-      fromBech32(walletStore.address).data
+      fromBech32(authStore.user.address).data
     );
-    return getNfts(starsAddress) || [];
+    return nftStore.getNfts(starsAddress) || [];
   }
   return [];
 });
@@ -57,6 +58,16 @@ const select = (nft) => {
 const noNft = () => {
   emit("selectNft");
 };
+
+watch(
+  () => authStore.user.address,
+  () => {
+    nftStore.loadNfts(authStore.user.address);
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 <style scoped>
 .nft {
