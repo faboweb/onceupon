@@ -13,14 +13,13 @@
         width: props.extended ? '151px' : '103px',
       }"
       v-if="props.nfts.length > 0"
+      :class="{
+        extended: props.extended,
+      }"
     >
       <div
         :class="{
           multiple: props.nfts.length > 1,
-        }"
-        :style="{
-          //marginLeft: !props.extended ? '-25px' : '',
-          maxWidth: !props.extended ? 'inherit' : '100%',
         }"
       >
         <nft-element
@@ -53,17 +52,27 @@ ion-avatar {
   width: 100%;
   height: 100%;
 }
-
+</style>
+<style lang="scss">
+.extended {
+  .multiple {
+    margin-left: 0px;
+  }
+}
 .multiple {
-  margin-left: -24px;
+  margin-left: -25px;
   display: flex;
-  gap: 0.3rem;
   flex-wrap: wrap;
-  margin-right: -24px;
+  margin-right: -25px;
+  background: rgba(217, 217, 217, 0.8);
 
   ion-avatar {
-    height: 73px;
-    width: 73px;
+    height: 76px;
+    width: 76px;
+
+    img {
+      border-radius: 0;
+    }
   }
 }
 </style>

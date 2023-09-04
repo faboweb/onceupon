@@ -73,9 +73,12 @@
         </div>
         <template v-if="loaded">
           <div
-            style="display: flex"
+            style="display: flex; cursor: pointer"
             v-for="author in authors"
-            @click="router.push('/profile/' + author.user)"
+            @click="
+              router.push('/profile/' + author.user);
+              seeAll = false;
+            "
             :key="author"
           >
             <nft-element
