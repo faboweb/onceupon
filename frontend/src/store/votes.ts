@@ -48,8 +48,9 @@ export const useVotesStore = defineStore("votesStore", {
           ]),
         });
         this.votes = [];
+        this.saveVotes();
       } finally {
-        this.processing = true;
+        this.processing = false;
       }
     },
     async saveVotes() {
