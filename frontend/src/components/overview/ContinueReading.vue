@@ -38,7 +38,7 @@
         :proposal="{
           title: randomStory.name,
           content: randomStoryEnding,
-          storyId: randomStory.id,
+          story_id: randomStory.id,
         }"
         caption="Continue the story"
       />

@@ -1,17 +1,65 @@
+import { execute } from "@/scripts/execute";
 import { defineStore } from "pinia";
+import { useWalletStore } from "./wallet";
+
+const voteToInt = (vote) => {
+  return {
+    yes: 1,
+    veto: 2,
+    no: 0,
+  }[vote];
+};
 
 interface State {
   votes: any[];
+  processing: boolean;
+  modalOpen: boolean;
 }
-export const useVoteStore = defineStore("voteStore", {
+export const useVotesStore = defineStore("votesStore", {
   // convert to a function
   state: (): State => ({
     votes: [],
+    processing: false,
+    modalOpen: false,
   }),
   getters: {},
   actions: {
-    vote(storyId: string, sectionId: string, vote: number) {
+    vote(storyId: string, sectionId: string, vote: string) {
+      this.votes = this.votes.filter(
+        (vote) => vote.storyId !== storyId || vote.sectionId !== sectionId
+      );
       this.votes.push({ storyId, sectionId, vote });
+      this.saveVotes();
+    },
+    removeVote(storyId: string, sectionId: string) {
+      this.votes = this.votes.filter(
+        (vote) => vote.storyId !== storyId || vote.sectionId !== sectionId
+      );
+      this.saveVotes();
+    },
+    async signVotes() {
+      this.processing = true;
+      try {
+        await execute("vote_multiple", {
+          votes: this.votes.map((vote) => [
+            vote.storyId,
+            vote.sectionId,
+            voteToInt(vote.vote),
+          ]),
+        });
+        this.votes = [];
+      } finally {
+        this.processing = true;
+      }
+    },
+    async saveVotes() {
+      const _votes = JSON.stringify(this.votes);
+      localStorage.setItem("votes", _votes);
+    },
+    async loadVotes() {
+      const _votes = localStorage.getItem("votes");
+      const votes = JSON.parse(_votes || "[]");
+      this.votes = votes;
     },
   },
 });

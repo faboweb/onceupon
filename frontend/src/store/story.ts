@@ -8,13 +8,13 @@ import { callApi } from "@/scripts/api";
 interface State {
   stories: any[] | null;
   fullStories: any;
-  proposals: any;
+  proposals: any; // dictionary story id -> proposals
   shares: any;
-  votes: any;
   error: null;
   blocks: any; // dictionary height -> block
   cidLookup: any; // dictionary cid -> content
   contributions: any; // dictionary address -> story ids
+  votes: any; // dictionary story id -> proposal id -> votes
 }
 
 function generateUUID() {
@@ -46,12 +46,12 @@ export const useStoryStore = defineStore("storyStore", {
     stories: [],
     fullStories: {},
     proposals: {},
-    votes: {},
     shares: {},
     error: null,
     blocks: {},
     cidLookup: {},
     contributions: {},
+    votes: {},
   }),
   getters: {
     allStories: (state) => state.stories,
@@ -102,14 +102,6 @@ export const useStoryStore = defineStore("storyStore", {
         cids.push(proposal.content_cid);
       });
       this.loadContent(cids);
-    },
-    async loadVotes(storyId) {
-      const walletStore = useWalletStore();
-      const result = await walletStore.query({
-        get_votes: { story_id: storyId },
-      });
-
-      this.votes[storyId] = result;
     },
     async loadShares(storyId) {
       const walletStore = useWalletStore();
@@ -171,21 +163,6 @@ export const useStoryStore = defineStore("storyStore", {
       this.loadContent([cid]);
       this.loadProposals(storyId);
     },
-    async vote(storyId, proposalId, vote) {
-      const voteToInt = {
-        yes: 1,
-        veto: 2,
-        no: 0,
-      }[vote];
-      if (!voteToInt)
-        throw new Error("vote " + vote + " is not an allowed value");
-      await execute("vote", {
-        section_id: proposalId,
-        story_id: storyId,
-        vote: voteToInt,
-      });
-      this.loadVotes(storyId);
-    },
     async removeStory(storyId) {
       await execute("remove_story", {
         story_id: storyId,
@@ -209,6 +186,11 @@ export const useStoryStore = defineStore("storyStore", {
       this.contributions[address] = sections;
       this.loadContent(sections.map((section) => section.content_cid));
     },
+    async getAuthor(address) {
+      const { stories, shares } = await callApi("author/" + address, "GET");
+
+      return { stories, shares };
+    },
     async loadAuthors(limit) {
       const nameStore = useNameStore();
       const authors = await callApi(
@@ -218,6 +200,14 @@ export const useStoryStore = defineStore("storyStore", {
       authors.forEach((author) => nameStore.getName(author.address));
 
       return authors;
+    },
+    async loadVotes(storyId) {
+      const walletStore = useWalletStore();
+      const result = await walletStore.query({
+        get_votes: { story_id: storyId },
+      });
+
+      this.votes[storyId] = result;
     },
   },
 });

@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useLikeStore } from "./likes";
-import { getAuth } from "firebase/auth";
+import "@/scripts/firebase";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 interface State {
   signInMethod: string;
@@ -32,7 +33,7 @@ export const useAuthStore = defineStore("authStore", {
     signOut() {
       this.user = null;
 
-      // TODO sign out from firebase
+      // TODO move to web2auth?
       const auth = getAuth();
       if (auth.currentUser) {
         auth.signOut();
@@ -53,12 +54,26 @@ export const useAuthStore = defineStore("authStore", {
         })
       );
     },
-    loadFromLocalStorage() {
+    async loadFromLocalStorage() {
       const auth = localStorage.getItem("auth");
       if (auth) {
-        const { user, method } = JSON.parse(auth);
+        const { user, signInMethod } = JSON.parse(auth);
         if (user) {
-          this.setSignIn(user, method);
+          if (signInMethod === "keplr") {
+            this.setSignIn(user, signInMethod);
+          } else {
+            const auth = getAuth();
+            await new Promise((resolve) => {
+              onAuthStateChanged(auth, (_user) => {
+                if (_user) {
+                  this.setSignIn(user, signInMethod);
+                } else {
+                  // User is signed out
+                }
+                resolve(undefined);
+              });
+            });
+          }
         }
       }
     },

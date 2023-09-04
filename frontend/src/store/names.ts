@@ -11,15 +11,17 @@ const contract =
   "stars1fx74nkqkw2748av8j7ew7r3xt9cgjqduwn8m0ur5lhe49uhlsasszc5fhr";
 const client = CosmWasmClient.connect(endpoint);
 
+export const shortAddress = (address) => {
+  return address.substr(0, 10) + "..." + address.substr(address.length - 4, 4);
+};
+
 export const useNameStore = defineStore("nameStore", {
   // convert to a function
   state: (): State => ({
     names: {},
   }),
   getters: {
-    name: (state) => (name) =>
-      state.names[name]?.name ||
-      name.substr(0, 10) + "..." + name.substr(name.length - 4, 4),
+    name: (state) => (name) => state.names[name]?.name || shortAddress(name),
     avatar: (state) => (name) => state.names[name]?.nft,
   },
   actions: {

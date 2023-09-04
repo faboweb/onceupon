@@ -9,7 +9,7 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::state::{State, STATE, STORIES};
 
-use crate::execute::{cycle, new_story, new_story_section, remove_story, voting};
+use crate::execute::{cycle, new_story, new_story_section, remove_story, voteMultiple, voting};
 use crate::query::{
     query_new_sections, query_sections, query_shares, query_state, query_stories, query_story,
     query_votes,
@@ -114,6 +114,7 @@ pub fn execute(
             section_id,
             vote,
         } => voting(deps, info, _env, story_id, section_id, vote),
+        ExecuteMsg::VoteMultiple { votes } => voteMultiple(deps, info, _env, votes),
         ExecuteMsg::Cycle {} => cycle(deps, _env),
         ExecuteMsg::RemoveStory { story_id } => remove_story(deps, info, _env, story_id),
     }

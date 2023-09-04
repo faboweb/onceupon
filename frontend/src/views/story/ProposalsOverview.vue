@@ -41,30 +41,34 @@
                 :disabled="
                   nextSectionPending ||
                   !authStore.isSignedIn ||
-                  processingVotes.includes(proposal.section_id)
+                  votesStore.processing
                 "
                 @click="vote(proposal.section_id)"
-                :fill="
-                  proposalVote(proposal.section_id) === 1 ? 'outline' : 'solid'
-                "
-                >{{
-                  proposalVote(proposal.section_id) === 1 ? "Unlike" : "Like"
-                }}</ion-button
+                fill="solid"
+              >
+                <ion-icon
+                  slot="start"
+                  :icon="checkmark"
+                  v-show="proposalVote(proposal.section_id) === 'yes'"
+                ></ion-icon
+                >Vote</ion-button
               >
               <ion-button
                 size="small"
                 :disabled="
                   nextSectionPending ||
                   !authStore.isSignedIn ||
-                  processingVotes.includes(proposal.section_id)
+                  votesStore.processing
                 "
                 @click="veto(proposal.section_id)"
-                :fill="
-                  proposalVote(proposal.section_id) === 2 ? 'outline' : 'solid'
-                "
-                >{{
-                  proposalVote(proposal.section_id) === 2 ? "Unveto" : "Veto"
-                }}</ion-button
+                fill="outline"
+              >
+                <ion-icon
+                  slot="start"
+                  :icon="checkmark"
+                  v-show="proposalVote(proposal.section_id) === 'veto'"
+                ></ion-icon>
+                Veto</ion-button
               >
             </div>
           </div>
@@ -98,7 +102,7 @@
             margin-bottom: -1rem;
           "
         >
-          <new-section :story-id="storyId" />
+          <new-section :storyId="storyId" :disabled="false" />
         </div>
       </div>
     </ion-content>
@@ -106,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonContent } from "@ionic/vue";
+import { IonPage, IonContent, IonIcon } from "@ionic/vue";
 import { useRoute } from "vue-router";
 import {
   useAuthStore,
@@ -117,18 +121,19 @@ import {
 } from "../../store";
 import { computed, onMounted, Ref, ref, defineProps } from "vue";
 import { useContinueStore } from "../../store/continue";
+import { useVotesStore } from "../../store/votes";
 import { formatDistance } from "date-fns";
 import NewSection from "../../components/story/NewSection.vue";
 import StorySection from "../../components/story/StorySection.vue";
+import { checkmark } from "ionicons/icons";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const continueStore = useContinueStore();
 const walletStore = useWalletStore();
 const authStore = useAuthStore();
+const votesStore = useVotesStore();
 const route = useRoute();
-
-const processingVotes = ref([]);
 
 const story = ref();
 const storyId = String(route?.params.id);
@@ -150,41 +155,24 @@ onMounted(async () => {
 });
 
 const proposalVote = (proposalId) => {
-  return storyStore.votes && storyStore.votes[storyId] && walletStore.address
-    ? storyStore.votes[storyId].find(
-        ({ section_id, user }) =>
-          section_id === proposalId && user === walletStore.address
-      )?.vote || undefined
-    : undefined;
+  return votesStore.votes.find(
+    (vote) => vote.storyId === storyId && vote.sectionId === proposalId
+  )?.vote;
 };
 const vote = async (proposalId) => {
-  processingVotes.value.push(proposalId);
-  try {
-    await storyStore.vote(
-      storyId,
-      proposalId,
-      proposalVote(proposalId) === 1 ? "no" : "yes"
-    );
-  } finally {
-    processingVotes.value = processingVotes.value.filter(
-      (id) => id !== proposalId
-    );
-  }
+  votesStore.vote(
+    storyId,
+    proposalId,
+    proposalVote(proposalId) === 1 ? "no" : "yes"
+  );
 };
 
 const veto = async (proposalId) => {
-  processingVotes.value.push(proposalId);
-  try {
-    await storyStore.vote(
-      storyId,
-      proposalId,
-      proposalVote(proposalId) === 2 ? "no" : "veto"
-    );
-  } finally {
-    processingVotes.value = processingVotes.value.filter(
-      (id) => id !== proposalId
-    );
-  }
+  votesStore.vote(
+    storyId,
+    proposalId,
+    proposalVote(proposalId) === 1 ? "no" : "veto"
+  );
 };
 
 const nextSection = computed(() => {
@@ -201,14 +189,21 @@ const nextSectionPending = computed(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 ion-button {
   text-transform: none;
   height: 36px;
   font-size: 14px;
   font-weight: 600;
+  min-width: 85px;
 
-  --background: rgba(242, 103, 9, 1);
+  &.button-solid {
+    --background: rgba(242, 103, 9, 1);
+  }
+  &.button-outline {
+    color: rgba(242, 103, 9, 1);
+    --border-color: rgba(242, 103, 9, 1);
+  }
 }
 .proposal {
   padding-bottom: 1rem;

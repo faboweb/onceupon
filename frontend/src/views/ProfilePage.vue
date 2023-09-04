@@ -33,6 +33,10 @@
             class="author"
           />
           <b style="margin-top: 1rem; font-size: 18px">{{ profileName }}</b>
+          <span style="font-size: 14px; color: rgba(0, 0, 0, 0.6)"
+            >{{ contributions.length }} Contributions -
+            {{ author.shares }} Shares in {{ author.stories }} Stories
+          </span>
         </div>
         <div style="margin-top: 1rem">
           <div
@@ -56,7 +60,14 @@
             ></ion-skeleton-text>
           </div>
 
-          <div style="display: flex; margin-top: 0.5rem; flex-wrap: wrap">
+          <div
+            style="
+              display: flex;
+              margin-top: 0.5rem;
+              flex-wrap: wrap;
+              gap: 1rem;
+            "
+          >
             <div
               v-for="(section, i) of contributions"
               :key="i"
@@ -67,11 +78,9 @@
                 cursor: pointer;
                 width: 186px;
                 height: 123px;
-                margin-right: 1rem;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 flex-grow: 1;
-                margin-bottom: 0.5rem;
               "
               @click="router.push('/story/' + section.story_id + '/read/')"
             >
@@ -125,12 +134,21 @@
               :animated="true"
             ></ion-skeleton-text>
           </div>
-          <div v-else style="margin-top: 0.5rem">
+          <div
+            v-else
+            style="
+              display: flex;
+              margin-top: 0.5rem;
+              flex-wrap: wrap;
+              gap: 1rem;
+            "
+          >
             <abstract-element
               v-for="section of loadedLikes"
               :key="section.section_id"
               :proposal="section"
               caption="Section"
+              style="flex: 1"
             />
           </div>
         </div>
@@ -155,6 +173,7 @@ import MobileFooter from "../components/overview/MobileFooter.vue";
 import AbstractElement from "../components/AbstractElement.vue";
 import { IonPage, IonContent } from "@ionic/vue";
 import { useLikeStore } from "../store/likes";
+import add from "date-fns/esm/fp/add/index";
 
 const route = useRoute();
 const address = String(route?.params.address);
@@ -165,6 +184,10 @@ const storyStore = useStoryStore();
 const likeStore = useLikeStore();
 const router = useRouter();
 const likes = ref();
+const author = ref({
+  stories: 0,
+  shares: 0,
+});
 const loadedLikes = ref([]);
 const doneLoadingLikes = ref(false);
 
@@ -200,6 +223,7 @@ watch(
     nameStore.getName(address);
     storyStore.loadContributions(address);
     likes.value = await likeStore.getLikes(address);
+    storyStore.getAuthor(address).then((_author) => (author.value = _author));
     await Promise.all(
       likes.value.map(async ({ story_id, section_id }) => {
         const story = await storyStore.getStory(story_id);

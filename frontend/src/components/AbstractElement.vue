@@ -10,34 +10,37 @@
       overflow: hidden;
       text-overflow: ellipsis;
     "
-    @click="router.push('/story/' + proposal.storyId + '/read/')"
+    @click="router.push('/story/' + proposal.story_id + '/read/')"
   >
     <b style="margin-bottom: 0.2rem; font-size: 14px; white-space: nowrap">
-      {{ proposal.title }}
+      {{ title }}
     </b>
-    <span style="color: rgba(242, 103, 9, 0.6); font-size: 14px">{{
-      caption
-    }}</span>
+    <span
+      style="color: rgba(242, 103, 9, 0.6); font-size: 14px; display: block"
+      >{{ caption }}</span
+    >
     <p
       style="
         text-align: left;
         white-space: pre-wrap;
         text-overflow: ellipsis;
         overflow: hidden;
-        max-height: 70px;
+        max-height: 60px;
         font-size: 12px;
       "
     >
-      {{ content.substr(0, 140) }}...
+      {{ content }}
     </p>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { onMounted, defineProps, computed } from "vue";
+import { useRouter } from "vue-router";
 import { useStoryStore } from "../store";
 
 const storyStore = useStoryStore();
+const router = useRouter();
 
 const props = defineProps({
   proposal: Object,
@@ -50,6 +53,15 @@ const content = computed(() => {
   } else {
     return props.proposal.content;
   }
+});
+
+const title = computed(() => {
+  if (props.proposal.title) return props.proposal.title;
+  return storyStore.stories.find((s) => s.id === props.proposal.story_id)?.name;
+});
+
+onMounted(() => {
+  storyStore.loadStories();
 });
 </script>
 

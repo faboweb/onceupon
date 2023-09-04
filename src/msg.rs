@@ -29,6 +29,9 @@ pub enum ExecuteMsg {
         section_id: String,
         vote: i8,
     },
+    VoteMultiple {
+        votes: Vec<(String, String, i8)>, // storyId, sectionId, vote
+    },
     Cycle {},
     RemoveStory {
         story_id: String,

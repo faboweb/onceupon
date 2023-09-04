@@ -15,7 +15,7 @@
           >
         </span>
         <div slot="end">
-          <b style="opacity: 0.6">Votes</b>
+          <votes-indicator />
         </div>
       </ion-toolbar>
     </ion-header>
@@ -66,6 +66,7 @@ import TopAuthors from "../components/overview/TopAuthors.vue";
 import ContinueReading from "../components/overview/ContinueReading.vue";
 import { useContinueStore } from "../store/continue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
+import VotesIndicator from "../components/VotesIndicator.vue";
 
 const storyStore = useStoryStore();
 const walletStore = useWalletStore();

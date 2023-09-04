@@ -73,6 +73,27 @@ const getBlock = async (network, height) => {
   return block;
 };
 
+function getToken(request) {
+  if (!request.headers.authorization) {
+    return undefined;
+  }
+
+  const token = request.headers.authorization.replace(/^Bearer\s/, "");
+
+  return token;
+}
+
+function getNetwork(request) {
+  if (!request.headers["x-network"]) {
+    return networks.mainnet;
+  }
+  const networkId = request.headers["x-network"];
+  if (!networks[networkId]) {
+    throw new Error("invalid network");
+  }
+  return networks[networkId];
+}
+
 app.post("/web3upload", async (req, res) => {
   const body = req.body || {};
   const { content } = body;
@@ -139,15 +160,15 @@ app.get("/story/:id", async (req, res) => {
     .get();
   const sectionData = sections.docs.map((doc) => doc.data());
 
-  const lastSectionBlock = await getBlock(network, story.last_cycle);
+  const lastSectionBlock = await getBlock(network, storyData.last_cycle);
   const currentBlock = await getBlock(network); // TODO take last?
-  const heightDiff = currentBlock?.header.height - story.last_cycle;
+  const heightDiff = currentBlock?.header.height - storyData.last_cycle;
   const timeDiff =
     new Date(currentBlock?.header.time).getTime() -
     new Date(lastSectionBlock.header.time).getTime();
   const assumedNextSectionBlockTime = new Date(
     new Date(lastSectionBlock.header.time).getTime() +
-      (timeDiff / heightDiff) * story.interval
+      (timeDiff / heightDiff) * storyData.interval
   );
 
   res.status(200).send({
@@ -263,134 +284,6 @@ app.get("/stories", async (req, res) => {
   return res.status(200).send(topStories);
 });
 
-const DEBOUNCE = 1000;
-const subscribeTxs = async (network, cb) => {
-  const debouncedIndex = debounce(async (height) => {
-    index(network, height);
-  }, DEBOUNCE);
-  try {
-    subscribe(network, (height) => {
-      debouncedIndex(height);
-    });
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-const index = async (network, height) => {
-  console.log("Indexing");
-  const queryClient = await getClient(network);
-  const {
-    stories,
-    shares,
-    sections: proposals,
-    votes,
-  } = await queryClient.queryContractSmart(
-    network.contract,
-    { get_state: {} },
-    "block"
-  );
-
-  const batch = db.batch();
-  await Promise.all(
-    stories.map(async (story) => {
-      const doc = db.doc("networks/" + network.id + "/stories/" + story.id);
-      const sections = story.sections;
-      delete story.sections;
-      batch.set(
-        doc,
-        {
-          ...story,
-          first_section: sections[0],
-          last_section: sections[sections.length - 1],
-          sections: sections.length,
-          owners: shares.filter(([story_id]) => story_id === story.id).length,
-          proposals: proposals.filter(({ story_id }) => story_id === story.id)
-            .length,
-          shares: shares
-            .filter(([story_id]) => story_id === story.id)
-            .reduce((acc, curr) => acc + curr.amount, 0),
-          lastUpdate: (await getBlock(network, story.last_cycle)).header.time,
-          top_nfts: Object.entries(
-            sections.reduce((acc, curr) => {
-              if (curr.nft) {
-                acc[curr.nft.contract_address + "_" + curr.nft.token_id] =
-                  (acc[curr.nft.contract_address + "_" + curr.nft.token_id] ||
-                    0) + 1;
-              }
-              return acc;
-            }, {})
-          )
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 4)
-            .map(([nft, count]) => {
-              const [contract_address, token_id] = nft.split("_");
-              return {
-                contract_address,
-                token_id,
-                count,
-              };
-            }),
-        },
-        { merge: true }
-      );
-
-      // TODO optimize
-      sections.forEach((section) =>
-        batch.set(
-          db.doc("networks/" + network.id + "/sections/" + section.section_id),
-          section,
-          { merge: true }
-        )
-      );
-    })
-  );
-
-  shares.map(([storyId, user, amount]) => {
-    const doc = db.doc("networks/" + network.id + "/shares/" + user);
-    batch.set(
-      doc,
-      {
-        user,
-        storyId,
-        amount,
-      },
-      { merge: true }
-    );
-  });
-
-  await batch.commit();
-
-  console.log("Indexing done");
-};
-
-const cycle = async (network) => {
-  const client = await adminSigningClient(network);
-  const block = await client.getBlock();
-  const height = block.header.height;
-
-  const stories = await (
-    await db.collection("networks/" + network.id + "/stories").get()
-  ).docs.map((doc) => doc.data());
-  const cycleNeeded = stories.find((story) => {
-    return story.last_cycle + story.interval <= height;
-  });
-
-  if (cycleNeeded) {
-    console.log("Triggering cycle");
-    await client.execute(
-      network.admin,
-      network.contract,
-      {
-        cycle: {},
-      },
-      "auto"
-    );
-    console.log("Done cycle");
-    await index(network, height);
-  }
-};
-
 Object.values(networks).forEach(async (network) => {
   try {
     const client = await CosmWasmClient.connect(network.url);
@@ -403,12 +296,12 @@ Object.values(networks).forEach(async (network) => {
     subscribeTxs(network, async (event) => {
       const block = await client.getBlock();
       // TODO get heigth from event
-      index(network, block.header.height);
+      index(network, block.header.height).catch(console.error);
     });
 
-    cycle(network);
+    await cycle(network);
     setInterval(async () => {
-      cycle(network);
+      cycle(network).catch(console.error);
     }, 1000 * 60 * 60 * 24);
   } catch (err) {
     console.error(err);
@@ -498,12 +391,12 @@ app.get("/web2Address", async (req, res) => {
 
 const fundAccount = async (user, network) => {
   const { address } = await getWallet(user, network);
-  const adminSigningClient = await adminSigningClient(network);
-  const balance = await adminSigningClient.getBalance(address);
+  const client = await adminSigningClient(network);
+  const balance = await client.getBalance(address);
 
   if (balance.amount === 0) {
     // send 1ustars to the new account to create it
-    await adminSigningClient.sendTokens(
+    await client.sendTokens(
       network.admin,
       address,
       [{ denom: "ustars", amount: "1" }],
@@ -661,23 +554,130 @@ app.get("/likes/:address", async (req, res) => {
   res.status(200).send(result);
 });
 
-function getToken(request) {
-  if (!request.headers.authorization) {
-    return undefined;
+const DEBOUNCE = 1000;
+const subscribeTxs = async (network, cb) => {
+  const debouncedIndex = debounce(async (height) => {
+    index(network, height);
+  }, DEBOUNCE);
+  try {
+    subscribe(network, (height) => {
+      debouncedIndex(height);
+    });
+  } catch (err) {
+    console.error(err);
   }
+};
 
-  const token = request.headers.authorization.replace(/^Bearer\s/, "");
+const index = async (network, height) => {
+  console.log("Indexing");
+  const queryClient = await getClient(network);
+  const {
+    stories,
+    shares,
+    sections: proposals,
+    votes,
+  } = await queryClient.queryContractSmart(
+    network.contract,
+    { get_state: {} },
+    "block"
+  );
 
-  return token;
-}
+  const batch = db.batch();
+  await Promise.all(
+    stories.map(async (story) => {
+      const doc = db.doc("networks/" + network.id + "/stories/" + story.id);
+      const sections = story.sections;
+      delete story.sections;
+      batch.set(
+        doc,
+        {
+          ...story,
+          first_section: sections[0],
+          last_section: sections[sections.length - 1],
+          sections: sections.length,
+          owners: shares.filter(([story_id]) => story_id === story.id).length,
+          proposals: proposals.filter(({ story_id }) => story_id === story.id)
+            .length,
+          shares: shares
+            .filter(([storyId]) => storyId === story.id)
+            .reduce((acc, [storyId, userId, amount]) => acc + amount, 0),
+          lastUpdate: (await getBlock(network, story.last_cycle)).header.time,
+          top_nfts: Object.entries(
+            sections.reduce((acc, curr) => {
+              if (curr.nft) {
+                acc[curr.nft.contract_address + "_" + curr.nft.token_id] =
+                  (acc[curr.nft.contract_address + "_" + curr.nft.token_id] ||
+                    0) + 1;
+              }
+              return acc;
+            }, {})
+          )
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 4)
+            .map(([nft, count]) => {
+              const [contract_address, token_id] = nft.split("_");
+              return {
+                contract_address,
+                token_id,
+                count,
+              };
+            }),
+        },
+        { merge: true }
+      );
 
-function getNetwork(request) {
-  if (!request.headers["x-network"]) {
-    return networks.mainnet;
+      // TODO optimize
+      sections.forEach((section) =>
+        batch.set(
+          db.doc("networks/" + network.id + "/sections/" + section.section_id),
+          section,
+          { merge: true }
+        )
+      );
+    })
+  );
+
+  shares.map(([storyId, user, amount]) => {
+    const doc = db.doc("networks/" + network.id + "/shares/" + user);
+    batch.set(
+      doc,
+      {
+        user,
+        storyId,
+        amount,
+      },
+      { merge: true }
+    );
+  });
+
+  await batch.commit();
+
+  console.log("Indexing done");
+};
+
+const cycle = async (network) => {
+  const client = await adminSigningClient(network);
+  const block = await client.getBlock();
+  const height = block.header.height;
+
+  const stories = await (
+    await db.collection("networks/" + network.id + "/stories").get()
+  ).docs.map((doc) => doc.data());
+  const cycleNeeded = stories.find((story) => {
+    return story.last_cycle + story.interval <= height;
+  });
+
+  if (cycleNeeded) {
+    console.log("Triggering cycle");
+    await client.execute(
+      network.admin,
+      network.contract,
+      {
+        cycle: {},
+      },
+      "auto"
+    );
+    console.log("Done cycle");
+    await index(network, height);
   }
-  const networkId = request.headers["x-network"];
-  if (!networks[networkId]) {
-    throw new Error("invalid network");
-  }
-  return networks[networkId];
-}
+};

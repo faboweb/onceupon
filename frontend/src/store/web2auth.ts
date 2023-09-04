@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import firebase from "firebase/compat/app";
 import "firebaseui/dist/firebaseui.css";
 import { useAuthStore } from "./auth";
 import { firebaseConfig } from "@/scripts/firebase";
@@ -14,8 +13,6 @@ import { updateProfile } from "firebase/auth";
 // import axios from "axios";
 
 // interface State {}
-
-firebase.initializeApp(firebaseConfig);
 
 export const useWeb2AuthStore = defineStore("web2AuthStore", {
   // convert to a function

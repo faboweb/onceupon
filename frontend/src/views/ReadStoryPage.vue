@@ -9,6 +9,9 @@
         >
           {{ "<" }} Back
         </span>
+        <div slot="end">
+          <votes-indicator />
+        </div>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true" class="ion-padding" scroll-y="false">
@@ -88,9 +91,12 @@ import { computed, onMounted, ref, Ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
+import VotesIndicator from "../components/VotesIndicator.vue";
+import { useVotesStore } from "../store/votes";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
+const voteStore = useVotesStore();
 
 const route = useRoute();
 const router = useRouter();
@@ -115,7 +121,7 @@ onMounted(async () => {
     router.push("/stories");
     return;
   }
-  storyStore.loadVotes(storyId);
+  voteStore.loadVotes(storyId);
 
   story.value.sections.forEach((proposal) => {
     nameStore.getName(proposal.proposer);

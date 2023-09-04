@@ -92,8 +92,14 @@
               "
             >
               <b>{{ nameStore.name(author.user) }}</b>
-              <p v-if="nameStore.name(author.user) !== author.user">
-                {{ author.user }}
+              <p
+                v-if="nameStore.name(author.user) !== author.user"
+                style="margin-top: 0.5rem"
+              >
+                <span style="font-size: 14px; color: rgba(0, 0, 0, 0.6)">
+                  {{ shortAddress(author.user) }} - {{ author.shares }} Shares
+                  in {{ author.stories }} Stories
+                </span>
               </p>
             </div>
           </div>
@@ -125,6 +131,7 @@ import NftElement from "@/components/NftElement.vue";
 import { useRouter } from "vue-router";
 import { IonContent, IonIcon, IonModal, IonSkeletonText } from "@ionic/vue";
 import { closeOutline } from "ionicons/icons";
+import { shortAddress } from "../../store/names";
 
 const storyStore = useStoryStore();
 const router = useRouter();

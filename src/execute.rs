@@ -176,6 +176,28 @@ pub fn voting(
     Ok(Response::new().add_attribute("method", "voting"))
 }
 
+pub fn voteMultiple(
+    deps: DepsMut,
+    info: MessageInfo,
+    _env: Env,
+    votes: Vec<(String, String, i8)>,
+) -> Result<Response, ContractError> {
+    let res = votes.into_iter().all(|vote| {
+        let k = (
+            vote.0.to_string(),
+            vote.1.to_string(),
+            info.sender.to_string(),
+        );
+        VOTES.save(deps.storage, k, &vote.2).is_ok()
+    });
+    if res == false {
+        return Err(ContractError::CustomError {
+            val: "Not all votes where successful".to_string(),
+        });
+    }
+    Ok(Response::new().add_attribute("method", "voteMultiple"))
+}
+
 fn add_shares(
     storage: &mut dyn Storage,
     shares: Map<(String, String), u64>,
