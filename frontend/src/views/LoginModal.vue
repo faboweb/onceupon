@@ -44,8 +44,7 @@
         <b style="margin-bottom: 1rem">Crypto Only</b>
         <ion-button
           @click="signIn('keplrWeb3')"
-          style="width: 331px; color: black; text-transform: none"
-          color="white"
+          style="width: 331px; color: white; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -59,8 +58,7 @@
         >
         <ion-button
           @click="signIn('keplrWeb2')"
-          style="width: 331px; color: black; text-transform: none"
-          color="white"
+          style="width: 331px; color: white; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -70,8 +68,7 @@
         </ion-button>
         <ion-button
           @click="signIn('google')"
-          style="width: 331px; color: black; text-transform: none"
-          color="white"
+          style="width: 331px; color: white; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -81,8 +78,7 @@
         </ion-button>
         <ion-button
           @click="signIn('twitter')"
-          style="width: 331px; color: black; text-transform: none"
-          color="white"
+          style="width: 331px; color: white; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>

@@ -45,9 +45,9 @@
       <!-- <iframe :hidden="!configStore.showVideo" width="100%" height="315" src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       <small style="float: right; cursor: pointer; color: rgb(115,115,115);" @click="configStore.setConfig('showVideo', !configStore.showVideo)">{{configStore.showVideo ? 'Hide' : 'Show'}} video</small> -->
 
-      <top-stories />
-      <top-authors />
-      <continue-reading />
+      <top-stories style="margin-top: 1.5rem" />
+      <top-authors style="margin-top: 1.5rem" />
+      <continue-reading style="margin-top: 1.5rem" />
       <mobile-footer style="margin-top: 4rem" />
     </ion-content>
   </ion-page>

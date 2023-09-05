@@ -39,6 +39,17 @@
           >
             <new-section :story-id="storyId" />
           </div>
+          <a
+            style="
+              color: rgba(242, 103, 9, 1);
+              margin-top: 1rem;
+              margin-bottom: 2rem;
+              display: block;
+              cursor: pointer;
+            "
+            @click="router.push('/story/' + storyId + '/proposals')"
+            >See all proposals ></a
+          >
         </template>
         <template v-else>
           <template v-for="i in [0, 1, 2]" :key="i">

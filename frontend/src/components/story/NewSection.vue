@@ -71,7 +71,6 @@
       <ion-button
         v-else
         @click="authStore.showSignInModal = true"
-        color="primary"
         :disabled="props.disabled"
         style="text-transform: none"
         >Sign In</ion-button
