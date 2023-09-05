@@ -17,7 +17,6 @@
         <div slot="end">
           <ion-button
             v-if="!authStore.isSignedIn"
-            style="--background: rgba(2, 55, 67, 1)"
             @click="authStore.showSignInModal = true"
             >Login</ion-button
           >
