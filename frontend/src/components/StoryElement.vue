@@ -38,18 +38,25 @@
             margin-bottom: 0.5rem;
           "
         >
-          <ion-icon :icon="listOutline" style="margin-right: 0.5rem"></ion-icon>
+          <ion-icon :icon="heart" style="margin-right: 0.2rem"></ion-icon>
+
+          <span>{{ story.likes }}</span>
+
+          <ion-icon
+            :icon="documents"
+            style="margin-right: 0.2rem; margin-left: 0.5rem"
+          ></ion-icon>
 
           <span>{{ story.sections }}</span>
           <ion-icon
-            :icon="eyeOutline"
-            style="margin-right: 0.5rem; margin-left: 0.5rem"
+            :icon="people"
+            style="margin-right: 0.2rem; margin-left: 0.5rem"
           ></ion-icon>
 
           <span>{{ story.owners }}</span>
           <ion-icon
-            :icon="documentOutline"
-            style="margin-right: 0.5rem; margin-left: 0.5rem"
+            :icon="checkmarkDoneCircle"
+            style="margin-right: 0.2rem; margin-left: 0.5rem"
           ></ion-icon>
 
           <span>{{ story.proposals }}</span>
@@ -73,7 +80,16 @@
 
 <script setup lang="ts">
 import { computed, defineProps } from "vue";
-import { listOutline, eyeOutline, documentOutline } from "ionicons/icons";
+import {
+  listOutline,
+  eyeOutline,
+  documentOutline,
+  heartOutline,
+  people,
+  checkmarkDoneCircle,
+  documents,
+  heart,
+} from "ionicons/icons";
 import { formatDistance } from "date-fns";
 import { useNameStore, useStoryStore } from "@/store";
 import {

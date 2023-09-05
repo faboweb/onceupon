@@ -33,7 +33,7 @@
     >
       <span>Become a writer</span>
     </div>
-    <div v-if="randomStoryEnding">
+    <div v-if="randomStoryEnding" style="display: flex; flex-direction: row">
       <abstract-element
         :proposal="{
           title: randomStory.name,
@@ -41,6 +41,7 @@
           story_id: randomStory.id,
         }"
         caption="Continue the story"
+        style="flex: 1"
       />
     </div>
     <div v-else>
@@ -73,7 +74,7 @@ watch(randomStory, async () => {
     randomStory.value.sections[randomStory.value.sections.length - 1];
   await storyStore.loadContent([lastSection.content_cid]);
   const lastSectionContent = storyStore.cidLookup[lastSection.content_cid];
-  const lastSectionEnding = lastSectionContent.substr(-140).trim();
+  const lastSectionEnding = lastSectionContent.trim();
   randomStoryEnding.value = lastSectionEnding;
 });
 

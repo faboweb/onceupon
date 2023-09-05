@@ -198,7 +198,7 @@
           style="
             background: rgba(255, 245, 233, 1);
             border: 1px solid rgba(204, 111, 0, 1);
-            padding-top: 2rem;
+            padding-top: 3rem;
             padding-bottom: 2rem;
             border-radius: 8px;
           "
@@ -210,22 +210,19 @@
                 <nft-element
                   :nft="getAvatar(topAuthors[1].user)"
                   class="author"
-                  style="width: 147px; height: 147px"
+                  style="width: 110px; height: 110px"
                   :size="147"
                   @click="router.push('/profile/' + topAuthors[1].user)"
                 />
                 <b>{{ nameStore.name(topAuthors[1].user) }}</b>
               </template>
             </div>
-            <div
-              class="leader"
-              style="margin-left: 0.5rem; margin-right: 0.5rem"
-            >
+            <div class="leader" style="margin-left: 1rem; margin-right: 1rem">
               <span>#1</span>
               <nft-element
                 :nft="getAvatar(topAuthors[0].user)"
                 class="author"
-                style="width: 177px; height: 177px"
+                style="width: 140px; height: 140px"
                 :size="177"
                 @click="router.push('/profile/' + topAuthors[0].user)"
               />
@@ -237,7 +234,7 @@
                 <nft-element
                   :nft="getAvatar(topAuthors[2].user)"
                   class="author"
-                  style="width: 147px; height: 147px"
+                  style="width: 110px; height: 110px"
                   :size="147"
                   @click="router.push('/profile/' + topAuthors[2].user)"
                 />
@@ -245,7 +242,7 @@
               </template>
             </div>
 
-            <ion-grid style="margin-top: 40px; margin-bottom: 24px">
+            <ion-grid style="margin-top: 24px; margin-bottom: 24px">
               <ion-row style="padding-bottom: 0.5rem; font-weight: 700">
                 <ion-col></ion-col>
                 <ion-col></ion-col>

@@ -5,10 +5,14 @@
   >
     <ion-badge
       v-if="votesStore.votes.length > 0"
-      style="position: absolute; left: -1.3rem"
+      style="position: absolute; left: -1.3rem; --background: rgb(242, 103, 9)"
       >{{ votesStore.votes.length }}</ion-badge
     >
-    <b>Votes</b>
+    <!-- <b>Votes</b> -->
+
+    <ion-icon
+      :icon="votesStore.votes.length > 0 ? fileTrayFull : fileTray"
+    ></ion-icon>
     <ion-modal
       :is-open="votesStore.modalOpen"
       @will-dismiss="votesStore.modalOpen = false"
@@ -147,7 +151,12 @@ import { IonBadge } from "@ionic/vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useAuthStore, useStoryStore } from "../store";
 import { useVotesStore } from "../store/votes";
-import { closeOutline, trashOutline } from "ionicons/icons";
+import {
+  closeOutline,
+  fileTray,
+  fileTrayFull,
+  trashOutline,
+} from "ionicons/icons";
 import { useRoute, useRouter } from "vue-router";
 
 const votesStore = useVotesStore();

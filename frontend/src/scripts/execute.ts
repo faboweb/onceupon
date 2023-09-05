@@ -8,7 +8,10 @@ export const execute = async (command: string, data: any) => {
   if (!authStore.isSignedIn) {
     throw new Error("User is not signed in");
   }
-  if (authStore.signInMethod === "keplr") {
+  if (
+    authStore.signInMethod === "keplr" ||
+    authStore.signInMethod === "keplrWeb2"
+  ) {
     try {
       await walletStore.execute(walletStore.address, {
         [command]: data,

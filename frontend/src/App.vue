@@ -153,4 +153,8 @@ ion-header {
 .author img {
   border-radius: 50%;
 }
+
+ion-icon {
+  --ionicon-stroke-width: 52px;
+}
 </style>

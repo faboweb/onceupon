@@ -143,39 +143,51 @@ app.post("/resolveCIDs", async (req, res) => {
 });
 
 app.get("/story/:id", async (req, res) => {
-  const network = getNetwork(req);
-  const storyId = req.params.id;
-  const story = await db
-    .collection("networks/" + network.id + "/stories")
-    .doc(storyId)
-    .get();
-  if (!story.exists) {
-    res.status(404).send("Story not found");
-    return;
+  try {
+    const network = getNetwork(req);
+    const storyId = req.params.id;
+    const story = await db
+      .collection("networks/" + network.id + "/stories")
+      .doc(storyId)
+      .get();
+    if (!story.exists) {
+      res.status(404).send("Story not found");
+      return;
+    }
+    const storyData = story.data();
+    const sections = await db
+      .collection("networks/" + network.id + "/sections")
+      .where("story_id", "==", storyId)
+      .get();
+    const sectionData = sections.docs.map((doc) => doc.data());
+
+    const lastSectionBlock = await getBlock(network, storyData.last_cycle);
+    const currentBlock = await getBlock(network); // TODO take last?
+    const heightDiff = currentBlock?.header.height - storyData.last_cycle;
+    const timeDiff =
+      new Date(currentBlock?.header.time).getTime() -
+      new Date(lastSectionBlock.header.time).getTime();
+    const assumedNextSectionBlockTime = new Date(
+      new Date(lastSectionBlock.header.time).getTime() +
+        (timeDiff / heightDiff) * storyData.interval
+    );
+
+    const likes = await db
+      .collection("networks/" + network.id + "/likes")
+      .where("story_id", "==", storyId)
+      .get();
+    const likesData = likes.docs.map((doc) => doc.data());
+
+    res.status(200).send({
+      ...storyData,
+      assumedNextSectionBlockTime,
+      sections: sectionData,
+      likes: likesData.length,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
   }
-  const storyData = story.data();
-  const sections = await db
-    .collection("networks/" + network.id + "/sections")
-    .where("story_id", "==", storyId)
-    .get();
-  const sectionData = sections.docs.map((doc) => doc.data());
-
-  const lastSectionBlock = await getBlock(network, storyData.last_cycle);
-  const currentBlock = await getBlock(network); // TODO take last?
-  const heightDiff = currentBlock?.header.height - storyData.last_cycle;
-  const timeDiff =
-    new Date(currentBlock?.header.time).getTime() -
-    new Date(lastSectionBlock.header.time).getTime();
-  const assumedNextSectionBlockTime = new Date(
-    new Date(lastSectionBlock.header.time).getTime() +
-      (timeDiff / heightDiff) * storyData.interval
-  );
-
-  res.status(200).send({
-    ...storyData,
-    assumedNextSectionBlockTime,
-    sections: sectionData,
-  });
 });
 
 app.get("/contributions/:user", async (req, res) => {
@@ -598,6 +610,9 @@ const index = async (network, height) => {
     "block"
   );
 
+  const likes = await db.collection("networks/" + network.id + "/likes").get();
+  const likesData = likes.docs.map((doc) => doc.data());
+
   const batch = db.batch();
   await Promise.all(
     stories.map(async (story) => {
@@ -638,6 +653,8 @@ const index = async (network, height) => {
                 count,
               };
             }),
+          likes: likesData.filter(({ story_id }) => story_id === story.id)
+            .length,
         },
         { merge: true }
       );

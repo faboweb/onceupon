@@ -5,73 +5,77 @@
       class="ion-padding"
       style="display: flex; flex-direction: column"
     >
-      <div style="margin-bottom: 0.5rem; width: 100%; text-align: center">
-        <b style="font-size: 16px; text-align: center">Create a story</b>
-      </div>
-      <div style="margin-bottom: 0.5rem">
-        <b style="color: rgba(0, 0, 0, 0.6)">Title</b>
-      </div>
-      <ion-input
-        placeholder="The tales of..."
-        v-model="title"
-        :style="{
-          border: dirty && titleError ? '1px solid red' : '',
-        }"
-        style="background: rgba(217, 217, 217, 0.5); border-radius: 4px"
-      ></ion-input>
-      <div style="margin-bottom: 0.5rem; margin-top: 1rem">
-        <b style="color: rgba(0, 0, 0, 0.6)">Write your first paragraph</b>
-      </div>
-      <ion-textarea
-        placeholder="Once upon..."
-        v-model="content"
-        :rows="5"
-        style="background: rgba(217, 217, 217, 0.5); border-radius: 4px"
-        autoGrow="true"
-      ></ion-textarea>
-      <div style="text-align: right; margin-top: -1.5rem; margin-right: 0.5rem">
-        <small
+      <div style="padding-bottom: 7rem">
+        <div style="margin-bottom: 0.5rem; width: 100%; text-align: center">
+          <b style="font-size: 16px; text-align: center">Create a story</b>
+        </div>
+        <div style="margin-bottom: 0.5rem">
+          <b style="color: rgba(0, 0, 0, 0.6)">Title</b>
+        </div>
+        <ion-input
+          placeholder="The tales of..."
+          v-model="title"
           :style="{
-            color: dirty && content.length < 240 ? 'red' : '',
+            border: dirty && titleError ? '1px solid red' : '',
           }"
-          >Min 240 ({{ content.length }})</small
+          style="background: rgba(217, 217, 217, 0.5); border-radius: 4px"
+        ></ion-input>
+        <div style="margin-bottom: 0.5rem; margin-top: 1rem">
+          <b style="color: rgba(0, 0, 0, 0.6)">Write your first paragraph</b>
+        </div>
+        <ion-textarea
+          placeholder="Once upon..."
+          v-model="content"
+          :rows="5"
+          style="background: rgba(217, 217, 217, 0.5); border-radius: 4px"
+          autoGrow="true"
+        ></ion-textarea>
+        <div
+          style="text-align: right; margin-top: -1.5rem; margin-right: 0.5rem"
         >
-      </div>
-      <div style="margin-bottom: 0.5rem; margin-top: 1rem">
-        <b style="color: rgba(0, 0, 0, 0.6)">Attach Nft</b>
-      </div>
-      <div
-        style="
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-        "
-      >
-        <div @click="attachNftModal = true">
-          <ion-button
-            fill="outline"
-            v-if="!nft"
-            :disabled="!authStore.isSignedIn"
-            style="text-transform: none"
-            ><ion-icon :icon="add"></ion-icon> Add NFT</ion-button
-          >
-          <ion-button fill="outline" style="text-transform: none" v-else
-            ><nft-element :nft="nft" /> Change NFT</ion-button
+          <small
+            :style="{
+              color: dirty && content.length < 240 ? 'red' : '',
+            }"
+            >Min 240 ({{ content.length }})</small
           >
         </div>
+        <div style="margin-bottom: 0.5rem; margin-top: 1rem">
+          <b style="color: rgba(0, 0, 0, 0.6)">Attach Nft</b>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+          "
+        >
+          <div @click="attachNftModal = true">
+            <ion-button
+              fill="outline"
+              v-if="!nft"
+              :disabled="!authStore.isSignedIn"
+              style="text-transform: none"
+              ><ion-icon :icon="add"></ion-icon> Add NFT</ion-button
+            >
+            <ion-button fill="outline" style="text-transform: none" v-else
+              ><nft-element :nft="nft" /> Change NFT</ion-button
+            >
+          </div>
 
-        <div style="margin-top: -1rem; text-align: right">
-          <ion-button
-            v-if="authStore.isSignedIn"
-            @click="save"
-            color="primary"
-            :disabled="content.length < 240"
-            style="margin-top: 1rem"
-            >Submit</ion-button
-          >
-          <ion-button v-else @click="walletStore.logInUser()" color="primary"
-            >Connect Wallet</ion-button
-          >
+          <div style="margin-top: -1rem; text-align: right">
+            <ion-button
+              v-if="authStore.isSignedIn"
+              @click="save"
+              color="primary"
+              :disabled="content.length < 240"
+              style="margin-top: 1rem"
+              >Submit</ion-button
+            >
+            <ion-button v-else @click="walletStore.logInUser()" color="primary"
+              >Connect Wallet</ion-button
+            >
+          </div>
         </div>
       </div>
 
@@ -107,7 +111,7 @@ import {
   IonCard,
 } from "@ionic/vue";
 import AttachNft from "@/components/story/AttachNft.vue";
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useNftStore } from "@/store/nfts";
 import { useWalletStore } from "@/store/wallet";
@@ -115,6 +119,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../store";
 import MobileFooter from "@/components/overview/MobileFooter.vue";
 import { add } from "ionicons/icons";
+import NftElement from "@/components/NftElement.vue";
 
 const router = useRouter();
 const storyStore = useStoryStore();
@@ -163,6 +168,7 @@ const save = async () => {
     content.value = "";
     title.value = "";
     nft.value = undefined;
+    localStorage.removeItem("draft");
     router.push("/story/" + storyId + "/read");
   } catch (error) {
     console.error(error);
@@ -170,6 +176,36 @@ const save = async () => {
     loading.dismiss();
   }
 };
+
+let saveDebounce;
+watch(
+  () => [nft.value, content.value, title.value],
+  () => {
+    if (saveDebounce) {
+      clearTimeout(saveDebounce);
+    }
+    saveDebounce = setTimeout(() => {
+      localStorage.setItem(
+        "draft",
+        JSON.stringify({
+          nft: nft.value,
+          content: content.value,
+          title: title.value,
+        })
+      );
+    }, 1000);
+  }
+);
+
+onMounted(() => {
+  const draft = localStorage.getItem("draft");
+  if (draft) {
+    const { nft: _nft, content: _content, title: _title } = JSON.parse(draft);
+    nft.value = _nft;
+    content.value = _content;
+    title.value = _title;
+  }
+});
 </script>
 <style scoped lang="scss">
 ion-card {
@@ -189,5 +225,12 @@ ion-textarea textarea {
 .button-outline {
   --border-color: rgba(242, 103, 9, 1);
   --color: rgba(242, 103, 9, 1);
+}
+</style>
+<style lang="scss">
+ion-textarea .native-wrapper,
+ion-input .native-wrapper {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 </style>
