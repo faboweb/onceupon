@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@cosmjs/amino':
+    specifier: ^0.31.1
+    version: 0.31.1
   '@cosmjs/crypto':
     specifier: ^0.30.1
     version: 0.30.1
@@ -138,6 +141,15 @@ packages:
       '@cosmjs/encoding': 0.30.1
       '@cosmjs/math': 0.30.1
       '@cosmjs/utils': 0.30.1
+    dev: false
+
+  /@cosmjs/amino@0.31.1:
+    resolution: {integrity: sha512-kkB9IAkNEUFtjp/uwHv95TgM8VGJ4VWfZwrTyLNqBDD1EpSX2dsNrmUe7k8OMPzKlZUFcKmD4iA0qGvIwzjbGA==}
+    dependencies:
+      '@cosmjs/crypto': 0.31.1
+      '@cosmjs/encoding': 0.31.1
+      '@cosmjs/math': 0.31.1
+      '@cosmjs/utils': 0.31.1
     dev: false
 
   /@cosmjs/cli@0.28.13:
