@@ -16,7 +16,7 @@ export const execute = async (command: string, data: any) => {
       await walletStore.execute(walletStore.address, {
         [command]: data,
       });
-    } catch (err) {
+    } catch (err: any) {
       console.log(err);
       const regexp = /.*Custom Error val: "(.+)".*/;
       const matches = regexp.exec(err.message);
