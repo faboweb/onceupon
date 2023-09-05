@@ -6,7 +6,12 @@
       </div>
       <ion-list>
         <template v-if="story && loaded">
-          <ion-item v-for="share of shares" :key="share.user">
+          <ion-item
+            v-for="share of shares"
+            :key="share.user"
+            style="cursor: pointer"
+            @click="router.push('/profile/' + share.user)"
+          >
             <nft-element
               :nft="getAvatar(share.user)"
               style="margin-right: 1rem"
@@ -60,7 +65,7 @@ import {
 } from "@ionic/vue";
 import { computed, Ref, ref } from "vue";
 import { useStoryStore } from "@/store/story";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useNameStore, useNavigationStore } from "@/store";
 import { getAvatar } from "@/scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
@@ -69,6 +74,7 @@ const storyStore = useStoryStore();
 const navigationStore = useNavigationStore();
 const nameStore = useNameStore();
 const route = useRoute();
+const router = useRouter();
 const storyId = String(route?.params.id);
 const story: Ref<any> = ref(null);
 const loaded = ref(false);

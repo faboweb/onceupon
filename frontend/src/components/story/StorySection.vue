@@ -27,6 +27,7 @@
         liked,
       }"
       @click="likeStore.toggleLike(section)"
+      v-if="authStore.isSignedIn && authStore.signInMethod !== 'keplr'"
     >
       <ion-icon :icon="liked ? heart : heartOutline"></ion-icon>
     </div>
@@ -90,10 +91,11 @@ import { IonGrid, IonRow, IonCol, IonCard, useIonRouter } from "@ionic/vue";
 import { formatDistance } from "date-fns";
 import { computed, defineProps, onMounted, ref } from "vue";
 import NftElement from "../NftElement.vue";
-import { useNetworkStore } from "../../store";
+import { useAuthStore, useNetworkStore } from "../../store";
 import { heart, heartOutline } from "ionicons/icons";
 
 const walletStore = useWalletStore();
+const authStore = useAuthStore();
 const nftStore = useNftStore();
 const nameStore = useNameStore();
 const storyStore = useStoryStore();

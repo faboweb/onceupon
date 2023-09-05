@@ -40,14 +40,39 @@
       <div style="margin-bottom: 0.5rem; margin-top: 1rem">
         <b style="color: rgba(0, 0, 0, 0.6)">Attach Nft</b>
       </div>
-      <div @click="attachNftModal = true">
-        <ion-avatar v-if="nft">
-          <img
-            :src="nftStore.getNft(nft).image"
-            :alt="nftStore.getNft(nft).name"
-          />
-        </ion-avatar>
-        <ion-button v-if="!nft" :disabled="!authStore.isSignedIn">+</ion-button>
+      <div
+        style="
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        "
+      >
+        <div @click="attachNftModal = true">
+          <ion-button
+            fill="outline"
+            v-if="!nft"
+            :disabled="!authStore.isSignedIn"
+            style="text-transform: none"
+            ><ion-icon :icon="add"></ion-icon> Add NFT</ion-button
+          >
+          <ion-button fill="outline" style="text-transform: none" v-else
+            ><nft-element :nft="nft" /> Change NFT</ion-button
+          >
+        </div>
+
+        <div style="margin-top: -1rem; text-align: right">
+          <ion-button
+            v-if="authStore.isSignedIn"
+            @click="save"
+            color="primary"
+            :disabled="content.length < 240"
+            style="margin-top: 1rem"
+            >Submit</ion-button
+          >
+          <ion-button v-else @click="walletStore.logInUser()" color="primary"
+            >Connect Wallet</ion-button
+          >
+        </div>
       </div>
 
       <ion-modal
@@ -58,20 +83,6 @@
           <AttachNft @select-nft="attachNft" />
         </ion-content>
       </ion-modal>
-
-      <div style="margin-top: 2rem; text-align: right">
-        <ion-button
-          v-if="authStore.isSignedIn"
-          @click="save"
-          color="primary"
-          :disabled="content.length < 240"
-          style="margin-top: 1rem"
-          >Submit</ion-button
-        >
-        <ion-button v-else @click="walletStore.logInUser()" color="primary"
-          >Connect Wallet</ion-button
-        >
-      </div>
 
       <mobile-footer />
     </ion-content>
@@ -103,6 +114,7 @@ import { useWalletStore } from "@/store/wallet";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store";
 import MobileFooter from "@/components/overview/MobileFooter.vue";
+import { add } from "ionicons/icons";
 
 const router = useRouter();
 const storyStore = useStoryStore();
@@ -159,7 +171,7 @@ const save = async () => {
   }
 };
 </script>
-<style>
+<style scoped lang="scss">
 ion-card {
   box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
   border-radius: 15px;
@@ -168,5 +180,14 @@ ion-card {
 ion-input input,
 ion-textarea textarea {
   padding-left: 1rem !important;
+}
+
+.button-solid {
+  --ion-color-primary: rgba(242, 103, 9, 1);
+}
+
+.button-outline {
+  --border-color: rgba(242, 103, 9, 1);
+  --color: rgba(242, 103, 9, 1);
 }
 </style>

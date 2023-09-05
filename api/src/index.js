@@ -554,6 +554,22 @@ app.get("/likes/:address", async (req, res) => {
   res.status(200).send(result);
 });
 
+app.get("/nfts/:address", async (req, res) => {
+  const network = getNetwork(req);
+
+  const address = req.params.address;
+  const sections = await db
+    .collection("networks/" + network.id + "/sections")
+    .where("proposer", "==", address)
+    .get();
+  const result = [];
+  sections.forEach((section) => {
+    const data = section.data();
+    if (data.nft) result.push(data.nft);
+  });
+  res.status(200).send(result);
+});
+
 const DEBOUNCE = 1000;
 const subscribeTxs = async (network, cb) => {
   const debouncedIndex = debounce(async (height) => {

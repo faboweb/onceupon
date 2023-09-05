@@ -55,7 +55,7 @@ export const useWalletStore = defineStore("wallet", {
 
         // @ts-ignore
         const nftStore = useNftStore();
-        nftStore.loadNfts(this.address);
+        nftStore.loadOwnedNfts(this.address);
         const nameStore = useNameStore();
         nameStore.getName(this.address);
 

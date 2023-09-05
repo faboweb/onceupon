@@ -1,7 +1,7 @@
 <template>
   <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-content>
-      <div style="padding-top: 1rem">
+      <div style="padding-top: 1rem; padding-bottom: 10rem">
         <div
           style="position: absolute; right: 0.5rem"
           :style="{
@@ -68,50 +68,16 @@
               gap: 1rem;
             "
           >
-            <div
-              v-for="(section, i) of contributions"
-              :key="i"
-              style="
-                background: rgba(217, 217, 217, 0.2);
-                border-radius: 8px;
-                padding: 0.5rem;
-                cursor: pointer;
-                width: 186px;
-                height: 123px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                flex-grow: 1;
-              "
-              @click="router.push('/story/' + section.story_id + '/read/')"
-            >
-              <b
-                style="
-                  margin-bottom: 0.2rem;
-                  font-size: 14px;
-                  white-space: nowrap;
-                "
-              >
-                {{ section.story?.name }}
-              </b>
-              <span style="color: rgba(242, 103, 9, 0.6); font-size: 14px"
-                >Section</span
-              >
-              <p
-                style="
-                  text-align: left;
-                  white-space: pre-wrap;
-                  text-overflow: ellipsis;
-                  overflow: hidden;
-                  max-height: 70px;
-                  font-size: 12px;
-                "
-              >
-                {{ section.content }}...
-              </p>
-            </div>
+            <abstract-element
+              :proposal="section"
+              v-for="section of contributions"
+              caption="Section"
+              :key="section.section_id"
+              style="flex: 1"
+            />
           </div>
         </div>
-        <div v-if="likes === undefined || likes.length > 0">
+        <div v-if="!doneLoadingLikes || likes.length > 0">
           <div
             style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
           >
@@ -152,6 +118,41 @@
             />
           </div>
         </div>
+        <div v-if="!doneLoadingNfts || loadedNfts.length > 0">
+          <div
+            style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
+          >
+            {{ self ? "My " : "" }} Linked Nfts
+          </div>
+          <div
+            style="display: flex; flex-direction: row; margin-top: 0.5rem"
+            v-if="!doneLoadingNfts"
+          >
+            <ion-skeleton-text
+              style="height: 103px; width: 151px; margin-right: 1rem"
+              :animated="true"
+            ></ion-skeleton-text>
+            <ion-skeleton-text
+              style="height: 103px; width: 151px; margin-right: 1rem"
+              :animated="true"
+            ></ion-skeleton-text>
+            <ion-skeleton-text
+              style="height: 103px; width: 151px; margin-right: 1rem"
+              :animated="true"
+            ></ion-skeleton-text>
+          </div>
+          <div
+            v-else
+            style="
+              display: flex;
+              margin-top: 0.5rem;
+              flex-wrap: wrap;
+              gap: 1rem;
+            "
+          >
+            <nft-list :nfts="loadedNfts" />
+          </div>
+        </div>
       </div>
 
       <mobile-footer />
@@ -169,11 +170,14 @@ import {
   useWalletStore,
 } from "../store";
 import NftElement from "../components/NftElement.vue";
+import NftList from "../components/NftList.vue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import AbstractElement from "../components/AbstractElement.vue";
 import { IonPage, IonContent } from "@ionic/vue";
 import { useLikeStore } from "../store/likes";
 import add from "date-fns/esm/fp/add/index";
+import { useNftStore } from "../store/nfts";
+import { getNftKey } from "@/store/nfts";
 
 const route = useRoute();
 const address = String(route?.params.address);
@@ -182,6 +186,7 @@ const authStore = useAuthStore();
 const nameStore = useNameStore();
 const storyStore = useStoryStore();
 const likeStore = useLikeStore();
+const nftStore = useNftStore();
 const router = useRouter();
 const likes = ref();
 const author = ref({
@@ -190,6 +195,8 @@ const author = ref({
 });
 const loadedLikes = ref([]);
 const doneLoadingLikes = ref(false);
+const loadedNfts = ref([]);
+const doneLoadingNfts = ref(false);
 
 const profileName = computed(() => {
   return nameStore.name(address);
@@ -219,12 +226,19 @@ watch(
   () => address,
   async () => {
     doneLoadingLikes.value = false;
+    doneLoadingNfts.value = false;
     loadedLikes.value = [];
+    loadedNfts.value = [];
+
     nameStore.getName(address);
     storyStore.loadContributions(address);
-    likes.value = await likeStore.getLikes(address); // TODO update likes on like
     storyStore.getAuthor(address).then((_author) => (author.value = _author));
-    await Promise.all(
+    nftStore.getLinkedNfts(address).then((nfts) => {
+      loadedNfts.value = nfts;
+      doneLoadingNfts.value = true;
+    });
+    likes.value = await likeStore.getLikes(address); // TODO update likes on like
+    Promise.all(
       likes.value.map(async ({ story_id, section_id }) => {
         const story = await storyStore.getStory(story_id);
         const section = story.sections.find(
@@ -232,8 +246,9 @@ watch(
         );
         loadedLikes.value.push(section);
       })
-    );
-    doneLoadingLikes.value = true;
+    ).then(() => {
+      doneLoadingLikes.value = true;
+    });
   },
   {
     immediate: true,

@@ -69,6 +69,7 @@ export const useAuthStore = defineStore("authStore", {
                   this.setSignIn(user, signInMethod);
                 } else {
                   // User is signed out
+                  this.signOut();
                 }
                 resolve(undefined);
               });

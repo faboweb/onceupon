@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
-import { loadNft, loadNftsForAddress } from "@/scripts/stargaze";
+import { loadNft, loadOwnedNftsForAddress } from "@/scripts/stargaze";
 import { useNetworkStore } from "./network";
+import { callApi } from "@/scripts/api";
 
 interface State {
   nfts: any;
@@ -32,9 +33,9 @@ export const useNftStore = defineStore("nftStore", {
       this.$state.nfts[getNftKeyApi(token)] = parseNft(token);
       return this.$state.nfts[getNftKeyApi(token)];
     },
-    async loadNfts(address) {
+    async loadOwnedNfts(address) {
       const networkStore = useNetworkStore();
-      const tokens = await loadNftsForAddress(
+      const tokens = await loadOwnedNftsForAddress(
         networkStore.currentNetwork,
         address
       );
@@ -42,6 +43,10 @@ export const useNftStore = defineStore("nftStore", {
       for (const token of tokens) {
         this.$state.nfts[getNftKeyApi(token)] = parseNft(token);
       }
+    },
+    async getLinkedNfts(address) {
+      const nfts = await callApi("nfts/" + address, "GET");
+      return nfts;
     },
   },
 });

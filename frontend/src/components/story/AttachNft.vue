@@ -62,7 +62,7 @@ const noNft = () => {
 watch(
   () => authStore.user.address,
   () => {
-    nftStore.loadNfts(authStore.user.address);
+    nftStore.loadOwnedNfts(authStore.user.address);
   },
   {
     immediate: true,

@@ -42,7 +42,7 @@ export async function loadNft(network, nft) {
   }
 }
 
-export async function loadNftsForAddress(network, address) {
+export async function loadOwnedNftsForAddress(network, address) {
   const {
     data: {
       tokens: { tokens },
