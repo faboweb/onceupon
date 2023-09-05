@@ -157,4 +157,21 @@ ion-header {
 ion-icon {
   --ionicon-stroke-width: 52px;
 }
+
+ion-button {
+  text-transform: none;
+  height: 36px;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 85px;
+
+  &.button-solid {
+    --background: rgba(242, 103, 9, 1);
+    --ion-color-base: rgba(242, 103, 9, 1);
+  }
+  &.button-outline {
+    color: rgba(242, 103, 9, 1);
+    --border-color: rgba(242, 103, 9, 1);
+  }
+}
 </style>

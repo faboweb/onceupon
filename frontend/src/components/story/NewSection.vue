@@ -30,7 +30,6 @@
         margin-top: -1.3rem;
         margin-right: 0.5rem;
         color: rgba(0, 0, 0, 0.6);
-        font-family: Barlow;
         font-size: 12px;
         font-weight: 400;
         line-height: 14px;
@@ -65,7 +64,6 @@
       <ion-button
         v-if="authStore.isSignedIn"
         @click="save"
-        color="primary"
         :disabled="props.disabled || content.length < 240"
         style="text-transform: none"
         >Submit</ion-button

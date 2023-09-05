@@ -190,21 +190,6 @@ const nextSectionPending = computed(() => {
 </script>
 
 <style scoped lang="scss">
-ion-button {
-  text-transform: none;
-  height: 36px;
-  font-size: 14px;
-  font-weight: 600;
-  min-width: 85px;
-
-  &.button-solid {
-    --background: rgba(242, 103, 9, 1);
-  }
-  &.button-outline {
-    color: rgba(242, 103, 9, 1);
-    --border-color: rgba(242, 103, 9, 1);
-  }
-}
 .proposal {
   padding-bottom: 1rem;
 }
