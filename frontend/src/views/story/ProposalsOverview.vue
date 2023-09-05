@@ -200,6 +200,7 @@ const nextSectionPending = computed(() => {
 .proposal:not(:first-child) {
   padding-top: 1rem;
 }
+
 .proposal:not(:last-child) {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
