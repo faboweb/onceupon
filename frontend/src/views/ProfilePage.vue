@@ -163,21 +163,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import {
-  useAuthStore,
-  useNameStore,
-  useStoryStore,
-  useWalletStore,
-} from "../store";
+import { useAuthStore, useNameStore, useStoryStore } from "../store";
 import NftElement from "../components/NftElement.vue";
 import NftList from "../components/NftList.vue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import AbstractElement from "../components/AbstractElement.vue";
-import { IonPage, IonContent } from "@ionic/vue";
+import { IonPage, IonContent, IonSkeletonText, IonButton } from "@ionic/vue";
 import { useLikeStore } from "../store/likes";
-import add from "date-fns/esm/fp/add/index";
 import { useNftStore } from "../store/nfts";
-import { getNftKey } from "@/store/nfts";
 
 const route = useRoute();
 const address = String(route?.params.address);

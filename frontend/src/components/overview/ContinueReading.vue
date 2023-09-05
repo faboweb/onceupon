@@ -60,6 +60,7 @@ import { useContinueStore } from "../../store/continue";
 import { useStoryStore } from "../../store";
 import { useRouter } from "vue-router";
 import AbstractElement from "../AbstractElement.vue";
+import { IonSkeletonText } from "@ionic/vue";
 
 const storyStore = useStoryStore();
 const continueStore = useContinueStore();

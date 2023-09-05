@@ -80,7 +80,7 @@
 </template>
 
 <script setup>
-import { useIonRouter } from "@ionic/vue";
+import { useIonRouter, IonIcon } from "@ionic/vue";
 import { add } from "ionicons/icons";
 import { useRoute, useRouter } from "vue-router";
 import { useAuthStore } from "../../store";

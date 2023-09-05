@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 import { useLikeStore } from "./likes";
 import "@/scripts/firebase";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { registerPushNotifications } from "@/scripts/firebase";
+import "../scripts/firebase";
 
 interface State {
   signInMethod: string;
@@ -22,13 +24,20 @@ export const useAuthStore = defineStore("authStore", {
     },
   },
   actions: {
-    setSignIn(user, method) {
+    async setSignIn(user, method, automatic = false) {
       this.user = user;
       this.signInMethod = method;
       this.storeInLocalStorage();
 
+      if (!user) return;
+
       const likeStore = useLikeStore();
       likeStore.loadLikes(this.user.address);
+
+      if (method === "keplr") return;
+      if (automatic) return;
+
+      await registerPushNotifications();
     },
     signOut() {
       this.user = null;
@@ -60,13 +69,13 @@ export const useAuthStore = defineStore("authStore", {
         const { user, signInMethod } = JSON.parse(auth);
         if (user) {
           if (signInMethod === "keplr") {
-            this.setSignIn(user, signInMethod);
+            this.setSignIn(user, signInMethod, true);
           } else {
             const auth = getAuth();
             await new Promise((resolve) => {
               onAuthStateChanged(auth, (_user) => {
                 if (_user) {
-                  this.setSignIn(user, signInMethod);
+                  this.setSignIn(user, signInMethod, true);
                 } else {
                   // User is signed out
                   this.signOut();

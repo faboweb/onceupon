@@ -118,7 +118,7 @@ onMounted(async () => {
     story.value = await storyStore.getStory(storyId);
   } catch (error) {
     console.error(error);
-    router.push("/stories");
+    router.push("/overview");
     return;
   }
   voteStore.loadVotes(storyId);

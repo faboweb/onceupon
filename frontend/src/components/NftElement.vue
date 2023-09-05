@@ -24,7 +24,7 @@ import { defineProps } from "vue";
 import { IonAvatar } from "@ionic/vue";
 import { FALLBACK_AVATAR } from "../scripts/getAvatar";
 defineProps({
-  nft: { type: Object, required: true },
+  nft: { type: Object },
   size: { type: Number, default: 64 },
 });
 const { getNft } = useNftStore();

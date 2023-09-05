@@ -98,6 +98,7 @@ import {
   IonContent,
   IonAvatar,
   IonIcon,
+  IonLabel,
 } from "@ionic/vue";
 import { useAuthStore, useWalletStore, useWeb2AuthStore } from "../store";
 import { closeOutline } from "ionicons/icons";

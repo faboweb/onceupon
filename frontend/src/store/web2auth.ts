@@ -8,6 +8,7 @@ import { callApi, callApiAuthenticated } from "@/scripts/api";
 import { useWalletStore } from "./wallet";
 import { signArbitrary } from "@/scripts/keplr";
 import { updateProfile } from "firebase/auth";
+import "../scripts/firebase";
 // import { useWalletStore } from "./wallet";
 // import { signArbitrary } from "@keplr-wallet/cosmos";
 // import axios from "axios";

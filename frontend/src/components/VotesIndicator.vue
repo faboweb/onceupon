@@ -147,7 +147,17 @@
 </template>
 
 <script setup lang="ts">
-import { IonBadge } from "@ionic/vue";
+import {
+  IonBadge,
+  IonIcon,
+  IonCol,
+  IonRow,
+  IonSkeletonText,
+  IonGrid,
+  IonButton,
+  IonContent,
+  IonModal,
+} from "@ionic/vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { useAuthStore, useStoryStore } from "../store";
 import { useVotesStore } from "../store/votes";

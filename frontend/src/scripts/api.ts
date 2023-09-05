@@ -1,5 +1,6 @@
 import { useNetworkStore } from "@/store";
 import axios from "axios";
+import "../scripts/firebase";
 
 export const callApi = async (path, method, body?) => {
   const networkStore = useNetworkStore();

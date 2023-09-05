@@ -80,22 +80,16 @@
 </template>
 
 <script setup lang="ts">
-import { loadingController, IonPage, IonContent, IonButton } from "@ionic/vue";
-import { computed, onMounted, Ref, ref } from "vue";
+import { IonPage, IonContent, IonButton } from "@ionic/vue";
+import { onMounted, Ref, ref } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useRoute, useRouter } from "vue-router";
 import StorySection from "@/components/story/StorySection.vue";
 import NewSection from "../../components/story/NewSection.vue";
-import { formatDistance } from "date-fns";
-import { useWalletStore, useNameStore, useNavigationStore } from "@/store";
-import { useAuthStore } from "../../store";
-import { useContinueStore } from "../../store/continue";
+import { useNameStore, useNavigationStore } from "../../store";
 
-const walletStore = useWalletStore();
 const storyStore = useStoryStore();
-const navigationStore = useNavigationStore();
 const nameStore = useNameStore();
-const authStore = useAuthStore();
 const route = useRoute();
 const router = useRouter();
 const storyId = String(route?.params.id);
@@ -107,10 +101,9 @@ onMounted(async () => {
     story.value = await storyStore.getStory(storyId);
   } catch (error) {
     console.error(error);
-    router.push("/stories");
+    router.push("/overview");
     return;
   }
-  navigationStore.backTo = "/stories";
 
   story.value.sections.forEach((proposal) => {
     nameStore.getName(proposal.proposer);

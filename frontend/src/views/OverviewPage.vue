@@ -54,7 +54,15 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonContent, IonFabButton, IonIcon } from "@ionic/vue";
+import {
+  IonPage,
+  IonContent,
+  IonFabButton,
+  IonIcon,
+  IonToolbar,
+  IonHeader,
+  IonBadge,
+} from "@ionic/vue";
 import { add } from "ionicons/icons";
 import { computed, onMounted } from "vue";
 import { useStoryStore } from "@/store/story";

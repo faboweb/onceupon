@@ -98,7 +98,7 @@ app.post("/web3upload", async (req, res) => {
   const body = req.body || {};
   const { content } = body;
 
-  const hash = sha256(content).toString("hex");
+  const hash = Buffer.from(sha256(content)).toString("hex");
   const existingUpload = await db.doc("contentHash/" + hash).get();
   if (existingUpload.exists) {
     res.status(200).send(existingUpload.data().cid);
@@ -301,6 +301,7 @@ Object.values(networks).forEach(async (network) => {
     const client = await CosmWasmClient.connect(network.url);
     const block = await client.getBlock();
     await index(network, block.header.height);
+    checkUpdatesAndNotify(network);
     // setInterval(async () => {
     //   const block = await client.getBlock();
     //   index(network, block.header.height);
@@ -308,7 +309,8 @@ Object.values(networks).forEach(async (network) => {
     subscribeTxs(network, async (event) => {
       const block = await client.getBlock();
       // TODO get heigth from event
-      index(network, block.header.height).catch(console.error);
+      await index(network, block.header.height).catch(console.error);
+      checkUpdatesAndNotify(network);
     });
 
     await cycle(network);
@@ -318,6 +320,11 @@ Object.values(networks).forEach(async (network) => {
   } catch (err) {
     console.error(err);
   }
+
+  sendNotification("test", "test", "test", {
+    storyId: "test",
+    type: "story",
+  });
 });
 
 // Start the server
@@ -327,6 +334,7 @@ app.listen(port, () => {
 
 var serviceAccount = require("../serviceAccountKey.json");
 const { subscribe } = require("./websocket");
+const { unsubscribe } = require("diagnostics_channel");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -543,6 +551,8 @@ app.post("/like", async (req, res) => {
         story_id: story_id,
         section_id: section_id,
       });
+      registerUserWithTopic(user.uid, story_id);
+      registerUserWithTopic(user.uid, section_id);
     }
     res.status(200);
   } catch (err) {
@@ -585,7 +595,8 @@ app.get("/nfts/:address", async (req, res) => {
 const DEBOUNCE = 1000;
 const subscribeTxs = async (network, cb) => {
   const debouncedIndex = debounce(async (height) => {
-    index(network, height);
+    await index(network, height);
+    checkUpdatesAndNotify(network);
   }, DEBOUNCE);
   try {
     subscribe(network, (height) => {
@@ -596,7 +607,43 @@ const subscribeTxs = async (network, cb) => {
   }
 };
 
-const index = async (network, height) => {
+app.post("/registerPushToken", async (req, res) => {
+  const idToken = await getToken(req);
+  const user = await admin.auth().verifyIdToken(idToken);
+
+  const body = req.body || {};
+  const { token } = body;
+
+  await db.doc("users/" + user.uid).set(
+    {
+      pushToken: token,
+    },
+    {
+      merge: true,
+    }
+  );
+
+  await db
+    .collection("pushTopics")
+    .where("userUid", "==", user.uid)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        doc.ref.set(
+          {
+            pushToken: token,
+          },
+          {
+            merge: true,
+          }
+        );
+      });
+    });
+
+  res.status(200).send();
+});
+
+const index = async (network) => {
   console.log("Indexing");
   const queryClient = await getClient(network);
   const {
@@ -714,3 +761,124 @@ const cycle = async (network) => {
     await index(network, height);
   }
 };
+
+async function checkUpdatesAndNotify(network) {
+  const client = await getClient(network);
+  const networkState = db.doc("networks/" + network.id);
+  const docSnap = await networkState.get();
+  const lastCheck = docSnap.data()?.last_check || 0;
+  const block = await client.getBlock();
+  const newSections = await db
+    .collection("networks/" + network.id + "/sections")
+    .where("added", ">", lastCheck)
+    .get();
+  const newSectionsData = newSections.docs.map((doc) => doc.data());
+  newSectionsData.forEach(async (section) => {
+    const header = `New chapter proposal!\n\n`;
+    const link = `https://onceupon.community/story/${section.story_id}/read`;
+    const content = (
+      await db.doc("content/" + section.content_cid).get()
+    ).data();
+    const message = `${header} ${content} \n\n ${link}`;
+    await sendNotification(section.story_id, message, "New chapter proposal!", {
+      storyId,
+      type: "proposal",
+    });
+  });
+
+  const newStories = await db
+    .collection("networks/" + network.id + "/stories")
+    .where("created", ">", lastCheck)
+    .get();
+  const newStoriesData = newStories.docs.map((doc) => doc.data());
+
+  newStoriesData.forEach(async (story) => {
+    // const content = (
+    //   await db.doc("content/" + story.first_section.content_cid).get()
+    // ).data();
+    const message = story.title;
+    await sendNotification("new_story", message, "New story!", {
+      storyId: story.id,
+      type: "story",
+    });
+
+    const userForAddressDocs = await db
+      .collection("users")
+      .where("address", "==", story.creator)
+      .get();
+    if (userForAddressDocs.docs.length > 0) {
+      const user = userForAddressDocs.docs[0].data();
+      registerUserWithTopic(user.uid, story_id);
+    }
+  });
+
+  await networkState.set(
+    {
+      last_check: block.header.height,
+    },
+    {
+      merge: true,
+    }
+  );
+}
+
+async function sendNotification(topic, message, title, data) {
+  try {
+    const subscribedTokens = await db
+      .collection("pushTopics")
+      .where("topic", "==", topic)
+      .get()
+      .then((snapshot) => {
+        const tokens = [];
+        snapshot.forEach((doc) => {
+          tokens.push(doc.data().pushToken);
+        });
+        return tokens;
+      });
+    await Promise.all(
+      subscribedTokens.map(async (registrationToken) => {
+        const payload = {
+          token: registrationToken,
+          data,
+          notification: {
+            title,
+            body: message,
+          },
+        };
+        await admin
+          .messaging()
+          .send(payload)
+          .catch((err) => {
+            db.collection("pushTopics")
+              .where("pushToken", "==", registrationToken)
+              .get()
+              .then((snapshot) => {
+                snapshot.forEach((doc) => {
+                  doc.ref.delete();
+                });
+              });
+          });
+      })
+    );
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+async function registerUserWithTopic(userUid, topic) {
+  const user = await db.doc("users/" + userUid).get();
+  const userData = user.data();
+  const pushToken = userData.pushToken;
+
+  const hash = Buffer.from(sha256(userUid + topic)).toString("hex");
+  await db.collection("pushTopics").doc(hash).set({
+    topic,
+    userUid,
+    pushToken,
+  });
+}
+
+async function unregisterUserWithTopic(userUid, topic) {
+  const hash = Buffer.from(sha256(userUid + topic)).toString("hex");
+  await db.collection("pushTopics").doc(hash).delete();
+}

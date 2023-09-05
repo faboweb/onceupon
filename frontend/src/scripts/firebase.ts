@@ -1,4 +1,6 @@
 import firebase from "firebase/compat/app";
+import { getMessaging, getToken } from "firebase/messaging";
+import { callApiAuthenticated } from "./api";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyCmCL-z7KyGGBd-TA45OU3RwBrbdZZ5teU",
@@ -12,8 +14,32 @@ export const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-// Initialize Firebase
-// const app = firebase.initializeApp(firebaseConfig);
+const registerPushNotificationsOnServer = async () => {
+  // Get registration token. Initially this makes a network call, once retrieved
+  // subsequent calls to getToken will return from cache.
+  const messaging = getMessaging();
+  const token = await getToken(messaging, {
+    vapidKey: process.env.VUE_APP_PUSH_VAPID,
+  });
+  await callApiAuthenticated("registerPushToken", "POST", {
+    token,
+  });
+};
 
-// // Initialize Realtime Database and get a reference to the service
-// export const database = firebase.firestore(app);
+export const registerPushNotifications = async () => {
+  if (!("Notification" in window)) {
+    // Check if the browser supports notifications
+    alert("This browser does not support desktop notification");
+  } else if (Notification.permission === "granted") {
+    // Check whether notification permissions have already been granted;
+    // if so, create a notification
+    await registerPushNotificationsOnServer();
+  } else if (Notification.permission !== "denied") {
+    // We need to ask the user for permission
+    const permission = await Notification.requestPermission();
+    // If the user accepts, let's create a notification
+    if (permission === "granted") {
+      await registerPushNotificationsOnServer();
+    }
+  }
+};

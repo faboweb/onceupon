@@ -1,7 +1,11 @@
-importScripts("https://www.gstatic.com/firebasejs/5.5.6/firebase-app.js");
-importScripts("https://www.gstatic.com/firebasejs/5.5.6/firebase-messaging.js");
+importScripts(
+  "https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"
+);
+importScripts(
+  "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging-compat.js"
+);
 
-export const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyCmCL-z7KyGGBd-TA45OU3RwBrbdZZ5teU",
   authDomain: "onceupon-15dc8.firebaseapp.com",
   projectId: "onceupon-15dc8",
@@ -14,3 +18,25 @@ export const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 
 const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage(({ notification: { title, body }, data }) => {
+  console.log(
+    "[firebase-messaging-sw.js] Received background message ",
+    title,
+    body
+  );
+  const notificationOptions = {
+    body,
+    icon: "/assets/onceupon-logo-feather-lite.png",
+    onclick: () => {
+      if (data.type === "story" || data.type === "section") {
+        window.open("/story/" + data.storyId + "/read");
+      }
+      if (data.type === "proposal") {
+        window.open("/story/" + data.storyId + "/proposals");
+      }
+    },
+  };
+
+  self.registration.showNotification(title, notificationOptions);
+});

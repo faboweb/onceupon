@@ -105,7 +105,7 @@ import StoryNftPreview from "./StoryNftPreview.vue";
 const nameStore = useNameStore();
 const storyStore = useStoryStore();
 
-const props = defineProps<{ story: any; extended: boolean }>();
+const props = defineProps<{ story: any; extended?: boolean }>();
 
 const time = (story) => {
   if (!story.lastUpdate) return "";

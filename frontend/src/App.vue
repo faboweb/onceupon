@@ -10,6 +10,7 @@
 </template>
 
 <script setup lang="ts">
+import "./scripts/firebase";
 import {
   IonHeader,
   IonToolbar,
@@ -26,34 +27,47 @@ import {
   IonButton,
   IonIcon,
 } from "@ionic/vue";
-import NftElement from "./components/NftElement.vue";
-import { IonApp, IonRouterOutlet, IonModal } from "@ionic/vue";
-import {
-  useWalletStore,
-  useNameStore,
-  useWeb2AuthStore,
-  useAuthStore,
-  useNetworkStore,
-  useStoryStore,
-} from "./store";
+import { IonApp, IonRouterOutlet, toastController } from "@ionic/vue";
+import { useAuthStore } from "./store";
 import { menu, cartOutline } from "ionicons/icons";
-import { onMounted, ref, watch } from "vue";
-import MobileFooter from "./components/overview/MobileFooter.vue";
+import { onMounted } from "vue";
 import LoginModal from "./views/LoginModal.vue";
-import { useLikeStore } from "@/store/likes";
+import { getMessaging, onMessage } from "firebase/messaging";
+import router from "./router";
 
-const walletStore = useWalletStore();
-const nameStore = useNameStore();
-const web2AuthStore = useWeb2AuthStore();
 const authStore = useAuthStore();
-const networkStore = useNetworkStore();
-const likeStore = useLikeStore();
 
 authStore.loadFromLocalStorage();
 
-const changeNetwork = (network) => {
-  networkStore.setNetwork(network);
-};
+const messaging = getMessaging();
+onMessage(messaging, async (payload) => {
+  if (payload.notification) {
+    console.log("Message received. ", payload);
+    const toast = await toastController.create({
+      message: `${payload.notification.title}\n${payload.notification.body}`,
+      duration: 5000,
+      position: "top",
+      cssClass: "toast",
+    });
+    toast.onclick = (ev) => {
+      if (["story", "section"].includes(payload.data?.type)) {
+        router.push("/story/" + payload.data.storyId + "/read");
+      }
+      if (["proposal"].includes(payload.data?.type)) {
+        router.push("/story/" + payload.data.storyId + "/proposals");
+      }
+    };
+    await toast.present();
+  }
+});
+
+onMounted(() => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("firebase-messaging-sw.js", {
+      scope: "./",
+    });
+  }
+});
 </script>
 <style lang="scss">
 @import "../public/fonts/style.css";
@@ -173,5 +187,18 @@ ion-button {
     color: rgba(242, 103, 9, 1);
     --border-color: rgba(242, 103, 9, 1);
   }
+}
+
+ion-toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.toast::part(message) {
+  white-space: pre-wrap;
+}
+.toast {
+  --background: rgb(242, 242, 242);
+  --color: rgba(1, 40, 49, 1);
 }
 </style>
