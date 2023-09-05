@@ -321,10 +321,10 @@ Object.values(networks).forEach(async (network) => {
     console.error(err);
   }
 
-  sendNotification("test", "test", "test", {
-    storyId: "test",
-    type: "story",
-  });
+  // sendNotification("test", "test", "test", {
+  //   storyId: "test",
+  //   type: "story",
+  // });
 });
 
 // Start the server
