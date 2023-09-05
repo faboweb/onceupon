@@ -121,7 +121,7 @@ import {
 } from "../../store";
 import { computed, onMounted, Ref, ref, defineProps } from "vue";
 import { useContinueStore } from "../../store/continue";
-import { useVotesStore } from "../../store/votes";
+import { useVotesStore, voteFromInt } from "../../store/votes";
 import { formatDistance } from "date-fns";
 import NewSection from "../../components/story/NewSection.vue";
 import StorySection from "../../components/story/StorySection.vue";
@@ -155,9 +155,13 @@ onMounted(async () => {
 });
 
 const proposalVote = (proposalId) => {
-  return votesStore.votes.find(
+  const pendingVote = votesStore.votes.find(
     (vote) => vote.storyId === storyId && vote.sectionId === proposalId
   )?.vote;
+  const submittedVote = storyStore.votes[storyId].find(
+    (vote) => vote.section_id === proposalId
+  )?.vote;
+  return pendingVote || voteFromInt(submittedVote);
 };
 const vote = async (proposalId) => {
   votesStore.vote(

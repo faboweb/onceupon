@@ -9,6 +9,13 @@ const voteToInt = (vote) => {
     no: 0,
   }[vote];
 };
+export const voteFromInt = (vote) => {
+  return {
+    1: "yes",
+    2: "veto",
+    0: "no",
+  }[vote];
+};
 
 interface State {
   votes: any[];
