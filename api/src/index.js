@@ -275,17 +275,17 @@ app.get("/stories", async (req, res) => {
       acc[curr.storyId].shares += curr.amount;
       return acc;
     }, {});
-  const storyIds = Object.values(sharesDict);
+  // const storyIds = Object.values(sharesDict);
   const stories = await db
     .collection("networks/" + network.id + "/stories")
     .get();
   let topStories = stories.docs
     .map((doc) => doc.data())
-    .filter((story) => storyIds.find((_s) => _s.storyId === story.id))
+    // .filter((story) => storyIds.find((_s) => _s.storyId === story.id))
     .map((story) => {
       return {
         ...story,
-        shares: sharesDict[story.id].shares,
+        shares: sharesDict[story.id]?.shares || 0,
       };
     })
     .sort((a, b) => b.shares - a.shares);
