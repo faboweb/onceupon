@@ -162,7 +162,8 @@
                 @click="router.push('/profile/' + story.creator)"
                 >By {{ nameStore.name(story.creator) }}</span
               >
-              - <span style="font-size: 14px">{{ story.owners }} Owners</span>
+              - <span style="font-size: 14px">{{ story.owners }} Owners</span> -
+              <span style="font-size: 14px">{{ story.likes }} Likes</span>
             </div>
             <p style="margin-bottom: 1rem">{{ content.substr(0, 240) }}...</p>
             <div>
@@ -204,18 +205,16 @@
           "
         >
           <div>
-            <div class="leader">
+            <div class="leader" v-if="topAuthors[1]">
               <span>#2</span>
-              <template v-if="topAuthors[1]">
-                <nft-element
-                  :nft="getAvatar(topAuthors[1].user)"
-                  class="author"
-                  style="width: 110px; height: 110px"
-                  :size="147"
-                  @click="router.push('/profile/' + topAuthors[1].user)"
-                />
-                <b>{{ nameStore.name(topAuthors[1].user) }}</b>
-              </template>
+              <nft-element
+                :nft="getAvatar(topAuthors[1].user)"
+                class="author"
+                style="width: 110px; height: 110px"
+                :size="147"
+                @click="router.push('/profile/' + topAuthors[1].user)"
+              />
+              <b>{{ nameStore.name(topAuthors[1].user) }}</b>
             </div>
             <div class="leader" style="margin-left: 1rem; margin-right: 1rem">
               <span>#1</span>
@@ -228,18 +227,16 @@
               />
               <b>{{ nameStore.name(topAuthors[0].user) }}</b>
             </div>
-            <div class="leader">
+            <div class="leader" v-if="topAuthors[2]">
               <span>#3</span>
-              <template v-if="topAuthors[2]">
-                <nft-element
-                  :nft="getAvatar(topAuthors[2].user)"
-                  class="author"
-                  style="width: 110px; height: 110px"
-                  :size="147"
-                  @click="router.push('/profile/' + topAuthors[2].user)"
-                />
-                <b>{{ nameStore.name(topAuthors[2].user) }}</b>
-              </template>
+              <nft-element
+                :nft="getAvatar(topAuthors[2].user)"
+                class="author"
+                style="width: 110px; height: 110px"
+                :size="147"
+                @click="router.push('/profile/' + topAuthors[2].user)"
+              />
+              <b>{{ nameStore.name(topAuthors[2].user) }}</b>
             </div>
 
             <ion-grid style="margin-top: 24px; margin-bottom: 24px">
@@ -275,6 +272,7 @@
           padding-bottom: 2rem;
           border-radius: 8px;
           margin-top: 3rem;
+          display: none;
         "
       >
         <b style="font-size: 20px">People love ONCE UPON</b>
@@ -430,7 +428,7 @@ const content = computed(() =>
 onMounted(async () => {
   story.value = (await storyStore.loadStories(1))[0];
   const authors = await storyStore.loadAuthors(5);
-  topAuthors.value = [...authors, ...authors, ...authors];
+  topAuthors.value = authors;
 });
 </script>
 
