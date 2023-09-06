@@ -5,7 +5,7 @@
       border-radius: 8px;
       padding: 0.5rem;
       cursor: pointer;
-      width: 186px;
+      min-width: 186px;
       height: 123px;
       overflow: hidden;
       text-overflow: ellipsis;
