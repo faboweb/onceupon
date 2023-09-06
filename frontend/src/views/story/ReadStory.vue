@@ -113,9 +113,6 @@ onMounted(async () => {
 });
 </script>
 <style>
-.sections ion-card:not(:last-child) {
-  border-bottom: none;
-}
 ion-skeleton-text {
   line-height: 15px;
 }

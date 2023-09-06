@@ -205,11 +205,6 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
-ion-card {
-  box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
-  border-radius: 15px;
-  padding: 10px;
-}
 ion-input input,
 ion-textarea textarea {
   padding-left: 1rem !important;

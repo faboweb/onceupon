@@ -98,9 +98,6 @@ const sortedStories = computed(() => {
 });
 </script>
 <style scoped>
-.story-outer:not(:last-child) ion-card {
-  border-bottom: none;
-}
 .telegram-button {
   background-color: #1b95e0;
   color: #fff;

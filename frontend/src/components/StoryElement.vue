@@ -121,12 +121,4 @@ const content = computed(
 </script>
 
 <style scoped>
-ion-card {
-  box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
-  border-radius: 15px;
-  padding: 10px;
-}
-ion-card:hover {
-  box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.5);
-}
 </style>

@@ -133,11 +133,6 @@ const time = computed(() => {
 });
 </script>
 <style scoped lang="scss">
-ion-card {
-  box-shadow: 5px 5px 50px rgba(192, 197, 214, 0.34);
-  border-radius: 15px;
-  padding: 10px;
-}
 ion-skeleton-text {
   line-height: 25px;
   margin-top: 8px;

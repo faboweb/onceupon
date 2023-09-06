@@ -334,7 +334,6 @@ app.listen(port, () => {
 
 var serviceAccount = require("../serviceAccountKey.json");
 const { subscribe } = require("./websocket");
-const { unsubscribe } = require("diagnostics_channel");
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -822,6 +821,7 @@ async function checkUpdatesAndNotify(network) {
   );
 }
 
+// TODO refactor all notification things
 async function sendNotification(topic, message, title, data) {
   try {
     const subscribedTokens = await db
@@ -849,14 +849,7 @@ async function sendNotification(topic, message, title, data) {
           .messaging()
           .send(payload)
           .catch((err) => {
-            db.collection("pushTopics")
-              .where("pushToken", "==", registrationToken)
-              .get()
-              .then((snapshot) => {
-                snapshot.forEach((doc) => {
-                  doc.ref.delete();
-                });
-              });
+            removeToken(registrationToken);
           });
       })
     );
@@ -881,4 +874,16 @@ async function registerUserWithTopic(userUid, topic) {
 async function unregisterUserWithTopic(userUid, topic) {
   const hash = Buffer.from(sha256(userUid + topic)).toString("hex");
   await db.collection("pushTopics").doc(hash).delete();
+}
+
+async function removeToken(token) {
+  await db
+    .collection("pushTopics")
+    .where("pushToken", "==", token)
+    .get()
+    .then((snapshot) => {
+      snapshot.forEach((doc) => {
+        doc.ref.delete();
+      });
+    });
 }

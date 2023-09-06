@@ -76,13 +76,6 @@ html {
   background-color: #fffdf2;
 }
 
-ion-card {
-  margin: 0;
-}
-
-ion-card:not(:last-child) {
-  margin-bottom: 0.5rem;
-}
 .inner-scroll {
   padding: 0;
 }
@@ -92,10 +85,10 @@ h1 {
   text-align: left;
   font-variant: all-petite-caps;
 }
-ion-avatar {
-  max-width: 100%;
-  height: auto;
-}
+// ion-avatar {
+//   max-width: 100%;
+//   height: auto;
+// }
 .header-md::after {
   background-image: none;
 }
