@@ -91,13 +91,16 @@
     <ion-modal :is-open="expand" @will-dismiss="expand = false">
       <div
         style="
-          text-align: right;
           width: 100%;
           padding-right: 1rem;
+          padding-left: 1rem;
           padding-top: 0.5rem;
           font-size: 24px;
+          display: flex;
+          justify-content: space-between;
         "
       >
+        <b>{{ story.name }}</b>
         <ion-icon
           :icon="closeOutline"
           style="cursor: pointer"
@@ -119,16 +122,8 @@
 import { IonContent, IonButton, IonTextarea, IonModal } from "@ionic/vue";
 import NftElement from "../NftElement.vue";
 import AttachNft from "@/components/story/AttachNft.vue";
-import {
-  ref,
-  defineProps,
-  defineEmits,
-  defineExpose,
-  watch,
-  onMounted,
-} from "vue";
+import { ref, defineProps, defineExpose, watch, computed } from "vue";
 import { useNftStore } from "@/store/nfts";
-import { useWalletStore } from "@/store/wallet";
 import { useAuthStore, useNetworkStore, useStoryStore } from "../../store";
 import { add, expandOutline, closeOutline } from "ionicons/icons";
 import { useContinueStore } from "../../store/continue";
@@ -138,7 +133,6 @@ const content = ref("");
 const attachNftModal = ref(false);
 const expand = ref(false);
 const nftStore = useNftStore();
-const walletStore = useWalletStore();
 const authStore = useAuthStore();
 const storyStore = useStoryStore();
 const continueStore = useContinueStore();
@@ -192,10 +186,14 @@ const proposeSection = async ({ content, nft }) => {
     await storyStore.addSectionProposal(props.storyId, content, nft);
     storyStore.loadProposals(props.storyId);
     reset();
-  } catch (_error) {
+  } catch (_error: any) {
     error.value = _error.message;
   }
 };
+
+const story = computed(() =>
+  storyStore.stories.find((s) => s.id === props.storyId)
+);
 </script>
 <style scoped>
 ion-textarea {

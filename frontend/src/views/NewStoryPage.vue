@@ -50,7 +50,13 @@
             justify-content: space-between;
           "
         >
-          <div @click="attachNftModal = true">
+          <div
+            @click="
+              () => {
+                if (authStore.isSignedIn) attachNftModal = true;
+              }
+            "
+          >
             <ion-button
               fill="outline"
               v-if="!nft"
@@ -72,7 +78,10 @@
               style="margin-top: 1rem"
               >Submit</ion-button
             >
-            <ion-button v-else @click="walletStore.logInUser()" color="primary"
+            <ion-button
+              v-else
+              @click="authStore.showSignInModal = true"
+              color="primary"
               >Connect Wallet</ion-button
             >
           </div>
@@ -99,22 +108,13 @@ import {
   IonButton,
   IonTextarea,
   IonModal,
-  IonGrid,
-  IonRow,
-  IonCol,
   IonInput,
-  IonAvatar,
   loadingController,
-  IonSelect,
-  IonSelectOption,
   IonPage,
-  IonCard,
 } from "@ionic/vue";
 import AttachNft from "@/components/story/AttachNft.vue";
 import { ref, computed, watch, onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
-import { useNftStore } from "@/store/nfts";
-import { useWalletStore } from "@/store/wallet";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../store";
 import MobileFooter from "@/components/overview/MobileFooter.vue";
@@ -126,13 +126,10 @@ const storyStore = useStoryStore();
 const authStore = useAuthStore();
 const content = ref("");
 const attachNftModal = ref(false);
-const nftStore = useNftStore();
-const walletStore = useWalletStore();
 const title = ref("");
 const nft = ref();
 const dirty = ref(false);
 const contentError = ref(false);
-const cycle = ref("week");
 
 const attachNft = async (_nft) => {
   nft.value = _nft;
