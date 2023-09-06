@@ -31,8 +31,8 @@ const { getNft } = useNftStore();
 </script>
 
 <style scoped>
-ion-avatar {
+/* ion-avatar {
   max-width: 100%;
   height: auto;
-}
+} */
 </style>
