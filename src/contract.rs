@@ -9,10 +9,9 @@ use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, MigrateMsg, QueryMsg};
 use crate::state::{State, STATE, STORIES};
 
-use crate::execute::{cycle, new_story, new_story_section, remove_story, voteMultiple, voting};
+use crate::execute::{cycle, new_story, new_story_section, remove_story, vote_multiple};
 use crate::query::{
-    query_new_sections, query_sections, query_shares, query_state, query_stories, query_story,
-    query_votes,
+    query_new_sections, query_sections, query_shares, query_state, query_story, query_votes,
 };
 use crate::types::Story;
 
@@ -109,12 +108,7 @@ pub fn execute(
             interval,
         } => new_story(deps, info, _env, id, name, first_section, interval),
         ExecuteMsg::NewStorySection { section } => new_story_section(deps, info, _env, section),
-        ExecuteMsg::Vote {
-            story_id,
-            section_id,
-            vote,
-        } => voting(deps, info, _env, story_id, section_id, vote),
-        ExecuteMsg::VoteMultiple { votes } => voteMultiple(deps, info, _env, votes),
+        ExecuteMsg::Vote { votes } => vote_multiple(deps, info, _env, votes),
         ExecuteMsg::Cycle {} => cycle(deps, _env),
         ExecuteMsg::RemoveStory { story_id } => remove_story(deps, info, _env, story_id),
     }
@@ -124,7 +118,6 @@ pub fn execute(
 pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetStory { story_id } => query_story(deps, story_id),
-        QueryMsg::GetStories {} => query_stories(deps),
         QueryMsg::GetVotes { story_id } => query_votes(deps, story_id),
         QueryMsg::GetSections { story_id } => query_sections(deps, story_id),
         QueryMsg::GetShares { story_id } => query_shares(deps, story_id),

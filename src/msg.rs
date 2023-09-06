@@ -2,8 +2,9 @@ use cosmwasm_schema::QueryResponses;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
+#[allow(unused_imports)] // the imports are used in return derive annotations
 use crate::types::{
-    Export, Section, ShareBalance, Story, StoryOverviewItem, UploadSection, VoteEntry,
+    Export, Section, ShareBalance, Story, UploadSection, VoteEntry, VoteSubmission,
 };
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -25,12 +26,7 @@ pub enum ExecuteMsg {
         section: UploadSection,
     },
     Vote {
-        story_id: String,
-        section_id: String,
-        vote: i8,
-    },
-    VoteMultiple {
-        votes: Vec<(String, String, i8)>, // storyId, sectionId, vote
+        votes: Vec<VoteSubmission>,
     },
     Cycle {},
     RemoveStory {
@@ -41,8 +37,6 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema, QueryResponses)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    #[returns(Vec<StoryOverviewItem>)]
-    GetStories {},
     #[returns(Story)]
     GetStory { story_id: String },
     #[returns(Vec<Section>)]

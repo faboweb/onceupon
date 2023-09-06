@@ -1,6 +1,6 @@
 use crate::error::ContractError;
 use crate::state::{SECTIONS, SHARES, STATE, STORIES, VOTES};
-use crate::types::{Section, SectionVotes, Story, UploadSection};
+use crate::types::{Section, SectionVotes, Story, UploadSection, VoteSubmission};
 use cosmwasm_std::{
     to_binary, DepsMut, Env, MessageInfo, Order, QuerierWrapper, QueryRequest, Response, StdError,
     Storage, WasmQuery,
@@ -159,36 +159,19 @@ pub fn new_story_section(
     Ok(Response::new().add_attribute("method", "new_story_section"))
 }
 
-pub fn voting(
+pub fn vote_multiple(
     deps: DepsMut,
     info: MessageInfo,
     _env: Env,
-    story_id: String,
-    section_id: String,
-    vote: i8,
-) -> Result<Response, ContractError> {
-    let k = (
-        story_id.to_string(),
-        section_id.to_string(),
-        info.sender.to_string(),
-    );
-    VOTES.save(deps.storage, k, &vote)?;
-    Ok(Response::new().add_attribute("method", "voting"))
-}
-
-pub fn voteMultiple(
-    deps: DepsMut,
-    info: MessageInfo,
-    _env: Env,
-    votes: Vec<(String, String, i8)>,
+    votes: Vec<VoteSubmission>,
 ) -> Result<Response, ContractError> {
     let res = votes.into_iter().all(|vote| {
         let k = (
-            vote.0.to_string(),
-            vote.1.to_string(),
+            vote.story_id.to_string(),
+            vote.section_id.to_string(),
             info.sender.to_string(),
         );
-        VOTES.save(deps.storage, k, &vote.2).is_ok()
+        VOTES.save(deps.storage, k, &vote.vote).is_ok()
     });
     if res == false {
         return Err(ContractError::CustomError {
@@ -245,7 +228,7 @@ pub fn remove_story(
     }
 
     STORIES.remove(deps.storage, story_id.to_string());
-    Ok(Response::new().add_attribute("method", "new_story"))
+    Ok(Response::new().add_attribute("method", "remove_story"))
 }
 
 // the main step function

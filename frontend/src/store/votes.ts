@@ -1,6 +1,5 @@
 import { execute } from "@/scripts/execute";
 import { defineStore } from "pinia";
-import { useWalletStore } from "./wallet";
 
 const voteToInt = (vote) => {
   return {
@@ -48,11 +47,11 @@ export const useVotesStore = defineStore("votesStore", {
       this.processing = true;
       try {
         await execute("vote_multiple", {
-          votes: this.votes.map((vote) => [
-            vote.storyId,
-            vote.sectionId,
-            voteToInt(vote.vote),
-          ]),
+          votes: this.votes.map((vote) => ({
+            story_id: vote.storyId,
+            section_id: vote.sectionId,
+            vote: voteToInt(vote.vote),
+          })),
         });
         this.votes = [];
         this.saveVotes();

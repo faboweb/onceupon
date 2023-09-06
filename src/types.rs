@@ -39,6 +39,13 @@ pub struct Section {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
+pub struct VoteSubmission {
+    pub section_id: String,
+    pub story_id: String,
+    pub vote: i8, // 1 - yes, 2 - veto, 0 - no vote
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
 pub struct VoteEntry {
     pub section_id: String,
     pub story_id: String,
@@ -58,22 +65,6 @@ pub struct ShareBalance {
     pub story_id: String,
     pub user: String,
     pub balance: u64,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
-pub struct StoryOverviewItem {
-    pub id: String,
-    pub name: String,
-    pub created: u64,
-    pub last_cycle: u64,  // block height of last cycle
-    pub next_cycle: u64,  // block height of next cycle
-    pub last_update: u64, // block height of last section added
-    pub creator: String,  // user id
-    pub first_section_cid: String,
-    pub sections: usize,
-    pub owners: usize,
-    pub proposals: usize,
-    pub top_nfts: Vec<NFT>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, JsonSchema)]
