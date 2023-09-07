@@ -26,21 +26,17 @@
             align-items: center;
           "
         >
-          <nft-element
-            :nft="profilePicture"
-            :size="89"
-            style="height: 89px; width: 89px"
-            class="author"
-          />
-          <b style="margin-top: 1rem; font-size: 18px">{{ profileName }}</b>
-          <span style="font-size: 14px; color: rgba(0, 0, 0, 0.6)"
+          <nft-element :nft="profilePicture" size="md" class="author" />
+          <b class="font-lg" style="margin-top: 1rem">{{ profileName }}</b>
+          <span class="font-secondary"
             >{{ contributions.length }} Contributions -
             {{ author.shares }} Shares in {{ author.stories }} Stories
           </span>
         </div>
         <div style="margin-top: 1rem">
           <div
-            style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
+            class="font-header"
+            style="margin-top: 2rem"
             v-if="!(contributionsLoaded && contributions.length === 0)"
           >
             {{ self ? "My " : "" }}Contributions
@@ -78,9 +74,7 @@
           </div>
         </div>
         <div v-if="!doneLoadingLikes || likes.length > 0">
-          <div
-            style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
-          >
+          <div class="font-header" style="margin-top: 2rem">
             {{ self ? "My " : "" }}Likes
           </div>
           <div
@@ -119,9 +113,7 @@
           </div>
         </div>
         <div v-if="!doneLoadingNfts || loadedNfts.length > 0">
-          <div
-            style="font-size: 16px; color: rgba(0, 0, 0, 0.6); margin-top: 2rem"
-          >
+          <div class="font-header" style="margin-top: 2rem">
             {{ self ? "My " : "" }} Linked Nfts
           </div>
           <div
@@ -162,7 +154,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useAuthStore, useNameStore, useStoryStore } from "../store";
 import NftElement from "../components/NftElement.vue";
 import NftList from "../components/NftList.vue";
@@ -180,7 +172,6 @@ const nameStore = useNameStore();
 const storyStore = useStoryStore();
 const likeStore = useLikeStore();
 const nftStore = useNftStore();
-const router = useRouter();
 const likes = ref();
 const author = ref({
   stories: 0,
@@ -252,16 +243,6 @@ onMounted(() => {
   storyStore.loadStories();
 });
 </script>
-
-<style scoped>
-ion-button {
-  background: rgba(242, 103, 9, 1);
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-}
-</style>
 <style scoped>
 .author img {
   border-radius: 50%;

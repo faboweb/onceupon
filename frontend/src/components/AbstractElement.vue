@@ -1,40 +1,22 @@
 <template>
   <div
-    style="
-      background: rgba(217, 217, 217, 0.2);
-      border-radius: 8px;
-      padding: 0.5rem;
-      cursor: pointer;
-      min-width: 186px;
-      height: 123px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    "
+    class="card"
+    style="cursor: pointer; min-width: 186px; height: 123px"
     @click="router.push('/story/' + proposal.story_id + '/read/')"
   >
-    <b style="margin-bottom: 0.2rem; font-size: 14px; white-space: nowrap">
+    <b class="font-sm" style="white-space: nowrap">
       {{ title }}
     </b>
-    <span
-      style="color: rgba(242, 103, 9, 0.6); font-size: 14px; display: block"
-      >{{ caption }}</span
-    >
-    <p
-      style="
-        text-align: left;
-        white-space: pre-wrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        max-height: 60px;
-        font-size: 12px;
-      "
-    >
+    <span class="font-sm font-primary" style="display: block">{{
+      caption
+    }}</span>
+    <p style="max-height: 55px">
       {{ content }}
     </p>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, defineProps, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useStoryStore } from "../store";
@@ -65,5 +47,8 @@ onMounted(() => {
 });
 </script>
 
-<style>
+<style scoped lang="scss">
+p {
+  @extend .font-sm;
+}
 </style>

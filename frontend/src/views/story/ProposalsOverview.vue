@@ -13,13 +13,8 @@
           "
         >
           <small
-            style="
-              font-size: 12px;
-              margin-top: 1rem;
-              display: block;
-              text-align: right;
-              color: rgb(0, 0, 0, 0.6);
-            "
+            class="font-secondary"
+            style="margin-top: 1rem; display: block; text-align: right"
           >
             <template v-if="nextSectionPending">
               Voting ended ({{ nextSection }})
@@ -75,12 +70,8 @@
         </div>
         <div
           v-if="proposals.length === 0"
-          style="
-            color: rgba(0, 0, 0, 0.6);
-            padding: 1rem;
-            text-align: center;
-            font-size: 14px;
-          "
+          class="font-sm card"
+          style="text-align: center; margin-bottom: 1rem; margin-top: 1rem"
         >
           There are no proposals yet.<br />Be the first to propose how the story
           continues!
@@ -112,14 +103,8 @@
 <script setup lang="ts">
 import { IonPage, IonContent, IonIcon } from "@ionic/vue";
 import { useRoute } from "vue-router";
-import {
-  useAuthStore,
-  useNameStore,
-  useNavigationStore,
-  useStoryStore,
-  useWalletStore,
-} from "../../store";
-import { computed, onMounted, Ref, ref, defineProps } from "vue";
+import { useAuthStore, useNameStore, useStoryStore } from "../../store";
+import { computed, onMounted, ref } from "vue";
 import { useContinueStore } from "../../store/continue";
 import { useVotesStore, voteFromInt } from "../../store/votes";
 import { formatDistance } from "date-fns";
@@ -130,7 +115,6 @@ import { checkmark } from "ionicons/icons";
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const continueStore = useContinueStore();
-const walletStore = useWalletStore();
 const authStore = useAuthStore();
 const votesStore = useVotesStore();
 const route = useRoute();

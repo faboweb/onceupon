@@ -1,16 +1,10 @@
 <template>
   <div style="flex-direction: row; display: flex; padding: 0">
     <div
-      style="
-        width: 103px;
-        height: 151px;
-        display: flex;
-        justify-content: space-between;
-        border-radius: 8px;
-        overflow: hidden;
-      "
+      class="multiple-nft-wrapper"
+      style="height: 160px; display: flex; border-radius: 8px; overflow: hidden"
       :style="{
-        width: props.extended ? '151px' : '103px',
+        width: props.extended ? '160px' : '110px',
       }"
       v-if="props.nfts.length > 0"
       :class="{
@@ -26,18 +20,15 @@
           v-for="nft in props.nfts"
           :key="nft.image"
           style="display: inline-block"
-          :style="{
-            maxHeight: '100%',
-          }"
           :nft="nft"
-          :size="93"
+          :size="props.nfts.length === 1 ? 'xl' : 'md'"
         />
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { defineProps, computed } from "vue";
 import NftElement from "@/components/NftElement.vue";
 
@@ -47,31 +38,30 @@ const props = defineProps({
 });
 </script>
 
-<style scoped lang="scss">
-ion-avatar {
-  width: 100%;
-  height: 100%;
-}
-</style>
 <style lang="scss">
-.extended {
-  .multiple {
-    margin-left: 0px;
-  }
-}
-.multiple {
-  margin-left: -25px;
-  display: flex;
-  flex-wrap: wrap;
-  margin-right: -25px;
-  background: rgba(217, 217, 217, 0.8);
-
+.multiple-nft-wrapper {
   ion-avatar {
-    height: 76px;
-    width: 76px;
+    margin-left: -25px;
+  }
 
-    img {
-      border-radius: 0;
+  &.extended {
+    ion-avatar {
+      margin-left: 0;
+    }
+  }
+
+  .multiple {
+    display: flex;
+    flex-wrap: wrap;
+    background: rgba(217, 217, 217, 0.8);
+
+    ion-avatar {
+      height: 80px !important;
+      width: 80px !important;
+
+      img {
+        border-radius: 0;
+      }
     }
   }
 }

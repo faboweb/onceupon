@@ -11,7 +11,7 @@
     <div
       style="
         display: flex;
-        background: rgba(2, 55, 67, 1);
+        background: var(--second-color);
         padding: 0.5rem 2rem;
         justify-content: space-between;
         align-items: center;
@@ -42,7 +42,7 @@
           style="
             position: relative;
             top: -2rem;
-            background: rgba(242, 103, 9, 1);
+            background: var(--main-color);
             border-radius: 8px;
             height: 43px;
             width: 43px;
@@ -79,7 +79,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useIonRouter, IonIcon } from "@ionic/vue";
 import { add } from "ionicons/icons";
 import { useRoute, useRouter } from "vue-router";

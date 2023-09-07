@@ -1,68 +1,44 @@
 <template>
   <div style="flex-direction: row; display: flex; padding: 0">
-    <div
-      style="
-        width: 124px;
-        height: 124px;
-        display: flex;
-        justify-content: space-between;
-      "
+    <story-nft-preview
+      :nfts="story.top_nfts"
+      :extended="true"
       v-if="story?.top_nfts.length > 0"
-    >
-      <nft-element
-        v-for="nft in story.top_nfts"
-        :key="nft.image"
-        style="display: inline-block"
-        :style="{
-          height: story.top_nfts.length > 1 ? '45px' : '100%',
-          width: story.top_nfts.length > 1 ? '45px' : '100%',
-          maxHeight: '100%',
-        }"
-        :nft="nft"
-        :size="93"
-      />
-    </div>
+    />
     <ion-skeleton-text
       style="width: 124px; height: 124px"
       v-else
       :animated="!story"
     />
-    <div
-      style="
-        display: flex;
-        flex-direction: column;
-        margin-left: 1rem;
-        font-size: 12px;
-      "
-    >
+    <div style="display: flex; flex-direction: column; margin-left: 1rem">
       <template v-if="story">
-        <b style="font-size: 18px; margin-bottom: 0.5rem">{{ story.name }}</b>
-        <div style="line-height: 20px; display: flex; align-items: center">
+        <b class="font-lg" style="margin-bottom: 0.5rem">{{ story.name }}</b>
+        <div class="story-info-row font-secondary">
           <ion-icon :icon="heartOutline" style="margin-right: 4px"></ion-icon>
 
-          <b style="margin-right: 4px">{{ story.likes || 0 }}</b>
-          <span style="color: rgba(0, 0, 0, 0.4)">Likes</span>
+          <b style="margin-right: 4px; color: black">{{ story.likes || 0 }}</b>
+          <span>Likes</span>
         </div>
-        <div style="line-height: 20px; display: flex; align-items: center">
+        <div class="story-info-row font-secondary">
           <ion-icon :icon="listOutline" style="margin-right: 4px"></ion-icon>
 
-          <b style="margin-right: 4px">{{ story.sections }}</b>
-          <span style="color: rgba(0, 0, 0, 0.4)">Sections</span>
+          <b style="margin-right: 4px; color: black">{{ story.sections }}</b>
+          <span>Sections</span>
         </div>
-        <div style="line-height: 20px; display: flex; align-items: center">
+        <div class="story-info-row font-secondary">
           <ion-icon :icon="eyeOutline" style="margin-right: 4px"></ion-icon>
 
-          <b style="margin-right: 4px">{{ story.owners }}</b>
-          <span style="color: rgba(0, 0, 0, 0.4)">Owners</span>
+          <b style="margin-right: 4px; color: black">{{ story.owners }}</b>
+          <span>Owners</span>
         </div>
-        <div style="line-height: 20px; display: flex; align-items: center">
+        <div class="story-info-row font-secondary">
           <ion-icon
             :icon="documentOutline"
             style="margin-right: 4px"
           ></ion-icon>
 
           <b style="margin-right: 4px">{{ story.proposals }}</b>
-          <span style="color: rgba(0, 0, 0, 0.4)">Proposals</span>
+          <span>Proposals</span>
         </div>
       </template>
       <template v-else>
@@ -87,9 +63,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, defineProps } from "vue";
-import NftElement from "../NftElement.vue";
+import StoryNftPreview from "../StoryNftPreview.vue";
 import {
   listOutline,
   eyeOutline,
@@ -104,4 +80,9 @@ const story = computed(() => {
 </script>
 
 <style>
+.story-info-row {
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+}
 </style>

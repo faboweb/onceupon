@@ -1,8 +1,6 @@
 import { defineStore } from "pinia";
 import "firebaseui/dist/firebaseui.css";
 import { useAuthStore } from "./auth";
-import { firebaseConfig } from "@/scripts/firebase";
-import axios from "axios";
 import { useNetworkStore } from "./network";
 import { callApi, callApiAuthenticated } from "@/scripts/api";
 import { useWalletStore } from "./wallet";

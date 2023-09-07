@@ -11,7 +11,7 @@
         margin-top: 1rem;
       "
     >
-      <span>Continue where you left off</span>
+      <span class="header font-header">Continue where you left off</span>
     </div>
     <div>
       <abstract-element
@@ -22,7 +22,7 @@
       />
     </div>
   </div>
-  <div v-else>
+  <div v-else class="display: flex; flex-direction: column;">
     <div
       style="
         display: flex;
@@ -31,7 +31,7 @@
         margin-top: 1rem;
       "
     >
-      <span>Become a writer</span>
+      <span class="header font-header">Become a writer</span>
     </div>
     <div v-if="randomStoryEnding" style="display: flex; flex-direction: row">
       <abstract-element
@@ -54,7 +54,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
 import { useContinueStore } from "../../store/continue";
 import { useStoryStore } from "../../store";

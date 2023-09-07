@@ -9,14 +9,8 @@
 <script setup lang="ts">
 import { IonPage, IonContent } from "@ionic/vue";
 import { useRoute } from "vue-router";
-import {
-  useNameStore,
-  useNavigationStore,
-  useStoryStore,
-  useWalletStore,
-} from "../../store";
-import { computed, onMounted, Ref, ref, defineProps, watch } from "vue";
-import NftElement from "../../components/NftElement.vue";
+import { useStoryStore } from "../../store";
+import { computed, onMounted, ref } from "vue";
 import NftList from "@/components/NftList.vue";
 import { getNftKey } from "../../store/nfts";
 

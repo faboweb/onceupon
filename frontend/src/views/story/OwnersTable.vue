@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-content>
-      <div style="padding: 1rem; font-size: 14px; text-align: center">
+      <div class="font-secondary" style="padding: 1rem; text-align: center">
         Authors get 100 points per section. Voters get 1 point per vote.
       </div>
       <ion-list>

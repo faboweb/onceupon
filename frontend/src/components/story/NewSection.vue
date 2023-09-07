@@ -1,17 +1,9 @@
 <template>
   <div>
-    <b
-      style="
-        font-size: 14px;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: rgba(0, 0, 0, 0.6);
-      "
-    >
-      How would you continue the story?
-    </b>
+    <b class="input-label"> How would you continue the story? </b>
     <ion-icon
       :icon="expandOutline"
+      class="input-label icon-button icon-md"
       style="float: right; margin-top: 4px; cursor: pointer"
       @click="expand = true"
     ></ion-icon>
@@ -26,14 +18,10 @@
         color: content.length < 240 && content.length > 0 ? 'red' : '',
         visibility: content.length >= 240 ? 'hidden' : 'visible',
       }"
+      class="font-secondary"
       style="
         margin-top: -1.3rem;
         margin-right: 0.5rem;
-        color: rgba(0, 0, 0, 0.6);
-        font-size: 12px;
-        font-weight: 400;
-        line-height: 14px;
-        letter-spacing: 0em;
         text-align: right;
         float: right;
         background: rgb(244 243 234);
@@ -95,15 +83,14 @@
           padding-right: 1rem;
           padding-left: 1rem;
           padding-top: 0.5rem;
-          font-size: 24px;
           display: flex;
           justify-content: space-between;
         "
       >
-        <b>{{ story.name }}</b>
+        <b class="font-lg">{{ story.name }}</b>
         <ion-icon
           :icon="closeOutline"
-          style="cursor: pointer"
+          class="icon-button icon-lg"
           @click="expand = false"
         ></ion-icon>
       </div>
@@ -141,7 +128,7 @@ const nft = ref();
 const error = ref();
 
 const props = defineProps<{
-  disabled: boolean;
+  disabled?: boolean;
   storyId: string;
 }>();
 
@@ -195,7 +182,7 @@ const story = computed(() =>
   storyStore.stories.find((s) => s.id === props.storyId)
 );
 </script>
-<style scoped>
+<style scoped lang="scss">
 ion-textarea {
   --padding-bottom: 1rem;
   --padding-top: 1rem;

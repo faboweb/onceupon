@@ -1,21 +1,20 @@
 <template>
   <div style="padding-left: 1rem; padding-right: 1rem">
     <div style="text-align: center; margin-top: 1rem">
-      <b style="font-size: 16px">Choose NFT to add</b>
-      <p
-        style="
-          margin-bottom: 1rem;
-          font-size: 12px;
-          text-align: center;
-          color: rgb(255 255 255 60%);
-        "
-      >
+      <b class="font-lg">Choose NFT to add</b>
+      <p class="font-secondary" style="margin-bottom: 1rem; text-align: center">
         NFTS are linked to a section by it's ID. OnceUpon doesn't take ownership
         of your NFTs.
       </p>
     </div>
     <nft-list :nfts="nfts" @click="(nft) => select(nft)" :clickable="true" />
-    <template v-if="nfts.length === 0">
+    <div v-if="!loaded && nfts.length === 0" class="wrap-list">
+      <ion-skeleton-text :animated="true"> </ion-skeleton-text>
+      <ion-skeleton-text :animated="true"> </ion-skeleton-text>
+      <ion-skeleton-text :animated="true"> </ion-skeleton-text>
+      <ion-skeleton-text :animated="true"> </ion-skeleton-text>
+    </div>
+    <template v-if="nfts.length === 0 && loaded">
       <p style="text-align: center; margin-top: 2rem">
         You don't own any NFT yet. Go to
         <a href="https://stargaze.zone">Stargaze</a> to buy an NFT.
@@ -31,8 +30,7 @@
 <script setup lang="ts">
 import { useNftStore } from "@/store/nfts";
 import { fromBech32, toBech32 } from "cosmwasm";
-import { computed, defineEmits, onMounted, watch } from "vue";
-import { FALLBACK_AVATAR } from "../../scripts/getAvatar";
+import { computed, defineEmits, ref, watch } from "vue";
 import { useAuthStore } from "../../store";
 import NftList from "../NftList.vue";
 
@@ -58,11 +56,14 @@ const select = (nft) => {
 const noNft = () => {
   emit("selectNft");
 };
+const loaded = ref(false);
 
 watch(
   () => authStore.user.address,
-  () => {
-    nftStore.loadOwnedNfts(authStore.user.address);
+  async () => {
+    loaded.value = false;
+    await nftStore.loadOwnedNfts(authStore.user.address);
+    loaded.value = true;
   },
   {
     immediate: true,
@@ -79,5 +80,9 @@ ion-avatar {
   --border-radius: 4px;
   margin-right: 1rem;
   margin-bottom: 1rem;
+}
+ion-skeleton-text {
+  height: 128px;
+  width: 128px;
 }
 </style>

@@ -2,13 +2,13 @@
   <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-header style="box-shadow: none">
       <ion-toolbar style="--border-color: none; height: 40px">
-        <span
+        <a
           slot="start"
           style="margin-left: 1rem; cursor: pointer"
           @click="router.push('/overview')"
         >
           {{ "<" }} Back
-        </span>
+        </a>
         <div slot="end">
           <votes-indicator />
         </div>
@@ -25,7 +25,7 @@
           style="height: 40px; padding-left: 4rem; padding-right: 4rem"
         >
           <ion-tab-button
-            style="font-size: 14px"
+            class="font-sm"
             tab="read"
             :class="{
               active: route.path === '/story/' + storyId + '/read',
@@ -36,7 +36,7 @@
           </ion-tab-button>
 
           <ion-tab-button
-            style="font-size: 14px"
+            class="font-sm"
             tab="proposals"
             :class="{
               active: route.path === '/story/' + storyId + '/proposals',
@@ -47,7 +47,7 @@
           </ion-tab-button>
 
           <ion-tab-button
-            style="font-size: 14px"
+            class="font-sm"
             tab="nfts"
             :class="{
               active: route.path === '/story/' + storyId + '/nfts',
@@ -58,7 +58,7 @@
           </ion-tab-button>
 
           <ion-tab-button
-            style="font-size: 14px"
+            class="font-sm"
             tab="owners"
             :class="{
               active: route.path === '/story/' + storyId + '/owners',
@@ -85,9 +85,8 @@ import {
   IonTabButton,
   IonLabel,
   IonRouterOutlet,
-  loadingController,
 } from "@ionic/vue";
-import { computed, onMounted, ref, Ref, watch } from "vue";
+import { computed, onMounted, ref, Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
@@ -108,10 +107,6 @@ const overviewStory = computed(() => {
   return storyStore.stories.find((s) => s.id === storyId);
 });
 
-const loadData = async () => {
-  loadData();
-};
-
 onMounted(async () => {
   try {
     storyStore.loadStories();
@@ -128,10 +123,13 @@ onMounted(async () => {
   });
 });
 </script>
-<style>
+<style lang="scss" scoped>
 .tab-selected {
   border-bottom: 2px solid black;
   font-weight: 700;
   color: black;
+}
+ion-tab-button::part(native):hover {
+  color: var(--main-color) !important;
 }
 </style>

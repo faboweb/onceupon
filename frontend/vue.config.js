@@ -24,6 +24,13 @@ module.exports = {
       }),
     ],
   },
+  css: {
+    loaderOptions: {
+      sass: {
+        additionalData: `@import "@/theme/custom.scss";`,
+      },
+    },
+  },
   chainWebpack: (config) => {
     config.resolve.set("fallback", {
       crypto: require.resolve("crypto-browserify"),

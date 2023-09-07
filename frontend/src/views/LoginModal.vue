@@ -7,12 +7,12 @@
   >
     <ion-content style="text-align: center">
       <div
+        class="font-lg"
         style="
           text-align: right;
           width: 100%;
           padding-right: 1rem;
           padding-top: 0.5rem;
-          font-size: 24px;
         "
       >
         <ion-icon
@@ -29,11 +29,11 @@
           padding-top: 2rem;
         "
       >
-        <b style="font-size: 16px">login or sign up</b>
+        <b class="font-md">login or sign up</b>
         <div
+          class="font-lg"
           style="
             color: rgba(3, 97, 118, 1);
-            font-size: 24px;
             margin-top: 2rem;
             margin-bottom: 2rem;
           "
@@ -91,7 +91,7 @@
   </ion-modal>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   IonModal,
   IonButton,
@@ -102,7 +102,6 @@ import {
 } from "@ionic/vue";
 import { useAuthStore, useWalletStore, useWeb2AuthStore } from "../store";
 import { closeOutline } from "ionicons/icons";
-import { watch } from "vue";
 
 const authStore = useAuthStore();
 const web2AuthStore = useWeb2AuthStore();

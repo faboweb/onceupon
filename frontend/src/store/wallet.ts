@@ -1,14 +1,7 @@
 import { useNftStore } from "./nfts";
 import { calculateFee, StdFee, GasPrice } from "@cosmjs/stargate";
-import { Decimal } from "@cosmjs/math";
 import { defineStore } from "pinia";
-import { WalletManager, Logger, DeviceType, OS } from "@cosmos-kit/core";
-import { assets, chains } from "chain-registry";
-import { Chain } from "@chain-registry/types";
-import { wallets as keplrWallet } from "@cosmos-kit/keplr-extension";
-import { wallets as keplrMobileWallet } from "@cosmos-kit/keplr-mobile";
 import { useNameStore } from "./names";
-import Bowser from "bowser";
 import { useAuthStore } from "./auth";
 import { useNetworkStore } from "./network";
 import { CosmWasmClient } from "cosmwasm";

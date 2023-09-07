@@ -5,12 +5,13 @@
   >
     <ion-badge
       v-if="votesStore.votes.length > 0"
-      style="position: absolute; left: -1.3rem; --background: rgb(242, 103, 9)"
+      style="position: absolute; left: -1.3rem; --background: var(--main-color)"
       >{{ votesStore.votes.length }}</ion-badge
     >
     <!-- <b>Votes</b> -->
 
     <ion-icon
+      class="icon-button icon-lg"
       :icon="votesStore.votes.length > 0 ? fileTrayFull : fileTray"
     ></ion-icon>
     <ion-modal
@@ -22,20 +23,20 @@
         style="display: flex; flex-direction: column"
         class="ion-padding"
       >
-        <b style="font-size: 20px; margin-bottom: 1rem">Your Votes</b>
+        <b class="font-lg" style="margin-bottom: 1rem">Your Votes</b>
         <div
           style="
             text-align: right;
             width: 100%;
             padding-right: 1rem;
             padding-top: 0.5rem;
-            font-size: 24px;
             position: absolute;
             right: 0;
             top: 0.5rem;
           "
         >
           <ion-icon
+            class="icon-button icon-lg"
             :icon="closeOutline"
             style="cursor: pointer"
             @click="votesStore.modalOpen = false"
@@ -81,10 +82,10 @@
                     ]
                   "
                 >
-                  <b style="font-size: 16px">{{
+                  <b class="font-md">{{
                     storyStore.stories.find((s) => s.id === vote.storyId)?.name
                   }}</b>
-                  <p style="font-size: 14px">
+                  <p class="font-sm">
                     {{
                       storyStore.cidLookup[
                         storyStore.proposals[vote.storyId]?.find(
@@ -116,19 +117,10 @@
             </ion-row>
           </ion-grid>
 
-          <ion-badge
-            v-else
-            style="
-              margin-top: 1rem;
-              font-size: 12px;
-              text-align: center;
-              color: rgb(255 255 255 60%);
-              white-space: wrap;
-            "
-          >
+          <div v-else class="card" style="margin-top: 1rem; white-space: wrap">
             You didn't vote on any proposal yet. Votes will show up here. You
             can then confirm the votes with the button below.
-          </ion-badge>
+          </div>
         </div>
 
         <div style="text-align: right; margin-top: 1rem">

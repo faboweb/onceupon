@@ -17,7 +17,9 @@
         > -->
           <div class="sections">
             <story-section
-              v-for="section in story.sections || []"
+              v-for="section in story.sections.sort(
+                (a, b) => a.added - b.added
+              ) || []"
               :key="section.section_id"
               :section="section"
             />
@@ -41,9 +43,9 @@
           </div>
           <a
             style="
-              color: rgba(242, 103, 9, 1);
+              color: var(--main-color);
               margin-top: 1rem;
-              margin-bottom: 2rem;
+              margin-bottom: 3rem;
               display: block;
               cursor: pointer;
             "
@@ -80,13 +82,13 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonContent, IonButton } from "@ionic/vue";
+import { IonPage, IonContent } from "@ionic/vue";
 import { onMounted, Ref, ref } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useRoute, useRouter } from "vue-router";
 import StorySection from "@/components/story/StorySection.vue";
 import NewSection from "../../components/story/NewSection.vue";
-import { useNameStore, useNavigationStore } from "../../store";
+import { useNameStore } from "../../store";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
@@ -112,7 +114,7 @@ onMounted(async () => {
   loaded.value = true;
 });
 </script>
-<style>
+<style scoped lang="scss">
 ion-skeleton-text {
   line-height: 15px;
 }

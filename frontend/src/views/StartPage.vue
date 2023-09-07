@@ -4,9 +4,9 @@
       <ion-toolbar style="margin-bottom: 1rem">
         <div
           slot="start"
-          style="color: rgba(2, 55, 67, 1); display: flex; align-items: center"
+          style="display: flex; align-items: center; color: var(--second-color)"
         >
-          <b style="font-size: 32px; font-weight: 900; margin-right: 3rem"
+          <b class="font-xxl" style="font-weight: 900; margin-right: 3rem"
             >ONCE UPON</b
           >
           <div class="links">
@@ -16,17 +16,21 @@
         </div>
         <div slot="end">
           <ion-button
+            class="header-button"
             v-if="!authStore.isSignedIn"
             @click="authStore.showSignInModal = true"
             >Login</ion-button
           >
-          <ion-button v-else @click="router.push('/overview')"
+          <ion-button
+            class="header-button"
+            v-else
+            @click="router.push('/overview')"
             >Explore App</ion-button
           >
         </div>
       </ion-toolbar>
     </ion-header>
-    <ion-content style="text-align: center">
+    <ion-content id="start-content" style="text-align: center">
       <div>
         <img
           src="@/../public/assets/onceupon-logo-feather-lite.png"
@@ -34,21 +38,25 @@
           style="width: 160px; height: 160px"
         />
       </div>
-      <b style="font-size: 40px; color: rgba(1, 40, 49, 1)"
+      <b class="font-xxl" style="color: var(--second-color)"
         >A world of stories awaits!</b
       >
       <p
+        class="font-xl"
         style="
           color: rgba(204, 111, 0, 1);
-          font-size: 24px;
           margin-bottom: 20px;
+          text-align: center;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
         "
       >
         Where stories come alive and you can unleash your imagination to read,
         share, and write your own magical tales!
       </p>
       <ion-button style="margin-bottom: 42px" @click="router.push('/overview')"
-        >Explore app</ion-button
+        >Explore App</ion-button
       >
       <div>
         <iframe
@@ -72,10 +80,12 @@
         style="
           background: rgba(255, 245, 233, 1);
           border: 1px solid rgba(204, 111, 0, 1);
-          margin-top: 135px;
-          padding-top: 2rem;
-          padding-bottom: 2rem;
+          margin-top: 6rem;
+          padding: 2rem;
           border-radius: 8px;
+          max-width: 750px;
+          margin-left: auto;
+          margin-right: auto;
         "
       >
         <div style="display: flex; flex-direction: row; margin-bottom: 2rem">
@@ -84,8 +94,15 @@
             alt=""
             style="width: 250px; height: 250px; margin-top: -100px"
           />
-          <div style="flex: 66%; text-align: left; color: rgba(1, 40, 49, 1)">
-            <b style="font-size: 28px; margin-bottom: 8px">For readers</b>
+          <div
+            style="
+              width: 300px;
+              text-align: left;
+              color: rgba(1, 40, 49, 1);
+              margin-right: auto;
+            "
+          >
+            <b class="font-xl" style="margin-bottom: 8px">For readers</b>
             <p style="margin-bottom: 16px">
               Where readers and writers come together to celebrate the magic of
               storytelling.
@@ -98,8 +115,8 @@
         <div
           style="display: flex; flex-direction: row; color: rgba(1, 40, 49, 1)"
         >
-          <div style="flex: 66%; text-align: right">
-            <b style="font-size: 28px; margin-bottom: 8px">For writers</b>
+          <div style="width: 300px; text-align: right; margin-left: auto">
+            <b class="font-xl" style="margin-bottom: 8px">For writers</b>
             <p style="margin-bottom: 16px">
               Where readers and writers come together to celebrate the magic of
               storytelling.
@@ -118,13 +135,13 @@
 
       <template v-if="story">
         <b
+          class="font-xxl"
           style="
-            font-size: 32px;
             color: rgba(1, 40, 49, 1);
 
             margin-bottom: 20px;
             display: block;
-            margin-top: 86px;
+            margin-top: 3rem;
           "
           >Featured story</b
         >
@@ -136,15 +153,20 @@
             padding-bottom: 2rem;
             display: flex;
             flex-direction: row;
-            padding-left: 1rem;
-            padding-right: 1rem;
+            padding-left: 3rem;
+            padding-right: 3rem;
             border-radius: 8px;
           "
         >
           <story-nft-preview
+            class="start-page-nft"
             :nfts="story?.top_nfts"
             :extended="true"
-            style="margin-right: 1rem"
+            style="
+              margin-right: 2rem;
+              border: 8px solid rgba(1, 108, 132, 1);
+              border-radius: 18px;
+            "
           />
           <div
             style="
@@ -154,27 +176,25 @@
               color: rgba(1, 40, 49, 1);
             "
           >
-            <b style="font-size: 20px">{{ story.name }}</b>
+            <b class="font-lg">{{ story.name }}</b>
             <div>
               <span
-                style="font-size: 14px; cursor: pointer"
+                class="font-sm"
+                style="cursor: pointer"
                 @click="router.push('/profile/' + story.creator)"
                 >By {{ nameStore.name(story.creator) }}</span
               >
-              - <span style="font-size: 14px">{{ story.owners }} Owners</span> -
-              <span style="font-size: 14px">{{ story.likes }} Likes</span>
             </div>
-            <p style="margin-bottom: 1rem">{{ content.substr(0, 240) }}...</p>
+            <div class="font-secondary">
+              <span>{{ story.owners }} Owners</span> -
+              <span>{{ story.likes }} Likes</span>
+            </div>
+            <p style="margin-bottom: 2rem">{{ content.substr(0, 240) }}...</p>
             <div>
-              <ion-button
-                style="--background: rgba(242, 103, 9, 1)"
-                @click="router.push('/story/' + story.id + '/read/')"
+              <ion-button @click="router.push('/story/' + story.id + '/read/')"
                 >Continue reading</ion-button
               >
-              <ion-button
-                fill="clear"
-                style="color: rgba(242, 103, 9, 1)"
-                @click="router.push('/overview')"
+              <ion-button fill="clear" @click="router.push('/overview')"
                 >Explore more stories</ion-button
               >
             </div>
@@ -184,13 +204,13 @@
 
       <template v-if="topAuthors.length > 0">
         <b
+          class="font-xxl"
           style="
-            font-size: 32px;
             color: rgba(1, 40, 49, 1);
 
             margin-bottom: 20px;
             display: block;
-            margin-top: 86px;
+            margin-top: 3rem;
           "
           >Leaderboard</b
         >
@@ -198,9 +218,12 @@
           style="
             background: rgba(255, 245, 233, 1);
             border: 1px solid rgba(204, 111, 0, 1);
-            padding-top: 3rem;
+            padding: 3rem;
             padding-bottom: 2rem;
             border-radius: 8px;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
           "
         >
           <div>
@@ -209,8 +232,7 @@
               <nft-element
                 :nft="getAvatar(topAuthors[1].user)"
                 class="author"
-                style="width: 110px; height: 110px"
-                :size="147"
+                size="lg"
                 @click="router.push('/profile/' + topAuthors[1].user)"
               />
               <b>{{ nameStore.name(topAuthors[1].user) }}</b>
@@ -220,8 +242,7 @@
               <nft-element
                 :nft="getAvatar(topAuthors[0].user)"
                 class="author"
-                style="width: 140px; height: 140px"
-                :size="177"
+                size="xl"
                 @click="router.push('/profile/' + topAuthors[0].user)"
               />
               <b>{{ nameStore.name(topAuthors[0].user) }}</b>
@@ -231,8 +252,7 @@
               <nft-element
                 :nft="getAvatar(topAuthors[2].user)"
                 class="author"
-                style="width: 110px; height: 110px"
-                :size="147"
+                size="lg"
                 @click="router.push('/profile/' + topAuthors[2].user)"
               />
               <b>{{ nameStore.name(topAuthors[2].user) }}</b>
@@ -274,7 +294,7 @@
           display: none;
         "
       >
-        <b style="font-size: 20px">People love ONCE UPON</b>
+        <b class="font-lg">People love ONCE UPON</b>
         <div
           style="
             width: 100%;
@@ -338,12 +358,14 @@
           padding-top: 0.5rem;
           padding-bottom: 0.5rem;
           margin-top: 3rem;
+          background: var(--background);
+          color: var(--second-color);
         "
       >
         <div>
           <div style="display: flex; flex-direction: column; text-align: left">
             <b>ONCE UPON</b>
-            <span style="font-size: 14px">Own your story</span>
+            <span class="font-sm">Own your story</span>
           </div>
         </div>
         <div style="display: flex; align-items: center">
@@ -352,7 +374,7 @@
             <a href="/story/new">Write Stories</a>
           </div>
         </div>
-        <div style="display: flex; flex-direction: column">
+        <div style="display: flex; flex-direction: column; text-align: left">
           <b>Follow</b>
           <div class="follow-buttons">
             <a href="https://twitter.com/OnceUponNft">
@@ -379,22 +401,14 @@
   </ion-page>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   IonContent,
   IonButton,
-  IonTextarea,
-  IonModal,
   IonGrid,
   IonRow,
   IonCol,
-  IonInput,
-  IonAvatar,
-  IonSelect,
-  IonSelectOption,
   IonPage,
-  IonCard,
-  IonFooter,
 } from "@ionic/vue";
 import { ref, computed, onMounted } from "vue";
 import {
@@ -406,7 +420,6 @@ import {
 import LoginModal from "./LoginModal.vue";
 import StoryNftPreview from "@/components/StoryNftPreview.vue";
 import { useRouter } from "vue-router";
-import { useNftStore } from "../store/nfts";
 import { getAvatar } from "../scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
 
@@ -414,7 +427,6 @@ const configStore = useConfigStore();
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const authStore = useAuthStore();
-const nftStore = useNftStore();
 const router = useRouter();
 
 const story = ref();
@@ -466,6 +478,7 @@ a {
     padding: 6px;
     display: flex;
     height: 100%;
+    width: 100%;
     cursor: pointer;
     img {
       border-radius: 0;
@@ -503,16 +516,37 @@ ion-row:nth-child(even) {
   border-radius: 8px;
 
   b {
-    font-size: 14px;
+    @extend .font-sm;
   }
 
   p {
-    font-size: 12px;
+    @extend .font-sm;
     padding-bottom: 4px;
   }
   span {
-    font-size: 12px;
+    @extend .font-sm;
     float: right;
+  }
+}
+
+.header-button.button-solid {
+  --background: var(--second-color);
+  --ion-color-base: var(--second-color);
+}
+#start-content::part(background) {
+  background: none;
+}
+</style>
+<style lang="scss">
+#main-content::part(background) {
+  background-image: url("@/../public/assets/start-pattern.svg");
+  background-repeat: repeat;
+}
+.start-page-nft {
+  .multiple-nft-wrapper,
+  ion-avatar {
+    width: 200px !important;
+    height: 200px !important;
   }
 }
 </style>

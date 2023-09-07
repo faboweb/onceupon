@@ -11,6 +11,23 @@ const routes: Array<RouteRecordRaw> = [
     path: "/overview",
     component: () => import("@/views/OverviewPage.vue"),
     name: "overview",
+    children: [
+      {
+        path: "",
+        component: () => import("@/views/overview/OverviewView.vue"),
+        name: "overview2",
+      },
+      {
+        path: "stories",
+        component: () => import("@/views/overview/StoriesPage.vue"),
+        name: "stories",
+      },
+      {
+        path: "authors",
+        component: () => import("@/views/overview/AuthorsPage.vue"),
+        name: "authors",
+      },
+    ],
   },
   {
     path: "/story/new",

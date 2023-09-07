@@ -1,6 +1,6 @@
 <template>
   <div
-    style="display: inline-block; width: 288px; flex: 1; margin-bottom: 1rem"
+    style="width: 288px; flex: 1"
     :style="{
       width: extended ? 'auto' : '288px',
     }"
@@ -8,28 +8,21 @@
     <div style="flex-direction: row; display: flex; padding: 0">
       <story-nft-preview :nfts="story.top_nfts" :extended="extended" />
       <div
+        class="card"
         style="
           display: inline-block;
           height: 123px;
           margin-top: 14px;
-          width: 185px;
-          background: rgba(217, 217, 217, 0.2);
+          width: 100%;
           border-radius: 0 4px 4px 0;
-          padding: 0.5rem;
-          overflow: hidden;
-          text-overflow: ellipsis;
         "
-        :style="{
-          width: story.top_nfts.length > 0 ? 'calc(100% - 101px)' : '100%',
-        }"
       >
-        <b style="margin-bottom: 0.2rem; font-size: 14px; white-space: nowrap">
+        <b class="font-sm" style="white-space: nowrap">
           {{ story.name || "No title" }}
         </b>
         <div
+          class="font-secondary"
           style="
-            font-size: 14px;
-            color: rgba(0, 0, 0, 0.4);
             display: block;
             text-align: left;
             display: flex;
@@ -61,16 +54,7 @@
 
           <span>{{ story.proposals }}</span>
         </div>
-        <p
-          style="
-            text-align: left;
-            white-space: pre-wrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            max-height: 44px;
-            font-size: 12px;
-          "
-        >
+        <p class="font-sm" style="max-height: 50px; margin-top: 0.5rem">
           {{ content?.substr(0, extended ? 300 : 140) || "Loading" }}...
         </p>
       </div>
@@ -90,8 +74,8 @@ import {
   documents,
   heart,
 } from "ionicons/icons";
-import { formatDistance } from "date-fns";
-import { useNameStore, useStoryStore } from "@/store";
+// import { formatDistance } from "date-fns";
+import { useStoryStore } from "@/store";
 import {
   IonIcon,
   IonCard,
@@ -102,19 +86,17 @@ import {
 } from "@ionic/vue";
 import StoryNftPreview from "./StoryNftPreview.vue";
 
-const nameStore = useNameStore();
 const storyStore = useStoryStore();
 
 const props = defineProps<{ story: any; extended?: boolean }>();
 
-const time = (story) => {
-  if (!story.lastUpdate) return "";
-  return formatDistance(new Date(story.lastUpdate), new Date(), {
-    addSuffix: true,
-  });
-};
+// const time = (story) => {
+//   if (!story.lastUpdate) return "";
+//   return formatDistance(new Date(story.lastUpdate), new Date(), {
+//     addSuffix: true,
+//   });
+// };
 
-const name = computed(() => nameStore.name(props.story.creator));
 const content = computed(
   () => storyStore.cidLookup[props.story.first_section.content_cid]
 );

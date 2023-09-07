@@ -2,29 +2,21 @@
   <div style="width: 100%">
     <nft-element
       v-if="section.nft"
+      size="lg"
       :nft="section.nft"
-      :size="120"
       style="
         float: right;
         padding: 0 0 0.5rem 0.5rem;
         box-sizing: content-box;
         cursor: pointer;
-        height: 120px;
-        width: 120px;
       "
       @click.prevent="selectedNft = section.nft"
     />
     <div
-      class="like-button"
-      style="
-        float: left;
-        padding-right: 0.5rem;
-        margin-top: 4px;
-        font-size: 30px;
-        cursor: pointer;
-      "
+      class="icon-button icon-xl"
+      style="float: left; padding-right: 0.5rem; margin-top: 2px"
       :class="{
-        liked,
+        active: liked,
       }"
       @click="likeStore.toggleLike(section)"
       v-if="authStore.isSignedIn && authStore.signInMethod !== 'keplr'"
@@ -32,12 +24,7 @@
       <ion-icon :icon="liked ? heart : heartOutline"></ion-icon>
     </div>
     <p
-      style="
-        font-size: 14px;
-        line-height: 21px;
-        margin-top: 0;
-        white-space: break-spaces;
-      "
+      style="white-space: break-spaces"
       :class="{
         'skeleton-offset': section.nft,
       }"
@@ -53,14 +40,8 @@
       </template>
     </p>
     <span
-      style="
-        font-size: 12px;
-        color: gray;
-        display: block;
-        float: right;
-        margin-top: 0.5rem;
-        cursor: pointer;
-      "
+      class="font-secondary font-sm"
+      style="display: block; float: right; margin-top: 0.5rem; cursor: pointer"
       @click="router.push('/profile/' + props.section.proposer)"
       >{{ name }} - {{ time }}</span
     >
@@ -70,6 +51,7 @@
     <ion-modal
       :is-open="!!selectedNft"
       @ionModalDidDismiss="selectedNft = null"
+      @click="selectedNft = null"
     >
       <ion-content>
         <nft-element
@@ -139,13 +121,5 @@ ion-skeleton-text {
 }
 .skeleton-offset ion-skeleton-text {
   width: calc(100% - 133px);
-}
-.like-button {
-  &.liked {
-    color: rgba(242, 103, 9, 1);
-  }
-  &:hover {
-    color: rgba(242, 103, 9, 1);
-  }
 }
 </style>

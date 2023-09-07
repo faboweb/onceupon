@@ -1,7 +1,8 @@
 <template>
   <ion-avatar
     :style="{
-      'max-height': size + 'px',
+      height: imageSize + 'px',
+      width: imageSize + 'px',
     }"
   >
     <img
@@ -20,12 +21,22 @@
 
 <script setup lang="ts">
 import { useNftStore } from "@/store/nfts";
-import { defineProps } from "vue";
+import { computed, defineProps } from "vue";
 import { IonAvatar } from "@ionic/vue";
 import { FALLBACK_AVATAR } from "../scripts/getAvatar";
-defineProps({
+const props = defineProps({
   nft: { type: Object },
-  size: { type: Number, default: 64 },
+  size: { type: String },
+});
+
+const sizeMap = {
+  sm: 64,
+  md: 96,
+  lg: 128,
+  xl: 160,
+};
+const imageSize = computed(() => {
+  return props.size ? sizeMap[props.size] : sizeMap.sm;
 });
 const { getNft } = useNftStore();
 </script>

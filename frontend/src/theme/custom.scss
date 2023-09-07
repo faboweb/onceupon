@@ -1,0 +1,122 @@
+html {
+    background-color: var(--background);
+  }
+
+.font-md {
+    font-size: 16px;
+}
+.font-lg {
+    font-size: 18px;
+}
+.font-xl {
+    font-size: 24px;
+}
+.font-xxl {
+    font-size: 32px;
+}
+.font-sm {
+    font-size: 14px;
+}
+.font-b {
+    font-weight: 700;
+}
+.font-l {
+    font-weight: 400;
+}
+.font-primary {
+   color: var(--main-color)
+}
+.font-secondary {
+    @extend .font-sm;
+   color: var(--grey)
+}
+.font-header {
+    @extend .font-md;
+   color: var(--black-accent)
+}
+.heading {
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+* {
+    --main-color: rgba(242, 103, 9, 1);
+    --second-color: rgba(2, 55, 67, 1);
+    --black-accent: rgb(102,102,102);
+    --grey: rgb(153,153,153);
+}
+
+.input-label {
+    @extend .font-b;
+    @extend .font-sm;
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 0rem;
+  }
+
+ion-button {
+    @extend .font-sm;
+    @extend .font-b;
+  
+    text-transform: none;
+    height: 36px;
+    min-width: 85px;
+  
+    &.button-solid {
+      --background: var(--main-color);
+      --ion-color-base: var(--main-color);
+    }
+    &.button-outline, &.button-clear {
+      color: var(--main-color);
+      --border-color: var(--main-color);
+    }
+  }
+
+p {
+    text-align: left;
+    white-space: pre-wrap;
+}
+
+.card {
+    background: rgba(217, 217, 217, 0.2);
+    border-radius: 8px;
+    padding: 0.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    // border-bottom: 1px solid var(--main-color);
+
+    p {
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+}
+
+.wrap-list {
+    display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap
+}
+
+.icon-xl {
+    font-size: 32px;
+}
+.icon-lg {
+    font-size: 24px;
+}
+.icon-button {
+    cursor: pointer;
+
+    &.active {
+        color: var(--main-color);
+    }
+
+    &:hover {
+        color: var(--main-color);
+    }
+}
+
+a {
+    color: black;
+    text-decoration: none;
+
+    &:hover {
+        color: var(--main-color);
+    }
+}

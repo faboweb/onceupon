@@ -1,18 +1,9 @@
 <template>
-  <div style="display: flex; flex-direction: row; gap: 1rem; flex-wrap: wrap">
+  <div class="wrap-list">
     <div v-for="contract in contracts" :key="contract" style="margin-top: 1rem">
-      <span
-        style="
-          font-size: 14px;
-          color: rgba(0, 0, 0, 0.4);
-          margin-bottom: 0.5rem;
-          display: block;
-        "
-        >{{
-          loadedNfts.find((nft) => nft.contract_address === contract)
-            ?.collection
-        }}</span
-      >
+      <span class="font-header heading">{{
+        loadedNfts.find((nft) => nft.contract_address === contract)?.collection
+      }}</span>
       <div
         v-for="nft in loadedNfts.filter(
           (nft) => nft.contract_address === contract
@@ -21,8 +12,7 @@
       >
         <nft-element
           :nft="nft"
-          :size="100"
-          style="height: 100px; width: 100px"
+          size="lg"
           @click="click(nft)"
           :style="{
             cursor: clickable ? 'pointer' : 'default',
@@ -35,19 +25,9 @@
 
 <script setup lang="ts">
 import NftElement from "@/components/NftElement.vue";
-import { useRoute } from "vue-router";
-import {
-  computed,
-  onMounted,
-  Ref,
-  ref,
-  defineProps,
-  watch,
-  defineEmits,
-} from "vue";
+import { computed, ref, defineProps, watch, defineEmits } from "vue";
 import { getNftKey, useNftStore } from "../store/nfts";
 
-const route = useRoute();
 const nftStore = useNftStore();
 
 const props = defineProps<{ nfts: any[]; clickable?: boolean }>();

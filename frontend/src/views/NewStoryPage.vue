@@ -7,7 +7,7 @@
     >
       <div style="padding-bottom: 7rem">
         <div style="margin-bottom: 0.5rem; width: 100%; text-align: center">
-          <b style="font-size: 16px; text-align: center">Create a story</b>
+          <b style="text-align: center">Create a story</b>
         </div>
         <div style="margin-bottom: 0.5rem">
           <b style="color: rgba(0, 0, 0, 0.6)">Title</b>
