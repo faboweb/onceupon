@@ -1,15 +1,20 @@
 <template>
   <div
-    class="card"
+    class="card clickable"
     style="cursor: pointer; min-width: 186px; height: 123px"
     @click="router.push('/story/' + proposal.story_id + '/read/')"
   >
     <b class="font-sm" style="white-space: nowrap">
       {{ title }}
     </b>
-    <span class="font-sm font-primary" style="display: block">{{
-      caption
-    }}</span>
+    <span
+      class="font-sm font-primary"
+      style="display: block"
+      :style="{
+        color,
+      }"
+      >{{ caption }}</span
+    >
     <p style="max-height: 55px">
       {{ content }}
     </p>
@@ -27,6 +32,7 @@ const router = useRouter();
 const props = defineProps({
   proposal: Object,
   caption: String,
+  color: String,
 });
 
 const content = computed(() => {

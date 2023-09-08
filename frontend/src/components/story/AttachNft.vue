@@ -15,10 +15,10 @@
       <ion-skeleton-text :animated="true"> </ion-skeleton-text>
     </div>
     <template v-if="nfts.length === 0 && loaded">
-      <p style="text-align: center; margin-top: 2rem">
+      <div class="card" style="text-align: center; margin-top: 2rem">
         You don't own any NFT yet. Go to
         <a href="https://stargaze.zone">Stargaze</a> to buy an NFT.
-      </p>
+      </div>
     </template>
     <br />
     <div style="text-align: center; margin-top: 2rem">

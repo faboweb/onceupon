@@ -62,7 +62,7 @@
         <iframe
           :hidden="!configStore.showVideo"
           width="100%"
-          height="315"
+          height="350"
           src="https://www.youtube.com/embed/TT7CIizVjPg?controls=0"
           title="YouTube video player"
           frameborder="0"
@@ -104,8 +104,8 @@
           >
             <b class="font-xl" style="margin-bottom: 8px">For readers</b>
             <p style="margin-bottom: 16px">
-              Where readers and writers come together to celebrate the magic of
-              storytelling.
+              Where you find exciting stories and can influence the direction of
+              them.
             </p>
             <ion-button @click="router.push('/overview')"
               >Read a story</ion-button
@@ -118,9 +118,12 @@
           <div style="width: 300px; text-align: right; margin-left: auto">
             <b class="font-xl" style="margin-bottom: 8px">For writers</b>
             <p style="margin-bottom: 16px">
-              Where readers and writers come together to celebrate the magic of
-              storytelling.
+              Where you can interact with an engaged community and find
+              inspiration through other creatives.
             </p>
+            <ion-button fill="clear" @click="router.push('/story/new')"
+              >Learn more</ion-button
+            >
             <ion-button @click="router.push('/story/new')"
               >Write a story</ion-button
             >
@@ -162,11 +165,7 @@
             class="start-page-nft"
             :nfts="story?.top_nfts"
             :extended="true"
-            style="
-              margin-right: 2rem;
-              border: 8px solid rgba(1, 108, 132, 1);
-              border-radius: 18px;
-            "
+            style="margin-right: 2rem"
           />
           <div
             style="
@@ -201,6 +200,88 @@
           </div>
         </div>
       </template>
+
+      <div
+        style="
+          background: rgba(255, 245, 233, 1);
+          border: 1px solid rgba(204, 111, 0, 1);
+          margin-top: 6rem;
+          padding: 2rem;
+          border-radius: 8px;
+          max-width: 750px;
+          margin-left: auto;
+          margin-right: auto;
+        "
+      >
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            margin-bottom: 2rem;
+            margin-left: -4rem;
+          "
+        >
+          <img
+            src="@/../public/assets/road_tree.svg"
+            alt=""
+            style="
+              width: 200px;
+              height: 180px;
+              margin-top: -30px;
+              margin-right: 3rem;
+            "
+          />
+          <div
+            style="
+              width: 300px;
+              text-align: left;
+              color: rgba(1, 40, 49, 1);
+              margin-right: auto;
+            "
+          >
+            <b class="font-xl" style="margin-bottom: 8px">Influence</b>
+            <p style="margin-bottom: 16px">
+              The best stories are created together. Here you can influence the
+              direction of a story.
+            </p>
+            <ion-button @click="router.push('/overview')"
+              >Vote on a story now</ion-button
+            >
+          </div>
+        </div>
+        <div
+          style="
+            display: flex;
+            flex-direction: row;
+            color: rgba(1, 40, 49, 1);
+            margin-right: -4rem;
+          "
+        >
+          <div style="width: 300px; text-align: right; margin-left: auto">
+            <b class="font-xl" style="margin-bottom: 8px">Be Rewarded</b>
+            <p style="margin-bottom: 16px">
+              Contributors should be rewarded for their work. Here creators AND
+              readers are rewarded by receiving a share in the story.
+            </p>
+            <ion-button fill="clear" @click="router.push('/overview/authors')"
+              >Learn more</ion-button
+            >
+            <ion-button @click="router.push('/overview/authors')"
+              >Top share holders</ion-button
+            >
+          </div>
+          <img
+            src="@/../public/assets/money_book.png"
+            alt=""
+            style="
+              width: 200px;
+              height: 200px;
+              margin-top: -30px;
+              margin-left: 3rem;
+            "
+          />
+        </div>
+      </div>
 
       <template v-if="topAuthors.length > 0">
         <b
@@ -358,7 +439,7 @@
           padding-top: 0.5rem;
           padding-bottom: 0.5rem;
           margin-top: 3rem;
-          background: var(--background);
+          background: var(--ion-background-color, #fff);
           color: var(--second-color);
         "
       >
@@ -547,6 +628,14 @@ ion-row:nth-child(even) {
   ion-avatar {
     width: 200px !important;
     height: 200px !important;
+  }
+
+  .multiple-nft-wrapper {
+    border: 8px solid rgba(1, 108, 132, 1);
+    border-radius: 18px;
+  }
+  ion-avatar img {
+    border-radius: 0;
   }
 }
 </style>

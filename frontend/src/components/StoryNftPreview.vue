@@ -43,6 +43,13 @@ const props = defineProps({
   ion-avatar {
     margin-left: -25px;
   }
+  // ion-avatar:hover {
+  //   transform: none;
+  // }
+
+  // &:hover {
+  //   transform: scale(1.05);
+  // }
 
   &.extended {
     ion-avatar {

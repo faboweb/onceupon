@@ -4,6 +4,7 @@
     :style="{
       width: extended ? 'auto' : '288px',
     }"
+    class="story-element"
   >
     <div style="flex-direction: row; display: flex; padding: 0">
       <story-nft-preview :nfts="story.top_nfts" :extended="extended" />
@@ -102,5 +103,13 @@ const content = computed(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.story-element {
+  &:hover {
+    filter: saturate(120%);
+    .card {
+      background: rgba(217, 217, 217, 0.4);
+    }
+  }
+}
 </style>

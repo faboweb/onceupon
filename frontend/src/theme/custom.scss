@@ -88,6 +88,14 @@ p {
         text-overflow: ellipsis;
         overflow: hidden;
     }
+
+    &.clickable:hover {
+        background: rgba(217, 217, 217, 0.4);
+    }
+}
+
+.clickable:hover {
+    filter: saturate(120%)
 }
 
 .wrap-list {

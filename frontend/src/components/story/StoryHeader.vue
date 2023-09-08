@@ -13,32 +13,39 @@
     <div style="display: flex; flex-direction: column; margin-left: 1rem">
       <template v-if="story">
         <b class="font-lg" style="margin-bottom: 0.5rem">{{ story.name }}</b>
-        <div class="story-info-row font-secondary">
-          <ion-icon :icon="heartOutline" style="margin-right: 4px"></ion-icon>
+        <div
+          class="wrap-list"
+          style="flex-direction: column; gap: 4px; max-height: 100%"
+        >
+          <div class="story-info-row font-secondary">
+            <ion-icon :icon="heartOutline" style="margin-right: 4px"></ion-icon>
 
-          <b style="margin-right: 4px; color: black">{{ story.likes || 0 }}</b>
-          <span>Likes</span>
-        </div>
-        <div class="story-info-row font-secondary">
-          <ion-icon :icon="listOutline" style="margin-right: 4px"></ion-icon>
+            <b style="margin-right: 4px; color: black">{{
+              story.likes || 0
+            }}</b>
+            <span>Likes</span>
+          </div>
+          <div class="story-info-row font-secondary">
+            <ion-icon :icon="listOutline" style="margin-right: 4px"></ion-icon>
 
-          <b style="margin-right: 4px; color: black">{{ story.sections }}</b>
-          <span>Sections</span>
-        </div>
-        <div class="story-info-row font-secondary">
-          <ion-icon :icon="eyeOutline" style="margin-right: 4px"></ion-icon>
+            <b style="margin-right: 4px; color: black">{{ story.sections }}</b>
+            <span>Sections</span>
+          </div>
+          <div class="story-info-row font-secondary">
+            <ion-icon :icon="eyeOutline" style="margin-right: 4px"></ion-icon>
 
-          <b style="margin-right: 4px; color: black">{{ story.owners }}</b>
-          <span>Owners</span>
-        </div>
-        <div class="story-info-row font-secondary">
-          <ion-icon
-            :icon="documentOutline"
-            style="margin-right: 4px"
-          ></ion-icon>
+            <b style="margin-right: 4px; color: black">{{ story.owners }}</b>
+            <span>Owners</span>
+          </div>
+          <div class="story-info-row font-secondary">
+            <ion-icon
+              :icon="documentOutline"
+              style="margin-right: 4px"
+            ></ion-icon>
 
-          <b style="margin-right: 4px">{{ story.proposals }}</b>
-          <span>Proposals</span>
+            <b style="margin-right: 4px; color: black">{{ story.proposals }}</b>
+            <span>Proposals</span>
+          </div>
         </div>
       </template>
       <template v-else>

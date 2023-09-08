@@ -1,6 +1,10 @@
 <template>
-  <ion-page>
-    <ion-content>
+  <ion-page
+    :style="{
+      height: `calc(100% + ${offset}px)`,
+    }"
+  >
+    <ion-content :scroll-events="true" @ionScroll="handleScroll($event)">
       <div style="padding-top: 1rem">
         <template v-if="story && loaded">
           <!-- <ion-button
@@ -83,12 +87,13 @@
 
 <script setup lang="ts">
 import { IonPage, IonContent } from "@ionic/vue";
-import { onMounted, Ref, ref } from "vue";
+import { computed, onMounted, Ref, ref } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useRoute, useRouter } from "vue-router";
 import StorySection from "@/components/story/StorySection.vue";
 import NewSection from "../../components/story/NewSection.vue";
 import { useNameStore } from "../../store";
+import { scroll } from "@/scripts/scroll";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
@@ -97,6 +102,11 @@ const router = useRouter();
 const storyId = String(route?.params.id);
 const story: Ref<any> = ref(null);
 const loaded = ref(false);
+
+const scrollOffset = ref(0);
+const offset = computed(() => {
+  return scrollOffset.value > 120 ? 40 : 160 - scrollOffset.value;
+});
 
 onMounted(async () => {
   try {
@@ -113,6 +123,11 @@ onMounted(async () => {
 
   loaded.value = true;
 });
+
+const handleScroll = (event) => {
+  scrollOffset.value = event.detail.scrollTop;
+  scroll("story/read", event);
+};
 </script>
 <style scoped lang="scss">
 ion-skeleton-text {

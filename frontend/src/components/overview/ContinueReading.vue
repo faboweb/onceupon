@@ -42,6 +42,7 @@
         }"
         caption="Continue the story"
         style="flex: 1"
+        color="rgba(0, 128, 0, 1)"
       />
     </div>
     <div v-else>

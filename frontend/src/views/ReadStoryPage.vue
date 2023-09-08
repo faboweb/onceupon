@@ -14,8 +14,14 @@
         </div>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" class="ion-padding" scroll-y="false">
-      <story-header :story="overviewStory" />
+    <ion-content :fullscreen="true" class="ion-padding" :scroll-y="false">
+      <story-header
+        :story="overviewStory"
+        ref="storyHeader"
+        :style="{
+          height: offset + 'px',
+        }"
+      />
       <!-- Listen to before and after tab change events -->
       <ion-tabs
         style="position: initial; margin-top: 1rem; height: calc(100% - 130px)"
@@ -31,6 +37,7 @@
               active: route.path === '/story/' + storyId + '/read',
             }"
             :href="'/story/' + storyId + '/read'"
+            @click.passive="scrollOffset = 0"
           >
             <ion-label>Story</ion-label>
           </ion-tab-button>
@@ -42,6 +49,7 @@
               active: route.path === '/story/' + storyId + '/proposals',
             }"
             :href="'/story/' + storyId + '/proposals'"
+            @click.passive="scrollOffset = 0"
           >
             <ion-label>Proposals</ion-label>
           </ion-tab-button>
@@ -53,6 +61,7 @@
               active: route.path === '/story/' + storyId + '/nfts',
             }"
             :href="'/story/' + storyId + '/nfts'"
+            @click.passive="scrollOffset = 0"
           >
             <ion-label>NFTs</ion-label>
           </ion-tab-button>
@@ -64,13 +73,18 @@
               active: route.path === '/story/' + storyId + '/owners',
             }"
             :href="'/story/' + storyId + '/owners'"
+            @click.passive="scrollOffset = 0"
           >
             <ion-label>Owners</ion-label>
           </ion-tab-button>
         </ion-tab-bar>
 
         <!-- Use v-slot:bottom with Vue ^2.6.0 -->
-        <ion-router-outlet></ion-router-outlet>
+        <ion-router-outlet
+          :style="{
+            height: `calc(100% + ${160 - offset}px)`,
+          }"
+        ></ion-router-outlet>
       </ion-tabs>
     </ion-content>
   </ion-page>
@@ -92,6 +106,8 @@ import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
 import VotesIndicator from "../components/VotesIndicator.vue";
 import { useVotesStore } from "../store/votes";
+// import { useScroll } from "@vueuse/core";
+import { listenScroll } from "@/scripts/scroll";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
@@ -99,9 +115,15 @@ const voteStore = useVotesStore();
 
 const route = useRoute();
 const router = useRouter();
+const scrollOffset = ref(0);
+
+const offset = computed(() => {
+  return scrollOffset.value > 120 ? 40 : 160 - scrollOffset.value;
+});
 
 const storyId = String(route?.params.id);
 const story: Ref<any> = ref(null);
+const storyHeader = ref();
 
 const overviewStory = computed(() => {
   return storyStore.stories.find((s) => s.id === storyId);
@@ -120,6 +142,10 @@ onMounted(async () => {
 
   story.value.sections.forEach((proposal) => {
     nameStore.getName(proposal.proposer);
+  });
+
+  listenScroll("story/read", (event) => {
+    scrollOffset.value = event.detail.scrollTop;
   });
 });
 </script>

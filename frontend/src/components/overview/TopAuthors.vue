@@ -18,7 +18,7 @@
     </div>
     <div v-if="loaded" style="display: flex">
       <nft-element
-        class="author"
+        class="author clickable"
         v-for="author in authors"
         size="sm"
         :key="author.user"

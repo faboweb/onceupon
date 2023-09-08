@@ -49,7 +49,7 @@
             border-radius: 50%;
             height: 69px;
             width: 69px;
-            margin-right: 1rem;
+            margin-top: 2rem;
           "
           :animated="true"
         ></ion-skeleton-text>
