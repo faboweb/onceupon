@@ -15,6 +15,16 @@ const web3Uplodad = async (content) => {
   const file = new File([content], "section.txt", { type: "text/plain" });
   const cid = await client.put([file]);
 
+  // store locally for easy access
+  await db.doc("content/" + cid).set({
+    content,
+  });
+
+  // store hash to avoid duplicates
+  await db.doc("contentHash/" + hash).set({
+    cid,
+  });
+
   return cid;
 };
 

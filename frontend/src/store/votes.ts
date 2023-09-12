@@ -9,6 +9,7 @@ const voteToInt = (vote) => {
   }[vote];
 };
 export const voteFromInt = (vote) => {
+  if (!vote) return "no";
   return {
     1: "yes",
     2: "veto",
@@ -46,7 +47,7 @@ export const useVotesStore = defineStore("votesStore", {
     async signVotes() {
       this.processing = true;
       try {
-        await execute("vote_multiple", {
+        await execute("vote", {
           votes: this.votes.map((vote) => ({
             story_id: vote.storyId,
             section_id: vote.sectionId,

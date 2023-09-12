@@ -279,6 +279,7 @@ async function addBotSection(network) {
   for (let storyId of storiesWithoutBotProposal) {
     const content = await createSection(network, storyId);
     const cid = await web3Uplodad(content);
+
     await executeMnemonic(network.mnemonic, network, {
       new_story_section: {
         section: {

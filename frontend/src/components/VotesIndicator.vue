@@ -42,7 +42,7 @@
             @click="votesStore.modalOpen = false"
           ></ion-icon>
         </div>
-        <div style="height: calc(100% - 7rem)">
+        <div style="height: calc(100% - 7rem); overflow: scroll">
           <ion-grid v-if="votesStore.votes.length > 0">
             <ion-row
               v-for="vote in votesStore.votes"
@@ -171,6 +171,7 @@ const storyId = route.params.storyId;
 
 const sign = async () => {
   await votesStore.signVotes();
+  votesStore.modalOpen = false;
   if (storyId) {
     await storyStore.loadVotes(storyId);
   }

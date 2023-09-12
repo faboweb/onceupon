@@ -142,7 +142,7 @@ const proposalVote = (proposalId) => {
   const pendingVote = votesStore.votes.find(
     (vote) => vote.storyId === storyId && vote.sectionId === proposalId
   )?.vote;
-  const submittedVote = storyStore.votes[storyId].find(
+  const submittedVote = storyStore.votes[storyId]?.find(
     (vote) => vote.section_id === proposalId
   )?.vote;
   return pendingVote || voteFromInt(submittedVote);

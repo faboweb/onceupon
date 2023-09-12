@@ -86,10 +86,11 @@ const cycle = async (network) => {
 const conditionalFundAccount = async (user, network) => {
   const { address } = await getWallet(user, network);
   const client = await adminSigningClient(network);
+  // const adminBalance = await client.getBalance(network.admin, "ustars");
   const balance = await client.getBalance(address, "ustars");
 
   if (Number(balance.amount) === 0) {
-    fundAccount(user, network);
+    await fundAccount(address, network);
   }
 };
 
@@ -97,15 +98,20 @@ const fundAccount = async (address, network) => {
   const client = await adminSigningClient(network);
 
   // send 1ustars to the new account to create it
+  const gas = 100000;
   await client.sendTokens(
     network.admin,
     address,
     [{ denom: "ustars", amount: "100000" }],
     {
-      amount: [{ denom: "ustars", amount: "1000" }],
-      gas: "100000",
+      amount: [{ denom: "ustars", amount: "" + gas }],
+      gas: "" + gas,
     }
   );
+
+  while ((await client.getBalance(address, "ustars")).amount === "0") {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
 
   const user = (
     await db.collection("users").where("address", "==", address).get()
@@ -202,7 +208,10 @@ const executeWallet = async (
   } catch (err) {
     if (retry) throw err;
 
-    if (err.message.indexOf("insufficient funds") !== -1) {
+    if (
+      err.message.indexOf("insufficient funds") !== -1 ||
+      err.message.indexOf("Account does not exist on chain") !== -1
+    ) {
       await fundAccount(address, network);
       return await executeWallet({ wallet, address }, network, message, true);
     } else {

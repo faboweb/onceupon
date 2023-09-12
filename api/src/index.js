@@ -35,35 +35,30 @@ app.post("/web3upload", async (req, res) => {
 
   const cid = await web3Uplodad(content);
 
-  // store locally for easy access
-  await db.doc("content/" + cid).set({
-    content,
-  });
-
-  // store hash to avoid duplicates
-  await db.doc("contentHash/" + hash).set({
-    cid,
-  });
-
   // returns the cid
   res.status(200).send(cid);
 });
 
 app.post("/resolveCIDs", async (req, res) => {
-  const body = req.body || {};
-  const { cids } = body;
-  const docs = cids.map((cid) => db.doc("content/" + cid));
-  const loadedDocs = await db.getAll(...docs);
+  try {
+    const body = req.body || {};
+    const { cids } = body;
+    const docs = cids.map((cid) => db.doc("content/" + cid));
+    const loadedDocs = await db.getAll(...docs);
 
-  const cidLookup = Object.fromEntries(
-    loadedDocs.map((doc) => {
-      const data = doc.data();
-      return [doc.id, data.content];
-    })
-  );
+    const cidLookup = Object.fromEntries(
+      loadedDocs.map((doc) => {
+        const data = doc.data();
+        return [doc.id, data.content];
+      })
+    );
 
-  // returns the cid
-  res.status(200).send(cidLookup);
+    // returns the cid
+    res.status(200).send(cidLookup);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
 });
 
 app.get("/story/:id", async (req, res) => {
