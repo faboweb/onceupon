@@ -23,6 +23,7 @@
     "lodash.debounce": "^4.0.8",
     "node-fetch": "^3.3.1",
     "nodemon": "^3.0.1",
+    "openai": "^4.5.0",
     "uuid": "^9.0.0",
     "web3.storage": "^4.5.4",
     "ws": "^8.13.0"

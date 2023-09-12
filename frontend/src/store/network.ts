@@ -16,7 +16,7 @@ interface State {
 export const useNetworkStore = defineStore("networkStore", {
   // convert to a function
   state: (): State => ({
-    network: "testnet",
+    network: process.env.VUE_APP_NETWORK,
     networks: [
       {
         name: "mainnet",

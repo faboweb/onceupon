@@ -93,8 +93,7 @@ const conditionalFundAccount = async (user, network) => {
   }
 };
 
-const fundAccount = async (user, network) => {
-  const { address } = await getWallet(user, network);
+const fundAccount = async (address, network) => {
   const client = await adminSigningClient(network);
 
   // send 1ustars to the new account to create it
@@ -108,14 +107,19 @@ const fundAccount = async (user, network) => {
     }
   );
 
-  await db.doc("users/" + user.uid).set(
-    {
-      funded: true,
-    },
-    {
-      merge: true,
-    }
-  );
+  const user = (
+    await db.collection("users").where("address", "==", address).get()
+  ).docs[0];
+  if (user) {
+    await db.doc("users/" + user.id).set(
+      {
+        funded: true,
+      },
+      {
+        merge: true,
+      }
+    );
+  }
 };
 
 const walletOptions = {
@@ -169,9 +173,12 @@ const getWallet = async (user, network) => {
   };
 };
 
-const execute = async (user, network, message, retry = false) => {
-  const { wallet, address } = await getWallet(user, network);
-
+const executeWallet = async (
+  { wallet, address },
+  network,
+  message,
+  retry = false
+) => {
   const defaultGasPrice = GasPrice.fromString("1ustars");
 
   const signingClient = await SigningCosmWasmClient.connectWithSigner(
@@ -196,12 +203,25 @@ const execute = async (user, network, message, retry = false) => {
     if (retry) throw err;
 
     if (err.message.indexOf("insufficient funds") !== -1) {
-      await fundAccount(user, network);
-      return await execute(user, network, message, true);
+      await fundAccount(address, network);
+      return await executeWallet({ wallet, address }, network, message, true);
     } else {
       throw err;
     }
   }
+};
+
+const execute = async (user, network, message, retry = false) => {
+  const { wallet, address } = await getWallet(user, network);
+
+  return await executeWallet({ wallet, address }, network, message, retry);
+};
+
+const executeMnemonic = async (mnemonic, network, message, retry = false) => {
+  const wallet = await Secp256k1HdWallet.fromMnemonic(mnemonic, walletOptions);
+  const address = (await wallet.getAccounts())[0].address;
+
+  return await executeWallet({ wallet, address }, network, message, retry);
 };
 
 module.exports = {
@@ -215,4 +235,5 @@ module.exports = {
   conditionalFundAccount,
   fundAccount,
   execute,
+  executeMnemonic,
 };

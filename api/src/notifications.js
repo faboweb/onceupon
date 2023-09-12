@@ -1,8 +1,16 @@
 const { db, admin } = require("./firebase");
 
-// TODO refactor all notification things
-async function sendNotification(topic, message, title, data) {
+async function sendNotification(network, topic, message, title, data) {
   try {
+    // write notification to db
+    await db.collection("networks/" + network.id + "/notifications").add({
+      topic,
+      message,
+      title,
+      data,
+      created: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
     const subscribedTokens = await db
       .collection("pushTopics")
       .where("topic", "==", topic)

@@ -1,8 +1,12 @@
-const { getBlock, getState, cycle } = require("./cosmos");
+const { getBlock, getState, cycle, executeMnemonic } = require("./cosmos");
 const { db } = require("./firebase");
+const { summarize, createSection } = require("./llm");
 const networks = require("./networks");
 const { subscribe } = require("./websocket");
 const debounce = require("lodash.debounce");
+const { generateUUID } = require("./scripts/guid");
+const { web3Uplodad } = require("./web3storage");
+const { sendNotification } = require("./notifications");
 
 Object.values(networks).forEach(async (network) => {
   try {
@@ -56,6 +60,10 @@ const index = async (network) => {
   const likes = await db.collection("networks/" + network.id + "/likes").get();
   const likesData = likes.docs.map((doc) => doc.data());
 
+  const existingSectionIds = (
+    await db.collection("networks/" + network.id + "/sections").get()
+  ).docs.map((doc) => doc.id);
+
   const batch = db.batch();
   await Promise.all(
     stories.map(async (story) => {
@@ -103,15 +111,66 @@ const index = async (network) => {
       );
 
       // TODO optimize
-      sections.forEach((section) =>
-        batch.set(
-          db.doc("networks/" + network.id + "/sections/" + section.section_id),
-          section,
-          { merge: true }
-        )
+      await Promise.all(
+        sections
+          .filter((s) => !existingSectionIds.includes(s.section_id))
+          .map(async (section) => {
+            const { content } = (
+              await db.doc("content/" + section.content_cid).get()
+            ).data();
+            const summary = await summarize(content);
+
+            batch.set(
+              db.doc(
+                "networks/" + network.id + "/sections/" + section.section_id
+              ),
+              { ...section, summary },
+              { merge: true }
+            );
+          })
       );
     })
   );
+  // DEPR
+  // await db
+  //   .collection("networks/" + network.id + "/sections")
+  //   .get()
+  //   .then(async (querySnapshot) => {
+  //     querySnapshot.forEach(async (doc) => {
+  //       const data = doc.data();
+  //       if (!data.summary) {
+  //         const { content } = (
+  //           await db.doc("content/" + data.content_cid).get()
+  //         ).data();
+  //         const summary = await summarize(content);
+  //         db.doc("networks/" + network.id + "/sections/" + doc.id).update(
+  //           {
+  //             summary,
+  //           },
+  //           { merge: true }
+  //         );
+  //       }
+  //     });
+  //   });
+
+  const existingProposals = await db
+    .collection("networks/" + network.id + "/proposals")
+    .get();
+  const existingProposalIds = existingProposals.docs.map((doc) => doc.id);
+  proposals
+    .filter(({ section_id }) => !existingProposalIds.includes(section_id))
+    .map((proposal) => {
+      const doc = db.doc(
+        "networks/" + network.id + "/proposals/" + proposal.section_id
+      );
+      batch.set(doc, proposal);
+    });
+  existingProposalIds
+    .filter((id) => !proposals.find(({ section_id }) => section_id === id))
+    .map((id) => {
+      const doc = db.doc("networks/" + network.id + "/proposals/" + id);
+      batch.delete(doc);
+    });
 
   shares.map(([storyId, user, amount]) => {
     const doc = db.doc("networks/" + network.id + "/shares/" + user);
@@ -129,6 +188,10 @@ const index = async (network) => {
   await batch.commit();
 
   console.log("Indexing done");
+
+  console.log("Checking to add bot sections");
+  await addBotSection(network);
+  console.log("Bot sections done");
 };
 
 async function checkUpdatesAndNotify(network) {
@@ -148,10 +211,16 @@ async function checkUpdatesAndNotify(network) {
       await db.doc("content/" + section.content_cid).get()
     ).data();
     const message = `${header} ${content} \n\n ${link}`;
-    await sendNotification(section.story_id, message, "New chapter proposal!", {
-      storyId,
-      type: "proposal",
-    });
+    await sendNotification(
+      network,
+      section.story_id,
+      message,
+      "New chapter proposal!",
+      {
+        storyId: section.story_id,
+        type: "proposal",
+      }
+    );
   });
 
   const newStories = await db
@@ -164,8 +233,8 @@ async function checkUpdatesAndNotify(network) {
     // const content = (
     //   await db.doc("content/" + story.first_section.content_cid).get()
     // ).data();
-    const message = story.title;
-    await sendNotification("new_story", message, "New story!", {
+    const message = story.name;
+    await sendNotification(network, "new_story", message, "New story!", {
       storyId: story.id,
       type: "story",
     });
@@ -190,8 +259,43 @@ async function checkUpdatesAndNotify(network) {
   );
 }
 
+async function addBotSection(network) {
+  const botAddress = network.admin;
+  const storyIds = await db
+    .collection("networks/" + network.id + "/stories")
+    .get();
+  const storyIdsData = storyIds.docs
+    .map((doc) => doc.data())
+    .map(({ id }) => id);
+  const proposals = await db
+    .collection("networks/" + network.id + "/proposals")
+    .get();
+  const proposalsData = proposals.docs.map((doc) => doc.data());
+  const storiesWithoutBotProposal = storyIdsData.filter((storyId) => {
+    const proposal = proposalsData.find(({ story_id }) => story_id === storyId);
+    return !proposal || proposal.proposer !== botAddress;
+  });
+  // TODO to parallelize need to handle sequence number
+  for (let storyId of storiesWithoutBotProposal) {
+    const content = await createSection(network, storyId);
+    const cid = await web3Uplodad(content);
+    await executeMnemonic(network.mnemonic, network, {
+      new_story_section: {
+        section: {
+          story_id: storyId,
+          section_id: generateUUID(),
+          content_cid: cid,
+          nft: null,
+          proposer: null,
+        },
+      },
+    });
+  }
+}
+
 module.exports = {
   networks,
   index,
   checkUpdatesAndNotify,
+  addBotSection,
 };

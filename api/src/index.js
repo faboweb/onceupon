@@ -1,18 +1,12 @@
 const express = require("express");
-const { sha256 } = require("@cosmjs/crypto");
-const { File, Web3Storage } = require("web3.storage");
 const { verifyADR36Amino } = require("@keplr-wallet/cosmos");
 const amino = require("@cosmjs/amino");
 var cors = require("cors");
 var crypto = require("crypto");
 const { db, auth, getUser } = require("./firebase");
-const {
-  getBlock,
-  fundAccount,
-  execute,
-  conditionalFundAccount,
-} = require("./cosmos");
+const { getBlock, execute, conditionalFundAccount } = require("./cosmos");
 const networks = require("./networks");
+const { web3Uplodad } = require("./web3storage");
 require("./logic");
 
 // global.fetch = require("node-fetch"); // needed by stargaze
@@ -39,18 +33,7 @@ app.post("/web3upload", async (req, res) => {
   const body = req.body || {};
   const { content } = body;
 
-  const hash = Buffer.from(sha256(content)).toString("hex");
-  const existingUpload = await db.doc("contentHash/" + hash).get();
-  if (existingUpload.exists) {
-    res.status(200).send(existingUpload.data().cid);
-    return;
-  }
-
-  const client = new Web3Storage({ token: process.env.WEB3_STORAGE_TOKEN });
-
-  // uploads the file to web3.storage
-  const file = new File([content], "section.txt", { type: "text/plain" });
-  const cid = await client.put([file]);
+  const cid = await web3Uplodad(content);
 
   // store locally for easy access
   await db.doc("content/" + cid).set({
