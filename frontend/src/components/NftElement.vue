@@ -27,6 +27,7 @@ import { FALLBACK_AVATAR } from "../scripts/getAvatar";
 const props = defineProps({
   nft: { type: Object },
   size: { type: String },
+  half: { type: Boolean, default: false },
 });
 
 const sizeMap = {
@@ -34,9 +35,11 @@ const sizeMap = {
   md: 96,
   lg: 128,
   xl: 160,
+  xxl: 192,
 };
 const imageSize = computed(() => {
-  return props.size ? sizeMap[props.size] : sizeMap.sm;
+  const size = props.size ? sizeMap[props.size] : sizeMap.sm;
+  return props.half ? size / 2 : size;
 });
 const { getNft } = useNftStore();
 </script>

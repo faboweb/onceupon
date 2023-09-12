@@ -175,7 +175,7 @@ export const useStoryStore = defineStore("storyStore", {
         "authors" + (limit ? "?limit=" + limit : ""),
         "GET"
       );
-      authors.forEach((author) => nameStore.getName(author.address));
+      authors.forEach((author) => nameStore.getName(author.user));
 
       return authors;
     },

@@ -17,11 +17,12 @@
         }"
       >
         <nft-element
-          v-for="nft in props.nfts"
+          v-for="nft in displayNfts"
           :key="nft.image"
           style="display: inline-block"
           :nft="nft"
-          :size="props.nfts.length === 1 ? 'xl' : 'md'"
+          :size="props.size || 'xl'"
+          :half="props.nfts.length > 1"
         />
       </div>
     </div>
@@ -35,13 +36,30 @@ import NftElement from "@/components/NftElement.vue";
 const props = defineProps({
   nfts: Array,
   extended: Boolean,
+  size: String,
+});
+
+const displayNfts = computed(() => {
+  if (props.nfts.length === 1) {
+    return props.nfts;
+  }
+  if (props.nfts.length === 2) {
+    return [...props.nfts, props.nfts[1], props.nfts[0]];
+  }
+  if (props.nfts.length === 3) {
+    return [...props.nfts, props.nfts[0]];
+  }
+  return props.nfts;
 });
 </script>
 
 <style lang="scss">
 .multiple-nft-wrapper {
-  ion-avatar {
+  ion-avatar:nth-child(odd) {
     margin-left: -25px;
+  }
+  ion-avatar:nth-child(even) {
+    margin-right: -25px;
   }
   // ion-avatar:hover {
   //   transform: none;
@@ -63,8 +81,8 @@ const props = defineProps({
     background: rgba(217, 217, 217, 0.8);
 
     ion-avatar {
-      height: 80px !important;
-      width: 80px !important;
+      height: 80px;
+      width: 80px;
 
       img {
         border-radius: 0;

@@ -4,20 +4,22 @@
       <span class="font-header heading">{{
         loadedNfts.find((nft) => nft.contract_address === contract)?.collection
       }}</span>
-      <div
-        v-for="nft in loadedNfts.filter(
-          (nft) => nft.contract_address === contract
-        )"
-        :key="getNftKey(nft)"
-      >
-        <nft-element
-          :nft="nft"
-          size="lg"
-          @click="click(nft)"
-          :style="{
-            cursor: clickable ? 'pointer' : 'default',
-          }"
-        />
+      <div class="wrap-list">
+        <div
+          v-for="nft in loadedNfts.filter(
+            (nft) => nft.contract_address === contract
+          )"
+          :key="getNftKey(nft)"
+        >
+          <nft-element
+            :nft="nft"
+            size="lg"
+            @click="click(nft)"
+            :style="{
+              cursor: clickable ? 'pointer' : 'default',
+            }"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -35,11 +37,18 @@ const emits = defineEmits(["click"]);
 const contracts = computed(() => {
   return Array.from(new Set(props.nfts.map((nft) => nft.contract_address)));
 });
+const uniqueNfts = computed(() => {
+  const nftDict = {};
+  props.nfts.forEach((nft) => {
+    nftDict[getNftKey(nft)] = nft;
+  });
+  return Object.values(nftDict);
+});
 const loadedNfts = ref([]);
 watch(
-  () => props.nfts,
+  () => uniqueNfts.value,
   async () => {
-    loadedNfts.value = await Promise.all(props.nfts.map(nftStore.getNft));
+    loadedNfts.value = await Promise.all(uniqueNfts.value.map(nftStore.getNft));
   },
   {
     immediate: true,

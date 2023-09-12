@@ -4,7 +4,7 @@
   "private": true,
   "description": "A blockchain based communal story telling game",
   "scripts": {
-    "serve": "VUE_APP_NETWORK=testnet && vue-cli-service serve",
+    "serve": "VUE_APP_NETWORK=mainnet && vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",

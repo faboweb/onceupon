@@ -7,12 +7,12 @@ module.exports = {
     url: "https://rpc-stargaze.pupmos.network",
     mnemonic: process.env.MNEMONIC_MAINNET,
   },
-  // testnet: {
-  //   id: "testnet",
-  //   contract:
-  //     "stars1j64pe4hsr6ptmleapqnax7fdl39a0nw0dwayvgz0d7cmkaezyuzst0n7us",
-  //   admin: "stars17cv7tkzteht4pxggrgf3jynstsasdf8pv07d3z",
-  //   url: "https://rpc.elgafar-1.stargaze-apis.com",
-  //   mnemonic: process.env.MNEMONIC,
-  // },
+  testnet: {
+    id: "testnet",
+    contract:
+      "stars1j64pe4hsr6ptmleapqnax7fdl39a0nw0dwayvgz0d7cmkaezyuzst0n7us",
+    admin: "stars17cv7tkzteht4pxggrgf3jynstsasdf8pv07d3z",
+    url: "https://rpc.elgafar-1.stargaze-apis.com",
+    mnemonic: process.env.MNEMONIC,
+  },
 };

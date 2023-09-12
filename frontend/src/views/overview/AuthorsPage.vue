@@ -7,7 +7,7 @@
       <b class="heading font-header" style="margin-bottom: 2rem">All Authors</b>
       <div
         v-if="authors.length > 0"
-        class="display: flex; flex-direction: column; gap: 1rem"
+        style="display: flex; flex-direction: column; gap: 1rem"
       >
         <div
           style="display: flex; cursor: pointer"

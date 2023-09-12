@@ -165,6 +165,7 @@
             class="start-page-nft"
             :nfts="story?.top_nfts"
             :extended="true"
+            :size="'xxl'"
             style="margin-right: 2rem"
           />
           <div
@@ -624,15 +625,13 @@ ion-row:nth-child(even) {
   background-repeat: repeat;
 }
 .start-page-nft {
-  .multiple-nft-wrapper,
-  ion-avatar {
-    width: 200px !important;
-    height: 200px !important;
-  }
-
   .multiple-nft-wrapper {
     border: 8px solid rgba(1, 108, 132, 1);
     border-radius: 18px;
+    // TODO bake into compoennt
+    width: 192px !important;
+    height: 192px !important;
+    box-sizing: content-box;
   }
   ion-avatar img {
     border-radius: 0;
