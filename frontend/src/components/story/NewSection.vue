@@ -49,20 +49,30 @@
           ><nft-element :nft="nft" /> Change NFT</ion-button
         >
       </div>
-      <ion-button
-        v-if="authStore.isSignedIn"
-        @click="save"
-        :disabled="props.disabled || content.length < 240"
-        style="text-transform: none"
-        >Submit</ion-button
-      >
-      <ion-button
-        v-else
-        @click="authStore.showSignInModal = true"
-        :disabled="props.disabled"
-        style="text-transform: none"
-        >Sign In</ion-button
-      >
+      <div>
+        <ion-button
+          v-if="authStore.isSignedIn"
+          @click="aiWriter"
+          fill="clear"
+          :disabled="props.disabled || processing"
+          style="text-transform: none"
+          >Use Magic</ion-button
+        >
+        <ion-button
+          v-if="authStore.isSignedIn"
+          @click="save"
+          :disabled="props.disabled || content.length < 240 || processing"
+          style="text-transform: none"
+          >Submit</ion-button
+        >
+        <ion-button
+          v-else
+          @click="authStore.showSignInModal = true"
+          :disabled="props.disabled"
+          style="text-transform: none"
+          >Sign In</ion-button
+        >
+      </div>
     </div>
     <div
       v-if="error"
@@ -115,6 +125,7 @@ import { useAuthStore, useNetworkStore, useStoryStore } from "../../store";
 import { add, expandOutline, closeOutline } from "ionicons/icons";
 import { useContinueStore } from "../../store/continue";
 import { debounce } from "lodash";
+import { callApiAuthenticated } from "../../scripts/api";
 
 const content = ref("");
 const attachNftModal = ref(false);
@@ -126,6 +137,7 @@ const continueStore = useContinueStore();
 const networkStore = useNetworkStore();
 const nft = ref();
 const error = ref();
+const processing = ref(false);
 
 const props = defineProps<{
   disabled?: boolean;
@@ -140,6 +152,27 @@ const reset = () => {
 
 const save = async () => {
   proposeSection({ content: content.value, nft: nft.value });
+};
+
+const aiWriter = async () => {
+  if (content.value.length < 50) {
+    error.value =
+      "Write at least 50 characters that descripe your new section.";
+    return;
+  }
+  error.value = undefined;
+  processing.value = true;
+  try {
+    const { section } = await callApiAuthenticated("aisection", "POST", {
+      storyId: props.storyId,
+      description: content.value,
+    });
+    content.value = section;
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    processing.value = false;
+  }
 };
 
 const debouncedSave = debounce(() => {
@@ -169,12 +202,15 @@ defineExpose({ reset });
 
 const proposeSection = async ({ content, nft }) => {
   error.value = undefined;
+  processing.value = true;
   try {
     await storyStore.addSectionProposal(props.storyId, content, nft);
     storyStore.loadProposals(props.storyId);
     reset();
   } catch (_error: any) {
     error.value = _error.message;
+  } finally {
+    processing.value = false;
   }
 };
 

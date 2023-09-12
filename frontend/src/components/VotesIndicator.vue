@@ -173,7 +173,10 @@ const sign = async () => {
   await votesStore.signVotes();
   votesStore.modalOpen = false;
   if (storyId) {
-    await storyStore.loadVotes(storyId);
+    // TODO doesn't load the votes, delay?
+    setTimeout(() => {
+      storyStore.loadVotes(storyId);
+    }, 1000);
   }
 };
 

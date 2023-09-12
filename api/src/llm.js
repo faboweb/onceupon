@@ -19,7 +19,7 @@ const summarize = async (text) => {
   return completion.choices[0].message.content;
 };
 
-const createSection = async (network, storyId) => {
+const createSection = async (network, storyId, description = null) => {
   const sections = await db
     .collection("networks/" + network.id + "/sections")
     .where("story_id", "==", storyId)
@@ -39,10 +39,18 @@ const createSection = async (network, storyId) => {
 
     Last section:
     ${lastSectionContent}
+    ${
+      description
+        ? `
+    A description of the section:
+    ${description}`
+        : ""
+    }
     `;
   const completion = await openai.chat.completions.create({
     messages: [{ role: "user", content: summaryPrompt }],
     model: "gpt-3.5-turbo",
+    // temperature: 1.5,
   });
 
   return completion.choices[0].message.content;

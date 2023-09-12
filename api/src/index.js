@@ -7,6 +7,7 @@ const { db, auth, getUser } = require("./firebase");
 const { getBlock, execute, conditionalFundAccount } = require("./cosmos");
 const networks = require("./networks");
 const { web3Uplodad } = require("./web3storage");
+const { createSection } = require("./llm");
 require("./logic");
 
 // global.fetch = require("node-fetch"); // needed by stargaze
@@ -336,6 +337,27 @@ app.post("/like", async (req, res) => {
       registerUserWithTopic(user.uid, section_id);
     }
     res.status(200);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+app.post("/aisection", async (req, res) => {
+  try {
+    const user = await getUser(req);
+    const network = getNetwork(req);
+
+    const body = req.body || {};
+    const { description, storyId } = body;
+
+    if (!description || !storyId) {
+      res.status(400).send("missing description or storyId");
+      return;
+    }
+
+    const section = await createSection(network, storyId, description);
+    res.status(200).send({ section, storyId });
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);

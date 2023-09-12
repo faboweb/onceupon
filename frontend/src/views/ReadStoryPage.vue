@@ -24,7 +24,7 @@
       />
       <!-- Listen to before and after tab change events -->
       <ion-tabs
-        style="position: initial; margin-top: 1rem; height: calc(100% - 130px)"
+        style="position: initial; margin-top: 1rem; height: calc(100% - 155px)"
       >
         <ion-tab-bar
           slot="top"
