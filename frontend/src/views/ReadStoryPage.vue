@@ -2,13 +2,11 @@
   <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-header style="box-shadow: none">
       <ion-toolbar style="--border-color: none; height: 40px">
-        <a
-          slot="start"
-          style="margin-left: 1rem; cursor: pointer"
-          @click="router.push('/overview')"
-        >
-          {{ "<" }} Back
-        </a>
+        <router-link to="/overview">
+          <a slot="start" style="margin-left: 1rem; cursor: pointer">
+            {{ "<" }} Back
+          </a>
+        </router-link>
         <div slot="end">
           <votes-indicator />
         </div>
