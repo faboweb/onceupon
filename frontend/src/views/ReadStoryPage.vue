@@ -2,7 +2,7 @@
   <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-header style="box-shadow: none">
       <ion-toolbar style="--border-color: none; height: 40px">
-        <router-link to="/overview">
+        <router-link :to="{ path: '/overview' }">
           <a slot="start" style="margin-left: 1rem; cursor: pointer">
             {{ "<" }} Back
           </a>
@@ -78,11 +78,11 @@
         </ion-tab-bar>
 
         <!-- Use v-slot:bottom with Vue ^2.6.0 -->
-        <ion-router-outlet
+        <router-view
           :style="{
             height: `calc(100% + ${160 - offset}px)`,
           }"
-        ></ion-router-outlet>
+        />
       </ion-tabs>
     </ion-content>
   </ion-page>
@@ -106,6 +106,7 @@ import VotesIndicator from "../components/VotesIndicator.vue";
 import { useVotesStore } from "../store/votes";
 // import { useScroll } from "@vueuse/core";
 import { listenScroll } from "@/scripts/scroll";
+import { RouterView } from "vue-router";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();

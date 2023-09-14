@@ -24,7 +24,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-router-outlet />
+      <router-view />
 
       <mobile-footer style="margin-top: 4rem" />
     </ion-content>
@@ -44,7 +44,7 @@ import { useStoryStore } from "@/store/story";
 import { useAuthStore } from "../store";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import VotesIndicator from "../components/VotesIndicator.vue";
-import { useRouter } from "vue-router";
+import { useRouter, RouterView } from "vue-router";
 
 const storyStore = useStoryStore();
 const authStore = useAuthStore();

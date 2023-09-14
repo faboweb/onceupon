@@ -49,7 +49,7 @@ export const useStoryStore = defineStore("storyStore", {
     },
     async loadStories(limit?) {
       const stories = await callApi(
-        "stories" + (limit ? "?limit" + limit : ""),
+        "stories" + (limit ? "?limit=" + limit : ""),
         "GET"
       );
       const nftStore = useNftStore();
