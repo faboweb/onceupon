@@ -5,7 +5,7 @@
         <a
           slot="start"
           style="margin-left: 1rem; cursor: pointer"
-          @click="router.back()"
+          @click="router.push('/overview')"
         >
           {{ "<" }} Back
         </a>
@@ -103,14 +103,14 @@ import {
   IonHeader,
   IonToolbar,
 } from "@ionic/vue";
-import { computed, onMounted, onUnmounted, ref, Ref } from "vue";
+import { computed, onMounted, ref, Ref } from "vue";
 import { useRoute } from "vue-router";
 import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
 import VotesIndicator from "../components/VotesIndicator.vue";
 import { useVotesStore } from "../store/votes";
 // import { useScroll } from "@vueuse/core";
-import { listenScroll, scroll } from "@/scripts/scroll";
+import { listenScroll } from "@/scripts/scroll";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
