@@ -78,7 +78,7 @@
         </ion-tab-bar>
 
         <!-- Use v-slot:bottom with Vue ^2.6.0 -->
-        <router-view
+        <ion-router-outlet
           :style="{
             height: `calc(100% + ${160 - offset}px)`,
           }"
@@ -106,7 +106,6 @@ import VotesIndicator from "../components/VotesIndicator.vue";
 import { useVotesStore } from "../store/votes";
 // import { useScroll } from "@vueuse/core";
 import { listenScroll } from "@/scripts/scroll";
-import { RouterView } from "vue-router";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
