@@ -56,16 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useContinueStore } from "../../store/continue";
 import { useStoryStore } from "../../store";
-import { useRouter } from "vue-router";
 import AbstractElement from "../AbstractElement.vue";
 import { IonSkeletonText } from "@ionic/vue";
 
 const storyStore = useStoryStore();
 const continueStore = useContinueStore();
-const router = useRouter();
 
 const randomStoryIndex = ref();
 const randomStoryEnding = ref();

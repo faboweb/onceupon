@@ -79,6 +79,7 @@ import {
   documentOutline,
   heartOutline,
 } from "ionicons/icons";
+import { IonSkeletonText, IonIcon } from "@ionic/vue";
 
 const props = defineProps(["story"]);
 const story = computed(() => {

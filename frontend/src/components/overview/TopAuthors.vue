@@ -44,15 +44,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
-import { useNameStore, useStoryStore } from "../../store";
+import { onMounted, ref } from "vue";
+import { useStoryStore } from "../../store";
 import { getAvatar } from "@/scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
-import { useRouter } from "vue-router";
-import { IonContent, IonIcon, IonSkeletonText } from "@ionic/vue";
+import { IonSkeletonText, useIonRouter } from "@ionic/vue";
 
 const storyStore = useStoryStore();
-const router = useRouter();
+const router = useIonRouter();
 
 const loaded = ref(false);
 const authors = ref([]);

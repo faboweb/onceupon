@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { useIonRouter, IonIcon } from "@ionic/vue";
 import { add } from "ionicons/icons";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useAuthStore } from "../../store";
 const route = useRoute();
 const ionRouter = useIonRouter();

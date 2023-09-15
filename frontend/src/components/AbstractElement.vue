@@ -23,11 +23,11 @@
 
 <script setup lang="ts">
 import { onMounted, defineProps, computed } from "vue";
-import { useRouter } from "vue-router";
 import { useStoryStore } from "../store";
+import { useIonRouter } from "@ionic/vue";
 
 const storyStore = useStoryStore();
-const router = useRouter();
+const router = useIonRouter();
 
 const props = defineProps({
   proposal: Object,

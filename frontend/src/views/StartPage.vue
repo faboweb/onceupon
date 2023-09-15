@@ -491,6 +491,7 @@ import {
   IonRow,
   IonCol,
   IonPage,
+  useIonRouter,
 } from "@ionic/vue";
 import { ref, computed, onMounted } from "vue";
 import {
@@ -501,7 +502,6 @@ import {
 } from "../store";
 import LoginModal from "./LoginModal.vue";
 import StoryNftPreview from "@/components/StoryNftPreview.vue";
-import { useRouter } from "vue-router";
 import { getAvatar } from "../scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
 
@@ -509,7 +509,7 @@ const configStore = useConfigStore();
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const authStore = useAuthStore();
-const router = useRouter();
+const router = useIonRouter();
 
 const story = ref();
 const topAuthors = ref([]);

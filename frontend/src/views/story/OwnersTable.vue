@@ -62,10 +62,11 @@ import {
   onIonViewWillEnter,
   IonSkeletonText,
   IonThumbnail,
+  useIonRouter,
 } from "@ionic/vue";
 import { computed, Ref, ref } from "vue";
 import { useStoryStore } from "@/store/story";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useNameStore, useNavigationStore } from "@/store";
 import { getAvatar } from "@/scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
@@ -74,7 +75,7 @@ const storyStore = useStoryStore();
 const navigationStore = useNavigationStore();
 const nameStore = useNameStore();
 const route = useRoute();
-const router = useRouter();
+const router = useIonRouter();
 const storyId = String(route?.params.id);
 const story: Ref<any> = ref(null);
 const loaded = ref(false);

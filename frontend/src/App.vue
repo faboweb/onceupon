@@ -1,7 +1,7 @@
 <template>
   <ion-app>
     <ion-content id="main-content">
-      <router-view
+      <ion-router-outlet
         style="max-width: 1024px; margin-left: auto; margin-right: auto"
       />
     </ion-content>

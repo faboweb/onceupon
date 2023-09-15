@@ -62,12 +62,11 @@ import { onMounted, ref } from "vue";
 import { useNameStore, useStoryStore } from "../../store";
 import { getAvatar } from "@/scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
-import { useRouter } from "vue-router";
-import { IonPage, IonContent, IonSkeletonText } from "@ionic/vue";
+import { IonPage, IonContent, IonSkeletonText, useIonRouter } from "@ionic/vue";
 import { shortAddress } from "../../store/names";
 
 const storyStore = useStoryStore();
-const router = useRouter();
+const router = useIonRouter();
 const nameStore = useNameStore();
 
 const authors = ref([]);

@@ -111,17 +111,17 @@ import {
   IonInput,
   loadingController,
   IonPage,
+  useIonRouter,
 } from "@ionic/vue";
 import AttachNft from "@/components/story/AttachNft.vue";
 import { ref, computed, watch, onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
-import { useRouter } from "vue-router";
 import { useAuthStore } from "../store";
 import MobileFooter from "@/components/overview/MobileFooter.vue";
 import { add } from "ionicons/icons";
 import NftElement from "@/components/NftElement.vue";
 
-const router = useRouter();
+const router = useIonRouter();
 const storyStore = useStoryStore();
 const authStore = useAuthStore();
 const content = ref("");

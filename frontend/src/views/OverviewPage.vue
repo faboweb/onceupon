@@ -24,7 +24,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <router-view />
+      <ion-router-outlet />
 
       <mobile-footer style="margin-top: 4rem" />
     </ion-content>
@@ -38,17 +38,17 @@ import {
   IonToolbar,
   IonHeader,
   IonRouterOutlet,
+  useIonRouter,
 } from "@ionic/vue";
 import { onMounted } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useAuthStore } from "../store";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import VotesIndicator from "../components/VotesIndicator.vue";
-import { useRouter, RouterView } from "vue-router";
 
 const storyStore = useStoryStore();
 const authStore = useAuthStore();
-const router = useRouter();
+const router = useIonRouter();
 
 onMounted(async () => {
   await storyStore.loadStories();

@@ -38,13 +38,12 @@
   
   <script setup lang="ts">
 import StoryElement from "@/components/StoryElement.vue";
-import { IonPage, IonContent, IonSkeletonText } from "@ionic/vue";
-import { useRouter } from "vue-router";
+import { IonPage, IonContent, IonSkeletonText, useIonRouter } from "@ionic/vue";
 import { useStoryStore } from "../../store";
 import MobileFooter from "@/components/overview/MobileFooter.vue";
 
 const storyStore = useStoryStore();
-const router = useRouter();
+const router = useIonRouter();
 </script>
   
   <style>

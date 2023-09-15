@@ -149,8 +149,9 @@ import {
   IonButton,
   IonContent,
   IonModal,
+  useIonRouter,
 } from "@ionic/vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useAuthStore, useStoryStore } from "../store";
 import { useVotesStore } from "../store/votes";
 import {
@@ -159,13 +160,13 @@ import {
   fileTrayFull,
   trashOutline,
 } from "ionicons/icons";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 const votesStore = useVotesStore();
 const storyStore = useStoryStore();
 const authStore = useAuthStore();
 const route = useRoute();
-const router = useRouter();
+const router = useIonRouter();
 
 const storyId = route.params.storyId;
 
