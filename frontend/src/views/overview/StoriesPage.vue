@@ -31,7 +31,6 @@
           :animated="true"
         ></ion-skeleton-text>
       </template>
-      <mobile-footer />
     </ion-content>
   </ion-page>
 </template>
@@ -40,7 +39,6 @@
 import StoryElement from "@/components/StoryElement.vue";
 import { IonPage, IonContent, IonSkeletonText, useIonRouter } from "@ionic/vue";
 import { useStoryStore } from "../../store";
-import MobileFooter from "@/components/overview/MobileFooter.vue";
 
 const storyStore = useStoryStore();
 const router = useIonRouter();
