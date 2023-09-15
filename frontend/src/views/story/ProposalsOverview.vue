@@ -1,6 +1,14 @@
 <template>
-  <ion-page>
-    <ion-content>
+  <ion-page
+    :style="{
+      height: `calc(100% + ${offset}px)`,
+    }"
+  >
+    <ion-content
+      :scroll-events="true"
+      @ionScroll="handleScroll($event)"
+      style="--offset-bottom: -40px"
+    >
       <div style="padding-top: 2.5rem">
         <div
           style="
@@ -111,6 +119,7 @@ import { formatDistance } from "date-fns";
 import NewSection from "../../components/story/NewSection.vue";
 import StorySection from "../../components/story/StorySection.vue";
 import { checkmark } from "ionicons/icons";
+import { scroll } from "@/scripts/scroll";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
@@ -175,6 +184,17 @@ const nextSection = computed(() => {
 const nextSectionPending = computed(() => {
   return new Date(story.value?.assumedNextSectionBlockTime) < new Date();
 });
+
+// TODO refactor into scroll page
+const scrollOffset = ref(0);
+const offset = computed(() => {
+  return scrollOffset.value > 120 ? 40 : 160 - scrollOffset.value;
+});
+
+const handleScroll = (event) => {
+  scrollOffset.value = event.detail.scrollTop;
+  scroll("story", event);
+};
 </script>
 
 <style scoped lang="scss">

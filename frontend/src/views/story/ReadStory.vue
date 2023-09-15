@@ -4,7 +4,11 @@
       height: `calc(100% + ${offset}px)`,
     }"
   >
-    <ion-content :scroll-events="true" @ionScroll="handleScroll($event)">
+    <ion-content
+      :scroll-events="true"
+      @ionScroll="handleScroll($event)"
+      style="--offset-bottom: -40px"
+    >
       <div style="padding-top: 1rem">
         <template v-if="story && loaded">
           <!-- <ion-button
@@ -132,7 +136,7 @@ onMounted(async () => {
 
 const handleScroll = (event) => {
   scrollOffset.value = event.detail.scrollTop;
-  scroll("story/read", event);
+  scroll("story", event);
 };
 </script>
 <style scoped lang="scss">

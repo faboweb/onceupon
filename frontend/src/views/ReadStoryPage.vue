@@ -103,14 +103,14 @@ import {
   IonHeader,
   IonToolbar,
 } from "@ionic/vue";
-import { computed, onMounted, ref, Ref } from "vue";
+import { computed, onMounted, onUnmounted, ref, Ref } from "vue";
 import { useRoute } from "vue-router";
 import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
 import VotesIndicator from "../components/VotesIndicator.vue";
 import { useVotesStore } from "../store/votes";
 // import { useScroll } from "@vueuse/core";
-import { listenScroll } from "@/scripts/scroll";
+import { listenScroll, scroll } from "@/scripts/scroll";
 
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
@@ -147,7 +147,7 @@ onMounted(async () => {
     nameStore.getName(proposal.proposer);
   });
 
-  listenScroll("story/read", (event) => {
+  listenScroll("story", (event) => {
     scrollOffset.value = event.detail.scrollTop;
   });
 });
