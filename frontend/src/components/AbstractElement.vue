@@ -2,7 +2,11 @@
   <div
     class="card clickable"
     style="cursor: pointer; min-width: 186px; height: 123px"
-    @click="router.push('/story/' + proposal.story_id + '/read/')"
+    @click="
+      router.push(
+        '/story/' + (proposal.story_id || proposal.storyId) + '/read/'
+      )
+    "
   >
     <b class="font-sm" style="white-space: nowrap">
       {{ title }}

@@ -27,7 +27,22 @@
           "
         >
           <nft-element :nft="profilePicture" size="md" class="author" />
-          <b class="font-lg" style="margin-top: 1rem">{{ profileName }}</b>
+          <div
+            @click="goMintscan()"
+            style="
+              cursor: pointer;
+              display: flex;
+              flex-direction: column;
+              text-align: center;
+            "
+          >
+            <b class="font-lg" style="margin-top: 1rem">{{ profileName }}</b>
+            <span
+              class="font-secondary"
+              v-if="profileName !== shortAddress(address)"
+              >{{ shortAddress(address) }}</span
+            >
+          </div>
           <span class="font-secondary"
             >{{ contributions.length }} Contributions -
             {{ author.shares }} Shares in {{ author.stories }} Stories
@@ -163,6 +178,7 @@ import AbstractElement from "../components/AbstractElement.vue";
 import { IonPage, IonContent, IonSkeletonText, IonButton } from "@ionic/vue";
 import { useLikeStore } from "../store/likes";
 import { useNftStore } from "../store/nfts";
+import { shortAddress } from "@/store/names";
 
 const route = useRoute();
 const address = String(route?.params.address);
@@ -205,6 +221,10 @@ const contributions = computed(() => {
 const contributionsLoaded = computed(() => {
   return storyStore.contributions[address] !== undefined;
 });
+
+const goMintscan = () => {
+  window.location.href = "https://www.mintscan.io/stargaze/accounts/" + address;
+};
 
 watch(
   () => address,
