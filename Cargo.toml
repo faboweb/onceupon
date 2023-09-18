@@ -1,6 +1,6 @@
 [package]
 name = "onceupon-cosmwasm"
-version = "0.13.0"
+version = "0.13.1"
 authors = ["Fabian Weber <faboweber@gmail.com>"]
 edition = "2018"
 
