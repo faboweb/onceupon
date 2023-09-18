@@ -44,7 +44,7 @@
         <b style="margin-bottom: 1rem">Crypto Only</b>
         <ion-button
           @click="signIn('keplrWeb3')"
-          style="width: 331px; color: white; text-transform: none"
+          style="width: 331px; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -58,7 +58,7 @@
         >
         <ion-button
           @click="signIn('keplrWeb2')"
-          style="width: 331px; color: white; text-transform: none"
+          style="width: 331px; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -68,7 +68,7 @@
         </ion-button>
         <ion-button
           @click="signIn('google')"
-          style="width: 331px; color: white; text-transform: none"
+          style="width: 331px; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -78,7 +78,7 @@
         </ion-button>
         <ion-button
           @click="signIn('twitter')"
-          style="width: 331px; color: white; text-transform: none"
+          style="width: 331px; text-transform: none"
           class="sign-in-button"
         >
           <ion-avatar>
@@ -130,5 +130,9 @@ const signIn = async (method) => {
 ion-button ion-avatar {
   height: 16px;
   width: 16px;
+}
+ion-button.button-solid {
+  --background: inherit;
+  color: black;
 }
 </style>
