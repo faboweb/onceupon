@@ -6,7 +6,6 @@
       :style="{
         width: props.extended ? '160px' : '110px',
       }"
-      v-if="props.nfts.length > 0"
       :class="{
         extended: props.extended,
       }"
@@ -55,6 +54,8 @@ const displayNfts = computed(() => {
 
 <style lang="scss">
 .multiple-nft-wrapper {
+  background: rgba(217, 217, 217, 0.8);
+
   ion-avatar:nth-child(odd) {
     margin-left: -25px;
   }
@@ -78,7 +79,6 @@ const displayNfts = computed(() => {
   .multiple {
     display: flex;
     flex-wrap: wrap;
-    background: rgba(217, 217, 217, 0.8);
 
     ion-avatar {
       height: 80px;

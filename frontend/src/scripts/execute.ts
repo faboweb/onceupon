@@ -10,7 +10,7 @@ export const execute = async (command: string, data: any) => {
   }
   if (
     authStore.signInMethod === "keplr" ||
-    authStore.signInMethod === "keplrWeb2"
+    authStore.signInMethod === "keplrSignIn"
   ) {
     try {
       await walletStore.execute(walletStore.address, {

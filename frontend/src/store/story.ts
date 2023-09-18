@@ -5,6 +5,7 @@ import { useWalletStore } from "./wallet";
 import { execute } from "@/scripts/execute";
 import { callApi } from "@/scripts/api";
 import { generateUUID } from "@/scripts/guid";
+import { useNetworkStore } from "./network";
 
 interface State {
   stories: any[] | null;
@@ -90,6 +91,7 @@ export const useStoryStore = defineStore("storyStore", {
     },
     async addStory(content, title, nft) {
       const storyId = generateUUID();
+      const networkStore = useNetworkStore();
 
       // TODO to script
       const cid = await callApi("web3upload", "POST", {
@@ -111,7 +113,10 @@ export const useStoryStore = defineStore("storyStore", {
             : null,
           proposer: null,
         },
-        interval: 12000 * 7, // need to calculate this
+        interval:
+          networkStore.currentNetwork.name === "mainnet"
+            ? 12000 * 7 // need to calculate this
+            : Math.floor(12000 / 24), // on testnet cycle every hour
       });
       this.loadContent([cid]);
       this.loadStories();
