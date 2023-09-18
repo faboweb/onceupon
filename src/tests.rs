@@ -2,7 +2,7 @@
 mod tests {
     use crate::contract::{execute, instantiate, query};
     use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
-    use crate::types::{Section, Story, UploadSection, NFT};
+    use crate::types::{Export, Section, Story, UploadSection, VoteSubmission, NFT};
 
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{coins, from_binary};
@@ -48,7 +48,7 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.last_cycle);
+        assert_eq!(env.block.height, value.last_cycle.unwrap());
 
         let msg = ExecuteMsg::NewStorySection {
             section: UploadSection {
@@ -98,7 +98,7 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_ne!(env.block.height, value.last_cycle);
+        assert_ne!(env.block.height, value.last_cycle.unwrap());
 
         env.block.height += 9;
         println!("{}", env.block.height);
@@ -128,15 +128,17 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.last_cycle);
+        assert_eq!(env.block.height, value.last_cycle.unwrap());
 
         env.block.height += 10;
 
         // when voted, progress
         let msg = ExecuteMsg::Vote {
-            story_id: "a".to_string(),
-            section_id: "b".to_string(),
-            vote: 1,
+            votes: vec![VoteSubmission {
+                story_id: "a".to_string(),
+                section_id: "b".to_string(),
+                vote: 1,
+            }],
         };
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
@@ -165,10 +167,13 @@ mod tests {
         )
         .unwrap();
         let value: Story = from_binary(&res).unwrap();
-        assert_eq!(env.block.height, value.last_cycle);
+        assert_eq!(env.block.height, value.last_cycle.unwrap());
 
-        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetStories {}).unwrap();
-        let value: Vec<StoryOverviewItem> = from_binary(&res).unwrap();
-        assert_eq!("d".to_string(), value[0].top_nfts[0].token_id);
+        let res = query(deps.as_ref(), env.clone(), QueryMsg::GetState {}).unwrap();
+        let value: Export = from_binary(&res).unwrap();
+        assert_eq!(
+            "d".to_string(),
+            value.stories[0].sections[0].nft.clone().unwrap().token_id
+        );
     }
 }

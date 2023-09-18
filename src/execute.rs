@@ -243,13 +243,24 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
         let ((story_id, section_id, _), vote) = vote.unwrap();
         if voted_stories.contains_key(&story_id) {
             let mut section_votes = voted_stories.get(&story_id).unwrap().clone();
-            let mut section_vote = section_votes.get(&section_id).unwrap().clone();
-            if vote == 1 {
-                section_vote.yes += 1;
-            } else if vote == 2 {
-                section_vote.veto += 1;
+            if section_votes.contains_key(&section_id) {
+                let mut section_vote = section_votes.get(&section_id).unwrap().clone();
+                if vote == 1 {
+                    section_vote.yes += 1;
+                } else if vote == 2 {
+                    section_vote.veto += 1;
+                }
+                section_votes.insert(section_id.clone(), section_vote.to_owned());
+            } else {
+                section_votes.insert(
+                    section_id.clone(),
+                    SectionVotes {
+                        section_id: section_id.clone(),
+                        yes: if vote == 1 { 1 } else { 0 },
+                        veto: if vote == 2 { 1 } else { 0 },
+                    },
+                );
             }
-            section_votes.insert(section_id.clone(), section_vote.to_owned());
             voted_stories.insert(story_id, section_votes.to_owned());
         } else {
             let mut section_votes = HashMap::<String, SectionVotes>::new();
