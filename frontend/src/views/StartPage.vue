@@ -10,7 +10,7 @@
             >ONCE UPON</b
           >
           <div class="links">
-            <a href="/overview" style="margin-right: 1rem">Explore</a>
+            <a href="/" style="margin-right: 1rem">Explore</a>
             <a href="/story/new">Write Stories</a>
           </div>
         </div>
@@ -21,10 +21,7 @@
             @click="authStore.showSignInModal = true"
             >Login</ion-button
           >
-          <ion-button
-            class="header-button"
-            v-else
-            @click="router.push('/overview')"
+          <ion-button class="header-button" v-else @click="router.push('/')"
             >Explore App</ion-button
           >
         </div>
@@ -55,7 +52,7 @@
         Where stories come alive and you can unleash your imagination to read,
         share, and write your own magical tales!
       </p>
-      <ion-button style="margin-bottom: 42px" @click="router.push('/overview')"
+      <ion-button style="margin-bottom: 42px" @click="router.push('/')"
         >Explore App</ion-button
       >
       <div>
@@ -107,9 +104,7 @@
               Where you find exciting stories and can influence the direction of
               them.
             </p>
-            <ion-button @click="router.push('/overview')"
-              >Read a story</ion-button
-            >
+            <ion-button @click="router.push('/')">Read a story</ion-button>
           </div>
         </div>
         <div
@@ -194,7 +189,7 @@
               <ion-button @click="router.push('/story/' + story.id + '/read/')"
                 >Continue reading</ion-button
               >
-              <ion-button fill="clear" @click="router.push('/overview')"
+              <ion-button fill="clear" @click="router.push('/')"
                 >Explore more stories</ion-button
               >
             </div>
@@ -245,7 +240,7 @@
               The best stories are created together. Here you can influence the
               direction of a story.
             </p>
-            <ion-button @click="router.push('/overview')"
+            <ion-button @click="router.push('/')"
               >Vote on a story now</ion-button
             >
           </div>
@@ -264,10 +259,10 @@
               Contributors should be rewarded for their work. Here creators AND
               readers are rewarded by receiving a share in the story.
             </p>
-            <ion-button fill="clear" @click="router.push('/overview/authors')"
+            <ion-button fill="clear" @click="router.push('//authors')"
               >Learn more</ion-button
             >
-            <ion-button @click="router.push('/overview/authors')"
+            <ion-button @click="router.push('//authors')"
               >Top share holders</ion-button
             >
           </div>
@@ -359,9 +354,7 @@
               </ion-row>
             </ion-grid>
           </div>
-          <ion-button @click="router.push('/overview')"
-            >Explore top stories</ion-button
-          >
+          <ion-button @click="router.push('/')">Explore top stories</ion-button>
         </div>
       </template>
 
@@ -452,7 +445,7 @@
         </div>
         <div style="display: flex; align-items: center">
           <div class="links">
-            <a href="/overview" style="margin-right: 1rem">Explore</a>
+            <a href="/" style="margin-right: 1rem">Explore</a>
             <a href="/story/new">Write Stories</a>
           </div>
         </div>

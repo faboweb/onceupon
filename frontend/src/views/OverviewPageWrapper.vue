@@ -2,11 +2,7 @@
   <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-header>
       <ion-toolbar>
-        <span
-          slot="start"
-          style="cursor: pointer"
-          @click="router.push('/overview')"
-        >
+        <span slot="start" style="cursor: pointer" @click="router.push('/')">
           Hello<br />
           <b v-if="authStore.user">{{
             authStore.user?.name ? "" + authStore.user?.name : ""
@@ -24,7 +20,7 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-router-outlet />
+      <slot />
 
       <mobile-footer style="margin-top: 4rem" />
     </ion-content>

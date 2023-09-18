@@ -12,7 +12,7 @@
       <a
         class="font-secondary"
         style="cursor: pointer; font-size: 16px"
-        @click="router.push('/overview/authors')"
+        @click="router.push('/authors')"
         >See all</a
       >
     </div>

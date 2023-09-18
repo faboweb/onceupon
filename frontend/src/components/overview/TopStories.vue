@@ -7,7 +7,7 @@
       <a
         class="font-secondary"
         style="cursor: pointer; font-size: 16px"
-        @click="router.push('/overview/stories')"
+        @click="router.push('/stories')"
         >See all</a
       >
     </div>

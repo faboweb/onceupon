@@ -1,60 +1,64 @@
 <template>
-  <ion-page>
-    <ion-content
-      style="display: flex; flex-direction: column"
-      class="ion-padding"
-    >
-      <b class="heading font-header" style="margin-bottom: 2rem">All Authors</b>
-      <div
-        v-if="authors.length > 0"
-        style="display: flex; flex-direction: column; gap: 1rem"
+  <overview-page-wrapper>
+    <ion-page>
+      <ion-content
+        style="display: flex; flex-direction: column"
+        class="ion-padding"
       >
-        <div
-          style="display: flex; cursor: pointer"
-          v-for="author in authors"
-          @click="router.push('/profile/' + author.user)"
-          :key="author"
+        <b class="heading font-header" style="margin-bottom: 2rem"
+          >All Authors</b
         >
-          <nft-element
-            class="author"
-            size="sm"
-            :nft="getAvatar(author.user)"
-            style="margin-right: 1rem; cursor: pointer"
-          />
+        <div
+          v-if="authors.length > 0"
+          style="display: flex; flex-direction: column; gap: 1rem"
+        >
           <div
-            style="
-              justify-content: center;
-              display: flex;
-              flex-direction: column;
-            "
+            style="display: flex; cursor: pointer"
+            v-for="author in authors"
+            @click="router.push('/profile/' + author.user)"
+            :key="author"
           >
-            <b>{{ nameStore.name(author.user) }}</b>
-            <p
-              v-if="nameStore.name(author.user) !== author.user"
-              style="margin-top: 0.5rem"
+            <nft-element
+              class="author"
+              size="sm"
+              :nft="getAvatar(author.user)"
+              style="margin-right: 1rem; cursor: pointer"
+            />
+            <div
+              style="
+                justify-content: center;
+                display: flex;
+                flex-direction: column;
+              "
             >
-              <span class="font-secondary">
-                {{ shortAddress(author.user) }} - {{ author.shares }} Shares in
-                {{ author.stories }} Stories
-              </span>
-            </p>
+              <b>{{ nameStore.name(author.user) }}</b>
+              <p
+                v-if="nameStore.name(author.user) !== author.user"
+                style="margin-top: 0.5rem"
+              >
+                <span class="font-secondary">
+                  {{ shortAddress(author.user) }} - {{ author.shares }} Shares
+                  in {{ author.stories }} Stories
+                </span>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-      <template v-else>
-        <ion-skeleton-text
-          v-for="(x, i) in new Array(5)"
-          :key="i"
-          style="
-            border-radius: 50%;
-            height: 69px;
-            width: 69px;
-            margin-top: 2rem;
-          "
-          :animated="true"
-        ></ion-skeleton-text>
-      </template> </ion-content
-  ></ion-page>
+        <template v-else>
+          <ion-skeleton-text
+            v-for="(x, i) in new Array(5)"
+            :key="i"
+            style="
+              border-radius: 50%;
+              height: 69px;
+              width: 69px;
+              margin-top: 2rem;
+            "
+            :animated="true"
+          ></ion-skeleton-text>
+        </template> </ion-content
+    ></ion-page>
+  </overview-page-wrapper>
 </template>
 
 <script setup lang="ts">
@@ -64,6 +68,7 @@ import { getAvatar } from "@/scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
 import { IonPage, IonContent, IonSkeletonText, useIonRouter } from "@ionic/vue";
 import { shortAddress } from "../../store/names";
+import OverviewPageWrapper from "../OverviewPageWrapper.vue";
 
 const storyStore = useStoryStore();
 const router = useIonRouter();

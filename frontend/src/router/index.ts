@@ -2,31 +2,29 @@ import { createRouter, createWebHistory } from "@ionic/vue-router";
 import { RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
+  // {
+  //   path: "/",
+  //   component: () => import("@/views/StartPage.vue"),
+  //   name: "start",
+  // },
   {
-    path: "/",
-    component: () => import("@/views/StartPage.vue"),
-    name: "start",
+    path: "",
+    redirect: "/overview",
   },
   {
     path: "/overview",
-    component: () => import("@/views/OverviewPage.vue"),
-    children: [
-      {
-        path: "",
-        component: () => import("@/views/overview/OverviewView.vue"),
-        name: "overview",
-      },
-      {
-        path: "stories",
-        component: () => import("@/views/overview/StoriesPage.vue"),
-        name: "stories",
-      },
-      {
-        path: "authors",
-        component: () => import("@/views/overview/AuthorsPage.vue"),
-        name: "authors",
-      },
-    ],
+    component: () => import("@/views/overview/OverviewView.vue"),
+    name: "overview",
+  },
+  {
+    path: "/stories",
+    component: () => import("@/views/overview/StoriesPage.vue"),
+    name: "stories",
+  },
+  {
+    path: "/authors",
+    component: () => import("@/views/overview/AuthorsPage.vue"),
+    name: "authors",
   },
   {
     path: "/story/new",

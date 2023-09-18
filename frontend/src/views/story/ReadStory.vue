@@ -123,7 +123,7 @@ onMounted(async () => {
     story.value = await storyStore.getStory(storyId);
   } catch (error) {
     console.error(error);
-    router.push("/overview");
+    router.push("/");
     return;
   }
 

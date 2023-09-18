@@ -116,7 +116,13 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonButton, IonTextarea, IonModal } from "@ionic/vue";
+import {
+  IonContent,
+  IonButton,
+  IonTextarea,
+  IonModal,
+  IonIcon,
+} from "@ionic/vue";
 import NftElement from "../NftElement.vue";
 import AttachNft from "@/components/story/AttachNft.vue";
 import { ref, defineProps, defineExpose, watch, computed } from "vue";

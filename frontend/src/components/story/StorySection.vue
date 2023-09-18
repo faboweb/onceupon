@@ -69,7 +69,17 @@ import { useWalletStore } from "@/store/wallet";
 import { useNftStore } from "@/store/nfts";
 import { useStoryStore } from "@/store/story";
 import { useLikeStore } from "@/store/likes";
-import { IonGrid, IonRow, IonCol, IonCard, useIonRouter } from "@ionic/vue";
+import {
+  IonGrid,
+  IonRow,
+  IonCol,
+  IonCard,
+  useIonRouter,
+  IonModal,
+  IonContent,
+  IonSkeletonText,
+  IonIcon,
+} from "@ionic/vue";
 import { formatDistance } from "date-fns";
 import { computed, defineProps, onMounted, ref } from "vue";
 import NftElement from "../NftElement.vue";
