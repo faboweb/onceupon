@@ -1,4 +1,9 @@
-const { getBlock, getState, cycle, executeMnemonic } = require("./cosmos");
+const {
+  getBlock,
+  getState,
+  executeMnemonic,
+  executeAdmin,
+} = require("./cosmos");
 const { db } = require("./firebase");
 const { summarize, createSection } = require("./llm");
 const networks = require("./networks");
@@ -31,18 +36,17 @@ Object.values(networks).forEach(async (network) => {
   } catch (err) {
     console.error(err);
   }
-
-  // sendNotification("test", "test", "test", {
-  //   storyId: "test",
-  //   type: "story",
-  // });
 });
 
 const DEBOUNCE = 1000;
 const subscribeTxs = async (network, cb) => {
   const debouncedIndex = debounce(async (height) => {
-    await index(network, height);
-    checkUpdatesAndNotify(network);
+    try {
+      await index(network, height);
+      checkUpdatesAndNotify(network);
+    } catch (err) {
+      console.error(err);
+    }
   }, DEBOUNCE);
   try {
     subscribe(network, (height) => {
@@ -50,6 +54,31 @@ const subscribeTxs = async (network, cb) => {
     });
   } catch (err) {
     console.error(err);
+  }
+};
+
+const cycle = async (network) => {
+  const block = await getBlock(network);
+  const height = block.header.height;
+
+  const stories = await (
+    await db.collection("networks/" + network.id + "/stories").get()
+  ).docs.map((doc) => doc.data());
+  const cycleNeeded = stories.find((story) => {
+    return story.last_cycle + story.interval <= height;
+  });
+
+  if (cycleNeeded) {
+    console.log("Triggering cycle");
+    await executeAdmin(
+      network,
+      {
+        cycle: {},
+      },
+      false
+    );
+    console.log("Done cycle");
+    await index(network, height);
   }
 };
 

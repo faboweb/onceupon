@@ -4,13 +4,13 @@
   "private": true,
   "description": "A blockchain based communal story telling game",
   "scripts": {
-    "serve": "VUE_APP_NETWORK=mainnet && vue-cli-service serve",
+    "serve": "VUE_APP_NETWORK=testnet && vue-cli-service serve",
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "vue-cli-service lint",
-    "deploy": "VUE_APP_NETWORK=mainnet && npm run build && firebase deploy --only hosting",
-    "deploy:staging": "VUE_APP_NETWORK=mainnet && npm run build && gcloud storage cp -r ./dist/**/* gs://onceupon-staging"
+    "deploy": "VUE_APP_NETWORK=mainnet && VUE_APP_API_URL=https://api-lvtha66xja-ue.a.run.app/ && npm run build && firebase deploy --only hosting",
+    "deploy:staging": "VUE_APP_NETWORK=mainnet && VUE_APP_API_URL=https://api-lvtha66xja-ue.a.run.app/ && npm run build && gcloud storage cp -r ./dist/**/* gs://onceupon-staging"
   },
   "dependencies": {
     "@capacitor/app": "4.1.1",

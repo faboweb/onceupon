@@ -1,12 +1,12 @@
 module.exports = {
-  mainnet: {
-    id: "mainnet",
-    contract:
-      "stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq",
-    admin: "stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv",
-    url: "https://rpc-stargaze.pupmos.network",
-    mnemonic: process.env.MNEMONIC_MAINNET,
-  },
+  // mainnet: {
+  //   id: "mainnet",
+  //   contract:
+  //     "stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq",
+  //   admin: "stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv",
+  //   url: "https://rpc-stargaze.pupmos.network",
+  //   mnemonic: process.env.MNEMONIC_MAINNET,
+  // },
   testnet: {
     id: "testnet",
     contract:

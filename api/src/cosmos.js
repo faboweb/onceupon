@@ -24,13 +24,21 @@ const getBlock = async (network, height) => {
   if (!height) {
     block = await client.getBlock();
     height = block.header.height;
+    blocks[height] = block;
+    return block;
   }
   if (blocks[height]) return blocks[height];
 
-  block = await client.getBlock(height).catch((err) => {
-    console.log(err);
-    return undefined;
-  });
+  let retry = 0;
+  while (!block && retry < 10) {
+    try {
+      block = await client.getBlock(height);
+    } catch (err) {
+      retry++;
+      console.error(err);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
   if (!block) return undefined;
   blocks[block.header.height] = block;
   return block;
@@ -54,33 +62,6 @@ const getState = async (network) => {
     proposals,
     votes,
   };
-};
-
-const cycle = async (network) => {
-  const client = await adminSigningClient(network);
-  const block = await client.getBlock();
-  const height = block.header.height;
-
-  const stories = await (
-    await db.collection("networks/" + network.id + "/stories").get()
-  ).docs.map((doc) => doc.data());
-  const cycleNeeded = stories.find((story) => {
-    return story.last_cycle + story.interval <= height;
-  });
-
-  if (cycleNeeded) {
-    console.log("Triggering cycle");
-    await client.execute(
-      network.admin,
-      network.contract,
-      {
-        cycle: {},
-      },
-      "auto"
-    );
-    console.log("Done cycle");
-    await index(network, height);
-  }
 };
 
 const conditionalFundAccount = async (user, network) => {
@@ -233,16 +214,20 @@ const executeMnemonic = async (mnemonic, network, message, retry = false) => {
   return await executeWallet({ wallet, address }, network, message, retry);
 };
 
+const executeAdmin = async (network, message, retry = false) => {
+  return executeMnemonic(network.mnemonic, network, message, retry);
+};
+
 module.exports = {
   getClient,
   getWallet,
 
   getBlock,
   getState,
-  cycle,
 
   conditionalFundAccount,
   fundAccount,
   execute,
   executeMnemonic,
+  executeAdmin,
 };

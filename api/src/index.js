@@ -48,10 +48,13 @@ app.post("/resolveCIDs", async (req, res) => {
     const loadedDocs = await db.getAll(...docs);
 
     const cidLookup = Object.fromEntries(
-      loadedDocs.map((doc) => {
-        const data = doc.data();
-        return [doc.id, data.content];
-      })
+      loadedDocs
+        .map((doc) => {
+          const data = doc.data();
+          if (!data) return;
+          return [doc.id, data.content];
+        })
+        .filter((x) => !!x)
     );
 
     // returns the cid
