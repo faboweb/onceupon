@@ -70,15 +70,20 @@ const cycle = async (network) => {
 
   if (cycleNeeded) {
     console.log("Triggering cycle");
-    await executeAdmin(
-      network,
-      {
-        cycle: {},
-      },
-      false
-    );
-    console.log("Done cycle");
-    await index(network, height);
+    try {
+      await executeAdmin(
+        network,
+        {
+          cycle: {},
+        },
+        false
+      );
+      console.log("Done cycle");
+      await index(network, height);
+    } catch (err) {
+      console.error("Cycle failed");
+      console.error(err);
+    }
   }
 };
 
