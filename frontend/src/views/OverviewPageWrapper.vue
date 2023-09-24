@@ -14,6 +14,11 @@
             >Sign In</b
           >
         </span>
+        <ion-title
+          v-if="title"
+          style="text-align: center; margin-left: -2rem"
+          >{{ title }}</ion-title
+        >
         <div slot="end">
           <votes-indicator />
         </div>
@@ -36,7 +41,7 @@ import {
   IonRouterOutlet,
   useIonRouter,
 } from "@ionic/vue";
-import { onMounted } from "vue";
+import { onMounted, defineProps } from "vue";
 import { useStoryStore } from "@/store/story";
 import { useAuthStore } from "../store";
 import MobileFooter from "../components/overview/MobileFooter.vue";
@@ -45,6 +50,10 @@ import VotesIndicator from "../components/VotesIndicator.vue";
 const storyStore = useStoryStore();
 const authStore = useAuthStore();
 const router = useIonRouter();
+
+const props = defineProps({
+  title: String,
+});
 
 onMounted(async () => {
   await storyStore.loadStories();

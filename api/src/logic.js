@@ -5,7 +5,7 @@ const {
   executeAdmin,
 } = require("./cosmos");
 const { db } = require("./firebase");
-const { summarize, createSection } = require("./llm");
+const { summarize, createSection, summarizeStory } = require("./llm");
 const networks = require("./networks");
 const { subscribe } = require("./websocket");
 const debounce = require("lodash.debounce");
@@ -88,7 +88,7 @@ const cycle = async (network) => {
 };
 
 const index = async (network) => {
-  console.log("Indexing");
+  console.log("Indexing", network.id);
   const { stories, shares, proposals, votes } = await getState(network);
 
   const likes = await db.collection("networks/" + network.id + "/likes").get();
@@ -144,6 +144,8 @@ const index = async (network) => {
         { merge: true }
       );
 
+      const updatedStories = new Set();
+
       // TODO optimize
       await Promise.all(
         sections
@@ -161,6 +163,8 @@ const index = async (network) => {
               { ...section, summary },
               { merge: true }
             );
+
+            updatedStories.add(section.story_id);
           })
       );
     })
@@ -220,6 +224,27 @@ const index = async (network) => {
   });
 
   await batch.commit();
+
+  // DEPR
+  const secondBatch = db.batch();
+  await Promise.all(
+    (
+      await db.collection("networks/" + network.id + "/stories").get()
+    ).docs.map(async (doc) => {
+      const story = doc.data();
+      if (!story.summary) {
+        const summary = await summarizeStory(network, story.id);
+        if (summary) {
+          secondBatch.set(
+            db.doc("networks/" + network.id + "/stories/" + story.id),
+            { summary },
+            { merge: true }
+          );
+        }
+      }
+    })
+  );
+  await secondBatch.commit();
 
   console.log("Indexing done");
 

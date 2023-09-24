@@ -54,7 +54,7 @@
         </ion-button>
 
         <b style="margin-top: 2rem; margin-bottom: 1rem"
-          >Likes, notifications and other features:</b
+          >Likes, notifications, AI and other features:</b
         >
         <ion-button
           @click="signIn('keplrWeb2')"

@@ -72,6 +72,14 @@
           <div style="margin-top: -1rem; text-align: right">
             <ion-button
               v-if="authStore.isSignedIn"
+              @click="aiWriter"
+              fill="clear"
+              style="text-transform: none; margin-top: 1rem"
+              :disabled="authStore.signInMethod === 'keplr'"
+              >Use Magic</ion-button
+            >
+            <ion-button
+              v-if="authStore.isSignedIn"
               @click="save"
               color="primary"
               :disabled="content.length < 240"
@@ -85,6 +93,12 @@
               >Connect Wallet</ion-button
             >
           </div>
+        </div>
+        <div
+          v-if="error"
+          style="color: rgb(242 31 68 / 70%); text-align: right; width: 100%"
+        >
+          {{ error }}
         </div>
       </div>
 
@@ -120,6 +134,7 @@ import { useAuthStore } from "../store";
 import MobileFooter from "@/components/overview/MobileFooter.vue";
 import { add } from "ionicons/icons";
 import NftElement from "@/components/NftElement.vue";
+import { callApiAuthenticated } from "../scripts/api";
 
 const router = useIonRouter();
 const storyStore = useStoryStore();
@@ -129,7 +144,7 @@ const attachNftModal = ref(false);
 const title = ref("");
 const nft = ref();
 const dirty = ref(false);
-const contentError = ref(false);
+const error = ref();
 
 const attachNft = async (_nft) => {
   nft.value = _nft;
@@ -146,10 +161,10 @@ const save = async () => {
     return;
   }
   if (!content.value || content.value.length < 240) {
-    contentError.value = true;
+    error.value = "Write at least 240 characters to start a story.";
     return;
   }
-  contentError.value = false;
+  error.value = null;
 
   const loading = await loadingController.create({
     message: "Loading...",
@@ -167,8 +182,35 @@ const save = async () => {
     nft.value = undefined;
     localStorage.removeItem("draft");
     router.push("/story/" + storyId + "/read");
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    error.value = err.message;
+    console.error(err);
+  } finally {
+    loading.dismiss();
+  }
+};
+
+// TODO refactor with NewSection
+const aiWriter = async () => {
+  if (content.value.length < 50) {
+    error.value = "Write at least 50 characters that describe the story.";
+    return;
+  }
+  error.value = undefined;
+
+  const loading = await loadingController.create({
+    message: "Loading...",
+    spinner: "circles",
+  });
+  loading.present();
+
+  try {
+    const { section } = await callApiAuthenticated("aistory", "POST", {
+      description: content.value,
+    });
+    content.value = section;
+  } catch (err) {
+    error.value = err.message;
   } finally {
     loading.dismiss();
   }
@@ -224,5 +266,12 @@ ion-textarea .native-wrapper,
 ion-input .native-wrapper {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+ion-button > ion-avatar {
+  max-height: 22px;
+  max-width: 22px;
+  margin-right: 0.5rem;
+  border-radius: 0;
 }
 </style>

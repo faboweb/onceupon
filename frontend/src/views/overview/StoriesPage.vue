@@ -1,13 +1,10 @@
 <template>
-  <overview-page-wrapper>
+  <overview-page-wrapper title="Stories">
     <ion-page>
       <ion-content
         style="display: flex; flex-direction: column"
         class="ion-padding"
       >
-        <b class="heading font-header" style="margin-bottom: 2rem"
-          >All Stories</b
-        >
         <div
           v-if="storyStore.stories.length > 0"
           style="display: flex; flex-direction: column; gap: 1rem"

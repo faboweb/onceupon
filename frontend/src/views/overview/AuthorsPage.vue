@@ -1,13 +1,10 @@
 <template>
-  <overview-page-wrapper>
+  <overview-page-wrapper title="Authors">
     <ion-page>
       <ion-content
         style="display: flex; flex-direction: column"
         class="ion-padding"
       >
-        <b class="heading font-header" style="margin-bottom: 2rem"
-          >All Authors</b
-        >
         <div
           v-if="authors.length > 0"
           style="display: flex; flex-direction: column; gap: 1rem"

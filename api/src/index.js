@@ -7,7 +7,7 @@ const { db, auth, getUser } = require("./firebase");
 const { getBlock, execute, conditionalFundAccount } = require("./cosmos");
 const networks = require("./networks");
 const { web3Uplodad } = require("./web3storage");
-const { createSection } = require("./llm");
+const { createSection, createStory } = require("./llm");
 require("./logic");
 
 // global.fetch = require("node-fetch"); // needed by stargaze
@@ -101,11 +101,20 @@ app.get("/story/:id", async (req, res) => {
       .get();
     const likesData = likes.docs.map((doc) => doc.data());
 
+    let summary = storyData.summary;
+    if (!summary) {
+      const { content } = (
+        await db.doc("content/" + storyData.first_section.content_cid).get()
+      ).data();
+      summary = content.substring(0, 240);
+    }
+
     res.status(200).send({
       ...storyData,
       assumedNextSectionBlockTime,
       sections: sectionData,
       likes: likesData.length,
+      summary,
     });
   } catch (err) {
     console.error(err);
@@ -202,16 +211,27 @@ app.get("/stories", async (req, res) => {
   const stories = await db
     .collection("networks/" + network.id + "/stories")
     .get();
-  let topStories = stories.docs
-    .map((doc) => doc.data())
-    // .filter((story) => storyIds.find((_s) => _s.storyId === story.id))
-    .map((story) => {
-      return {
-        ...story,
-        shares: sharesDict[story.id]?.shares || 0,
-      };
-    })
-    .sort((a, b) => b.shares - a.shares);
+  let topStories = (
+    await Promise.all(
+      stories.docs
+        .map((doc) => doc.data())
+        // .filter((story) => storyIds.find((_s) => _s.storyId === story.id))
+        .map(async (story) => {
+          let summary = story.summary;
+          if (!summary) {
+            const { content } = (
+              await db.doc("content/" + story.first_section.content_cid).get()
+            ).data();
+            summary = content.substring(0, 240);
+          }
+          return {
+            ...story,
+            shares: sharesDict[story.id]?.shares || 0,
+            summary,
+          };
+        })
+    )
+  ).sort((a, b) => b.shares - a.shares);
   if (limit) {
     topStories = topStories.slice(0, limit);
   }
@@ -361,6 +381,27 @@ app.post("/aisection", async (req, res) => {
 
     const section = await createSection(network, storyId, description);
     res.status(200).send({ section, storyId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send(err.message);
+  }
+});
+
+app.post("/aistory", async (req, res) => {
+  try {
+    const user = await getUser(req);
+    // const network = getNetwork(req);
+
+    const body = req.body || {};
+    const { description } = body;
+
+    if (!description) {
+      res.status(400).send("missing description");
+      return;
+    }
+
+    const section = await createStory(description);
+    res.status(200).send({ section });
   } catch (err) {
     console.error(err);
     res.status(500).send(err.message);

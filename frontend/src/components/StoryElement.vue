@@ -56,7 +56,7 @@
           <span>{{ story.proposals }}</span>
         </div>
         <p class="font-sm" style="max-height: 50px; margin-top: 0.5rem">
-          {{ content?.substr(0, extended ? 300 : 140) || "Loading" }}...
+          {{ story.summary?.substr(0, extended ? 300 : 140) || "Loading" }}...
         </p>
       </div>
     </div>
@@ -87,8 +87,6 @@ import {
 } from "@ionic/vue";
 import StoryNftPreview from "./StoryNftPreview.vue";
 
-const storyStore = useStoryStore();
-
 const props = defineProps<{ story: any; extended?: boolean }>();
 
 // const time = (story) => {
@@ -97,10 +95,6 @@ const props = defineProps<{ story: any; extended?: boolean }>();
 //     addSuffix: true,
 //   });
 // };
-
-const content = computed(
-  () => storyStore.cidLookup[props.story.first_section.content_cid]
-);
 </script>
 
 <style scoped lang="scss">

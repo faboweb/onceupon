@@ -35,11 +35,14 @@ const getBlock = async (network, height) => {
       block = await client.getBlock(height);
     } catch (err) {
       retry++;
-      console.error(err);
+      // console.error(err);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
   }
-  if (!block) return undefined;
+  if (!block) {
+    console.error("Couldnt get block for network", network.id);
+    return undefined;
+  }
   blocks[block.header.height] = block;
   return block;
 };
@@ -188,6 +191,12 @@ const executeWallet = async (
     return result;
   } catch (err) {
     if (retry) throw err;
+
+    // TODO sometimes first execution with Keplr fails
+    if (err.message.indexOf("reading 'length'") !== -1) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return await executeWallet({ wallet, address }, network, message, true);
+    }
 
     if (
       err.message.indexOf("insufficient funds") !== -1 ||

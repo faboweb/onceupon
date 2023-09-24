@@ -58,7 +58,7 @@ starsd tx gov submit-proposal wasm-store artifacts/onceupon_cosmwasm-aarch64.was
     --code-source-url https://github.com/faboweb/onceupon/tree/v0.13.1 \
     --builder cosmwasm/rust-optimizer-arm64:0.12.13
 # starsd query wasm list-code --node https://rpc.stargaze-apis.com:443 --chain-id stargaze-1
-CODE_ID=98
+CODE_ID=99
 CONTRACT='stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq'
 ARGS='{}'
 PROPOSER="stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv"
