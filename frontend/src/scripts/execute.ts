@@ -13,7 +13,7 @@ export const execute = async (command: string, data: any) => {
     authStore.signInMethod === "keplrSignIn"
   ) {
     try {
-      await walletStore.execute(walletStore.address, {
+      await walletStore.execute(authStore.user.address, {
         [command]: data,
       });
     } catch (err: any) {

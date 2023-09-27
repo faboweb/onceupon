@@ -101,7 +101,7 @@ export const useWalletStore = defineStore("wallet", {
       // @ts-ignore
       return await cosmWasmClient.queryContractSmart(network.contract, query);
     },
-    async execute(userAddress, entrypoint) {
+    async execute(userAddress, entrypoint, retry = false) {
       if (!this.wallet) {
         await this.logInUser();
       }
@@ -128,12 +128,21 @@ export const useWalletStore = defineStore("wallet", {
           break;
       }
       const signingClient = this.wallet.client;
-      await signingClient.execute(
-        userAddress,
-        network.contract,
-        entrypoint,
-        fee
-      );
+      try {
+        await signingClient.execute(
+          userAddress,
+          network.contract,
+          entrypoint,
+          fee
+        );
+      } catch (err) {
+        // TODO sometimes first execution with Keplr fails
+        if (err.message.indexOf("reading 'length'") !== -1) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          return await this.execute(userAddress, entrypoint, true);
+        }
+        throw err;
+      }
     },
     async getBlock(height?) {
       const client = await this.getClient();

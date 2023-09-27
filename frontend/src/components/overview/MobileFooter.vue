@@ -68,10 +68,7 @@
           opacity:
             route.path === '/profile/' + authStore.user?.address ? 1 : 0.6,
         }"
-        @click="
-          authStore.user?.address &&
-            ionRouter.push('/profile/' + authStore.user.address)
-        "
+        @click="clickProfile()"
         style="cursor: pointer"
         >Profile</span
       >
@@ -87,6 +84,14 @@ import { useAuthStore } from "../../store";
 const route = useRoute();
 const ionRouter = useIonRouter();
 const authStore = useAuthStore();
+
+const clickProfile = () => {
+  if (!authStore.isSignedIn) {
+    authStore.showSignInModal = true;
+  } else {
+    ionRouter.push("/profile/" + authStore.user?.address);
+  }
+};
 </script>
 
 <style>

@@ -150,6 +150,7 @@ import {
   IonContent,
   IonModal,
   useIonRouter,
+  loadingController,
 } from "@ionic/vue";
 import { computed, onMounted, watch } from "vue";
 import { useAuthStore, useStoryStore } from "../store";
@@ -171,14 +172,15 @@ const router = useIonRouter();
 const storyId = route.params.storyId;
 
 const sign = async () => {
+  const loading = await loadingController.create({
+    message: "Voting...",
+    spinner: "circles",
+  });
+  loading.present();
+
   await votesStore.signVotes();
   votesStore.modalOpen = false;
-  if (storyId) {
-    // TODO doesn't load the votes, delay?
-    setTimeout(() => {
-      storyStore.loadVotes(storyId);
-    }, 1000);
-  }
+  loading.dismiss();
 };
 
 const stories = computed(() => {

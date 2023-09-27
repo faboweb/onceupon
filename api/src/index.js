@@ -4,7 +4,12 @@ const amino = require("@cosmjs/amino");
 var cors = require("cors");
 var crypto = require("crypto");
 const { db, auth, getUser } = require("./firebase");
-const { getBlock, execute, conditionalFundAccount } = require("./cosmos");
+const {
+  getBlock,
+  execute,
+  conditionalFundAccount,
+  getWallet,
+} = require("./cosmos");
 const networks = require("./networks");
 const { web3Uplodad } = require("./web3storage");
 const { createSection, createStory } = require("./llm");

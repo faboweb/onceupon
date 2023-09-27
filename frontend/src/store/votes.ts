@@ -1,7 +1,9 @@
 import { execute } from "@/scripts/execute";
 import { defineStore } from "pinia";
+import { useStoryStore } from "./story";
+import { useAuthStore } from "./auth";
 
-const voteToInt = (vote) => {
+export const voteToInt = (vote) => {
   return {
     yes: 1,
     veto: 2,
@@ -46,6 +48,8 @@ export const useVotesStore = defineStore("votesStore", {
     },
     async signVotes() {
       this.processing = true;
+      const storyStore = useStoryStore();
+      const authStore = useAuthStore();
       try {
         await execute("vote", {
           votes: this.votes.map((vote) => ({
@@ -53,6 +57,14 @@ export const useVotesStore = defineStore("votesStore", {
             section_id: vote.sectionId,
             vote: voteToInt(vote.vote),
           })),
+        });
+        this.votes.forEach((vote) => {
+          storyStore.addVote(
+            vote.storyId,
+            vote.sectionId,
+            authStore.user.address,
+            vote.vote
+          );
         });
         this.votes = [];
         this.saveVotes();

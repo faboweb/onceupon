@@ -6,6 +6,7 @@ import { execute } from "@/scripts/execute";
 import { callApi } from "@/scripts/api";
 import { generateUUID } from "@/scripts/guid";
 import { useNetworkStore } from "./network";
+import { voteToInt } from "./votes";
 
 interface State {
   stories: any[] | null;
@@ -191,6 +192,22 @@ export const useStoryStore = defineStore("storyStore", {
       });
 
       this.votes[storyId] = result;
+    },
+    async addVote(storyId, sectionId, user, vote) {
+      const existingVote = this.votes[storyId]?.find(
+        (v) => v.user === user && v.section_id === sectionId
+      );
+      const voteNumber = voteToInt(vote);
+      if (existingVote) {
+        existingVote.vote = voteNumber;
+      } else {
+        this.votes[storyId].push({
+          story_id: storyId,
+          user,
+          section_id: sectionId,
+          vote: voteNumber,
+        });
+      }
     },
   },
 });
