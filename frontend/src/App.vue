@@ -123,6 +123,8 @@ ion-icon {
 ion-toolbar {
   display: flex;
   justify-content: space-between;
+  --ion-toolbar-background: none;
+  min-height: 45px;
 }
 
 .toast::part(message) {

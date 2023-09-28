@@ -120,7 +120,7 @@ p {
     }
 }
 .toolbar-background {
-    visibility: hidden;
+    visibility: hidden !important;
 }
 ion-tab-bar {
     --background: var(--ion-background-color, #fff);
