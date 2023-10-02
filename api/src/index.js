@@ -147,11 +147,11 @@ app.get("/contributions/:user", async (req, res) => {
 app.get("/author/:address", async (req, res) => {
   const network = getNetwork(req);
   const shares = await db
-    .collection("networks/" + network.id + "/shares")
-    .where("user", "==", req.params.address)
+    .collection("networks/" + network.id + "/shares2")
     .get();
-  const authorShares = shares.docs
-    .map((doc) => doc.data())
+  const sharesData = shares.docs.map((doc) => doc.data());
+  const authorShares = sharesData
+    .filter(({ user }) => user === req.query.address)
     .reduce(
       (acc, curr) => {
         acc.shares += curr.amount;
@@ -170,22 +170,21 @@ app.get("/authors", async (req, res) => {
   const network = getNetwork(req);
   const { limit } = req.query;
   const shares = await db
-    .collection("networks/" + network.id + "/shares")
+    .collection("networks/" + network.id + "/shares2")
     .get();
-  const sharesDict = shares.docs
-    .map((doc) => doc.data())
-    .reduce((acc, curr) => {
-      if (!acc[curr.user]) {
-        acc[curr.user] = {
-          user: curr.user,
-          shares: 0,
-          stories: 0,
-        };
-      }
-      acc[curr.user].shares += curr.amount;
-      acc[curr.user].stories += 1;
-      return acc;
-    }, {});
+  const sharesData = shares.docs.map((doc) => doc.data());
+  const sharesDict = sharesData.reduce((acc, curr) => {
+    if (!acc[curr.user]) {
+      acc[curr.user] = {
+        user: curr.user,
+        shares: 0,
+        stories: 0,
+      };
+    }
+    acc[curr.user].shares += curr.amount;
+    acc[curr.user].stories += 1;
+    return acc;
+  }, {});
   let authors = Object.values(sharesDict).sort((a, b) => b.shares - a.shares);
   if (limit) {
     authors = authors.slice(0, limit);
@@ -198,20 +197,19 @@ app.get("/stories", async (req, res) => {
   let { limit } = req.query;
   const network = getNetwork(req);
   const shares = await db
-    .collection("networks/" + network.id + "/shares")
+    .collection("networks/" + network.id + "/shares2")
     .get();
-  const sharesDict = shares.docs
-    .map((doc) => doc.data())
-    .reduce((acc, curr) => {
-      if (!acc[curr.storyId]) {
-        acc[curr.storyId] = {
-          storyId: curr.storyId,
-          shares: 0,
-        };
-      }
-      acc[curr.storyId].shares += curr.amount;
-      return acc;
-    }, {});
+  const sharesData = shares.docs.map((doc) => doc.data());
+  const sharesDict = sharesData.reduce((acc, curr) => {
+    if (!acc[curr.storyId]) {
+      acc[curr.storyId] = {
+        // storyId: curr.storyId,
+        shares: 0,
+      };
+    }
+    acc[curr.storyId].shares += curr.amount;
+    return acc;
+  }, {});
   // const storyIds = Object.values(sharesDict);
   const stories = await db
     .collection("networks/" + network.id + "/stories")
