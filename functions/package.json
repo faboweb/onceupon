@@ -5,8 +5,8 @@
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "build:scripts": "npx typescript-bundle ../mobile/src/scripts/stargaze.ts --outFile ./stargaze.js --exportAs commonjs    ",
-    "deploy": "npm run build:scripts && firebase deploy --only functions ",
+    "build:scripts": "npx typescript-bundle ../frontend/src/scripts/stargaze.ts --outFile ./stargaze.js --exportAs commonjs    ",
+    "deploy": "firebase deploy --only functions ",
     "logs": "firebase functions:log",
     "postinstall": "node node_modules/puppeteer/install.js"
   },
