@@ -121,10 +121,10 @@ export const useWalletStore = defineStore("wallet", {
           fee = calculateFee(300_000, GasPrice.fromString("0ustars"));
           break;
         case "new_story":
-          fee = calculateFee(350_000, GasPrice.fromString("0.5ustars"));
+          fee = calculateFee(350_000, GasPrice.fromString("0ustars"));
           break;
         default:
-          fee = calculateFee(350_000, GasPrice.fromString("0.5ustars"));
+          fee = calculateFee(350_000, GasPrice.fromString("0ustars"));
           break;
       }
       const signingClient = this.wallet.client;

@@ -4,7 +4,11 @@ import "../scripts/firebase";
 
 export const callApi = async (path, method, body?) => {
   const networkStore = useNetworkStore();
-  return await axios(process.env.VUE_APP_API_URL + path, {
+  const api =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000/"
+      : process.env.VUE_APP_API_URL;
+  return await axios(api + path, {
     method,
     data: body,
     headers: {

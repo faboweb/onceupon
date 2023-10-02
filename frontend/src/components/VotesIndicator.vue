@@ -133,6 +133,12 @@
             >Confirm Votes</ion-button
           >
         </div>
+        <div
+          v-if="error"
+          style="color: rgb(242 31 68 / 70%); text-align: right; width: 100%"
+        >
+          {{ error }}
+        </div>
       </ion-content>
     </ion-modal>
   </div>
@@ -152,7 +158,7 @@ import {
   useIonRouter,
   loadingController,
 } from "@ionic/vue";
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useAuthStore, useStoryStore } from "../store";
 import { useVotesStore } from "../store/votes";
 import {
@@ -170,6 +176,7 @@ const route = useRoute();
 const router = useIonRouter();
 
 const storyId = route.params.storyId;
+const error = ref("");
 
 const sign = async () => {
   const loading = await loadingController.create({
@@ -178,9 +185,14 @@ const sign = async () => {
   });
   loading.present();
 
-  await votesStore.signVotes();
-  votesStore.modalOpen = false;
-  loading.dismiss();
+  try {
+    await votesStore.signVotes();
+    votesStore.modalOpen = false;
+  } catch (err) {
+    error.value = err.message;
+  } finally {
+    loading.dismiss();
+  }
 };
 
 const stories = computed(() => {

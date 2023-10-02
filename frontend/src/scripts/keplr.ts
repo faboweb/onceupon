@@ -17,7 +17,7 @@ export const connectKeplr = async (network) => {
   // XXX: This line is needed to set the sender address for SigningCosmosClient.
   //   const accounts = await offlineSigner.getAccounts();
 
-  const defaultGasPrice = GasPrice.fromString("1ustars");
+  const defaultGasPrice = GasPrice.fromString("0ustars");
 
   // Initialize the gaia api with the offline signer that is injected by Keplr extension.
   const signingClient = await SigningCosmWasmClient.connectWithSigner(

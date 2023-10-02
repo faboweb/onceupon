@@ -2,7 +2,11 @@
   <ion-page style="padding-left: 0.5rem; padding-right: 0.5rem">
     <ion-header>
       <ion-toolbar>
-        <span slot="start" style="cursor: pointer" @click="router.push('/')">
+        <span
+          slot="start"
+          style="cursor: pointer"
+          @click="() => router.replace('/')"
+        >
           Hello<br />
           <b v-if="authStore.user">{{
             authStore.user?.name ? "" + authStore.user?.name : ""
@@ -16,7 +20,12 @@
         </span>
         <ion-title
           v-if="title"
-          style="text-align: center; margin-left: -2rem"
+          style="
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+          "
           >{{ title }}</ion-title
         >
         <div slot="end">
@@ -59,5 +68,3 @@ onMounted(async () => {
   await storyStore.loadStories();
 });
 </script>
-<style scoped>
-</style>
