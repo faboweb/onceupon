@@ -5,7 +5,7 @@ const {
   executeAdmin,
 } = require("./cosmos");
 const { db } = require("./firebase");
-const { summarize, createSection, summarizeStory } = require("./llm");
+const { summarize, createSections } = require("./llm");
 const networks = require("./networks");
 const { subscribe } = require("./websocket");
 const debounce = require("lodash.debounce");
@@ -210,13 +210,13 @@ const index = async (network) => {
       batch.delete(doc);
     });
 
+  const sharesDoc = db.collection("networks/" + network.id + "/shares2");
   shares.map(([storyId, user, amount]) => {
-    const doc = db.doc("networks/" + network.id + "/shares/" + user);
     batch.set(
-      doc,
+      sharesDoc.doc(storyId + "_" + user),
       {
-        user,
         storyId,
+        user,
         amount,
       },
       { merge: true }
@@ -224,27 +224,6 @@ const index = async (network) => {
   });
 
   await batch.commit();
-
-  // DEPR
-  const secondBatch = db.batch();
-  await Promise.all(
-    (
-      await db.collection("networks/" + network.id + "/stories").get()
-    ).docs.map(async (doc) => {
-      const story = doc.data();
-      if (!story.summary) {
-        const summary = await summarizeStory(network, story.id);
-        if (summary) {
-          secondBatch.set(
-            db.doc("networks/" + network.id + "/stories/" + story.id),
-            { summary },
-            { merge: true }
-          );
-        }
-      }
-    })
-  );
-  await secondBatch.commit();
 
   console.log("Indexing done");
 
@@ -265,7 +244,7 @@ async function checkUpdatesAndNotify(network) {
   const newSectionsData = newSections.docs.map((doc) => doc.data());
   newSectionsData.forEach(async (section) => {
     const header = `New chapter proposal!\n\n`;
-    const link = `https://onceupon.community/story/${section.story_id}/read`;
+    const link = `https://app.onceupon.community/story/${section.story_id}/read`;
     const content = (
       await db.doc("content/" + section.content_cid).get()
     ).data();
@@ -331,25 +310,40 @@ async function addBotSection(network) {
     .get();
   const proposalsData = proposals.docs.map((doc) => doc.data());
   const storiesWithoutBotProposal = storyIdsData.filter((storyId) => {
-    const proposal = proposalsData.find(({ story_id }) => story_id === storyId);
-    return !proposal || proposal.proposer !== botAddress;
+    const botProposals = proposalsData.filter(
+      ({ story_id, proposer }) =>
+        story_id === storyId && proposer === botAddress
+    );
+    return botProposals.length < 2;
   });
   // TODO to parallelize need to handle sequence number
   for (let storyId of storiesWithoutBotProposal) {
-    const content = await createSection(network, storyId);
-    const cid = await web3Uplodad(content);
+    const botProposals = proposalsData.filter(
+      ({ story_id, proposer }) =>
+        story_id === storyId && proposer === botAddress
+    );
+    let sections = await createSections(network, storyId);
+    // DEPR temporary until bot always creates two
+    if (botProposals.length === 1) {
+      sections = sections.slice(1);
+    }
+    await Promise.all(
+      sections.map(async (content) => {
+        const cid = await web3Uplodad(content);
 
-    await executeMnemonic(network.mnemonic, network, {
-      new_story_section: {
-        section: {
-          story_id: storyId,
-          section_id: generateUUID(),
-          content_cid: cid,
-          nft: null,
-          proposer: null,
-        },
-      },
-    });
+        await executeMnemonic(network.mnemonic, network, {
+          new_story_section: {
+            section: {
+              story_id: storyId,
+              section_id: generateUUID(),
+              content_cid: cid,
+              nft: null,
+              proposer: null,
+            },
+          },
+        });
+      })
+    );
   }
 }
 

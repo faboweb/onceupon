@@ -384,7 +384,7 @@ app.post("/aisection", async (req, res) => {
       return;
     }
 
-    const section = await createSection(network, storyId, description);
+    const section = (await createSection(network, storyId, 1, description))[0];
     res.status(200).send({ section, storyId });
   } catch (err) {
     console.error(err);

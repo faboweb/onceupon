@@ -10,7 +10,7 @@ const getClient = () => {
 
 const summarize = async (text) => {
   const openai = getClient();
-  const summaryPrompt = `summarize the following section of a story briefly:\n${text}`;
+  const summaryPrompt = `Summarize the following section in concise bullet points, focusing only on the most essential details.\n\n${text}`;
   const completion = await openai.chat.completions.create({
     messages: [{ role: "user", content: summaryPrompt }],
     model: "gpt-3.5-turbo",
@@ -19,29 +19,63 @@ const summarize = async (text) => {
   return completion.choices[0].message.content;
 };
 
-const createSection = async (network, storyId, description = null) => {
+const createPaths = async (network, storyId) => {
   const sections = await db
     .collection("networks/" + network.id + "/sections")
     .where("story_id", "==", storyId)
     .get();
   const sectionsData = sections.docs.map((doc) => doc.data());
   const sortedSections = sectionsData.sort((a, b) => a.added - b.added);
-  const lastSection = sortedSections[sortedSections.length - 1];
-  const { content: lastSectionContent } = (
-    await db.doc("content/" + lastSection.content_cid).get()
-  ).data();
 
   const openai = getClient();
   const prompt = `
-    Create a section of a longer story in max 400 words. Don't end the story. Use the following rules:
+    Provide the next brief paragraph for the story. Create two very different ones. Only give the brief summary.
+
+    Summaries of the story so far:
+    ${sortedSections.map((s) => s.summary).join("\n")}
+
+    Return as a JSON in format: [{
+      content: "The short description",
+    }]`;
+  try {
+    const completion = await openai.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "gpt-3.5-turbo",
+      // temperature: 1.5,
+    });
+
+    const choices = JSON.parse(completion.choices[0].message.content).map(
+      (choice) => choice.content
+    );
+    return choices;
+  } catch (e) {
+    return createPaths(network, storyId);
+  }
+};
+
+const createSection = async (network, storyId, amount, description = null) => {
+  const sections = await db
+    .collection("networks/" + network.id + "/sections")
+    .where("story_id", "==", storyId)
+    .get();
+  const sectionsData = sections.docs.map((doc) => doc.data());
+  const sortedSections = sectionsData.sort((a, b) => a.added - b.added);
+  // const lastSection = sortedSections[sortedSections.length - 1];
+  // const { content: lastSectionContent } = (
+  //   await db.doc("content/" + lastSection.content_cid).get()
+  // ).data();
+
+  const openai = getClient();
+  const prompt = `
+    Create a section of a longer story. Use the following rules:
+    - Don't end the story
+    - Use 350 to 400 words
     - Don't reveal facts about the setting of the story, instead show those facts through other details.
     - Prefer dialog to show details about a character then describing the details.
     
     Summaries of the sections so far:
     ${sortedSections.map((s) => s.summary).join("\n")}
 
-    Last section:
-    ${lastSectionContent}
     ${
       description
         ? `
@@ -49,14 +83,25 @@ const createSection = async (network, storyId, description = null) => {
     ${description}`
         : ""
     }
+    
+    New section:
     `;
   const completion = await openai.chat.completions.create({
     messages: [{ role: "user", content: prompt }],
     model: "gpt-3.5-turbo",
     // temperature: 1.5,
+    n: amount,
   });
 
-  return completion.choices[0].message.content;
+  return completion.choices.map((c) => c.message.content);
+};
+
+const createSections = async (network, storyId) => {
+  const paths = await createPaths(network, storyId);
+  const sections = await Promise.all(
+    paths.map((path) => createSection(network, storyId, 1, path))
+  );
+  return [].concat(...sections);
 };
 
 const createStory = async (description) => {
@@ -133,4 +178,5 @@ module.exports = {
   createSection,
   summarizeStory,
   createStory,
+  createSections,
 };

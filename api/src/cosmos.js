@@ -86,7 +86,7 @@ const fundAccount = async (address, network) => {
   await client.sendTokens(
     network.admin,
     address,
-    [{ denom: "ustars", amount: "100000" }],
+    [{ denom: "ustars", amount: "10" }],
     {
       amount: [{ denom: "ustars", amount: "" + gas }],
       gas: "" + gas,
@@ -123,7 +123,7 @@ const adminSigningClient = async (network) => {
     walletOptions
   );
 
-  const defaultGasPrice = GasPrice.fromString("1ustars");
+  const defaultGasPrice = GasPrice.fromString("0ustars");
 
   const signingClient = await SigningCosmWasmClient.connectWithSigner(
     network.url,
@@ -169,7 +169,7 @@ const executeWallet = async (
   message,
   retry = false
 ) => {
-  const defaultGasPrice = GasPrice.fromString("1ustars");
+  const defaultGasPrice = GasPrice.fromString("0ustars");
 
   const signingClient = await SigningCosmWasmClient.connectWithSigner(
     network.url,
@@ -191,6 +191,25 @@ const executeWallet = async (
     return result;
   } catch (err) {
     if (retry) throw err;
+
+    // TODO
+    if (err.message.indexOf("account sequence mismatch") !== -1) {
+      await Promise((resolve) => setTimeout(resolve, 1000));
+      return await executeWallet({ wallet, address }, network, message, false);
+    }
+
+    if (err.message.indexOf("was not yet found on the chain") !== -1) {
+      const match = err.message.match(/Transaction with ID ([A-F0-9]+) was/);
+      const transactionID = match[1];
+      let result;
+      while (!result) {
+        result = await signingClient.getTx(transactionID);
+        await Promise((resolve) => setTimeout(resolve, 500));
+      }
+      if (result.code) {
+        throw Error("Transaction failed");
+      }
+    }
 
     // TODO sometimes first execution with Keplr fails
     if (err.message.indexOf("reading 'length'") !== -1) {
