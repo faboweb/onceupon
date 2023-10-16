@@ -1,9 +1,9 @@
 <template>
-  <ion-page>
+  <div>
     <ion-content>
       <nft-list :nfts="nfts" />
     </ion-content>
-  </ion-page>
+  </div>
 </template>
 
 <script setup lang="ts">

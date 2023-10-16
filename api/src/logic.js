@@ -12,6 +12,7 @@ const debounce = require("lodash.debounce");
 const { generateUUID } = require("./scripts/guid");
 const { web3Uplodad } = require("./web3storage");
 const { sendNotification } = require("./notifications");
+const { getName, getNames } = require("./stargaze");
 
 Object.values(networks).forEach(async (network) => {
   try {
@@ -169,27 +170,6 @@ const index = async (network) => {
       );
     })
   );
-  // DEPR
-  // await db
-  //   .collection("networks/" + network.id + "/sections")
-  //   .get()
-  //   .then(async (querySnapshot) => {
-  //     querySnapshot.forEach(async (doc) => {
-  //       const data = doc.data();
-  //       if (!data.summary) {
-  //         const { content } = (
-  //           await db.doc("content/" + data.content_cid).get()
-  //         ).data();
-  //         const summary = await summarize(content);
-  //         db.doc("networks/" + network.id + "/sections/" + doc.id).update(
-  //           {
-  //             summary,
-  //           },
-  //           { merge: true }
-  //         );
-  //       }
-  //     });
-  //   });
 
   const existingProposals = await db
     .collection("networks/" + network.id + "/proposals")
@@ -211,7 +191,7 @@ const index = async (network) => {
     });
 
   const sharesDoc = db.collection("networks/" + network.id + "/shares2");
-  shares.map(([storyId, user, amount]) => {
+  shares.forEach(([storyId, user, amount]) => {
     batch.set(
       sharesDoc.doc(storyId + "_" + user),
       {
@@ -221,6 +201,22 @@ const index = async (network) => {
       },
       { merge: true }
     );
+  });
+
+  const users = new Set(shares.map(([, user]) => user));
+  const names = await getNames(network, Array.from(users));
+  const namesDoc = db.collection("networks/" + network.id + "/names");
+  Object.entries(names).forEach(([address, nameRecord]) => {
+    if (!nameRecord) return;
+    const record = nameRecord.media
+      ? {
+          name: nameRecord.name,
+          image: nameRecord.media?.url,
+        }
+      : {
+          name: nameRecord.name,
+        };
+    batch.set(namesDoc.doc(address), record, { merge: true });
   });
 
   await batch.commit();

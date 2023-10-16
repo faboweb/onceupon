@@ -85,13 +85,14 @@ import { computed, defineProps, onMounted, ref } from "vue";
 import NftElement from "../NftElement.vue";
 import { useAuthStore, useNetworkStore } from "../../store";
 import { heart, heartOutline } from "ionicons/icons";
+import { useRouter } from "vue-router";
 
 const walletStore = useWalletStore();
 const authStore = useAuthStore();
 const nftStore = useNftStore();
 const nameStore = useNameStore();
 const storyStore = useStoryStore();
-const router = useIonRouter();
+const router = useRouter();
 const networkStore = useNetworkStore();
 const likeStore = useLikeStore();
 

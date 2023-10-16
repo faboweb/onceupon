@@ -12,17 +12,17 @@
       <a
         class="font-secondary"
         style="cursor: pointer; font-size: 16px"
-        @click="router.push('/authors')"
+        @click="router.push('/overview/authors')"
         >See all</a
       >
     </div>
     <div v-if="loaded" style="display: flex">
-      <nft-element
-        class="author clickable"
+      <author
         v-for="author in authors"
+        class="clickable"
+        :image="author.image"
         size="sm"
         :key="author.user"
-        :nft="getAvatar(author.user)"
         style="margin-right: 1rem; cursor: pointer"
         @click="router.push('/profile/' + author.user)"
       />
@@ -46,12 +46,12 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useStoryStore } from "../../store";
-import { getAvatar } from "@/scripts/getAvatar";
-import NftElement from "@/components/NftElement.vue";
 import { IonSkeletonText, useIonRouter } from "@ionic/vue";
+import { useRouter } from "vue-router";
+import Author from "../Author.vue";
 
 const storyStore = useStoryStore();
-const router = useIonRouter();
+const router = useRouter();
 
 const loaded = ref(false);
 const authors = ref([]);
@@ -64,9 +64,6 @@ onMounted(async () => {
 
 <style>
 .user img {
-  border-radius: 50%;
-}
-.author img {
   border-radius: 50%;
 }
 </style>

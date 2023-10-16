@@ -497,12 +497,13 @@ import LoginModal from "./LoginModal.vue";
 import StoryNftPreview from "@/components/StoryNftPreview.vue";
 import { getAvatar } from "../scripts/getAvatar";
 import NftElement from "@/components/NftElement.vue";
+import { useRouter } from "vue-router";
 
 const configStore = useConfigStore();
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const authStore = useAuthStore();
-const router = useIonRouter();
+const router = useRouter();
 
 const story = ref();
 const topAuthors = ref([]);

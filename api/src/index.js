@@ -172,11 +172,20 @@ app.get("/authors", async (req, res) => {
   const shares = await db
     .collection("networks/" + network.id + "/shares2")
     .get();
+  const names = (
+    await db.collection("networks/" + network.id + "/names").get()
+  ).docs.map((doc) => ({
+    ...doc.data(),
+    address: doc.id,
+  }));
   const sharesData = shares.docs.map((doc) => doc.data());
   const sharesDict = sharesData.reduce((acc, curr) => {
     if (!acc[curr.user]) {
+      const nameRecord = names.find((doc) => doc.address === curr.user);
       acc[curr.user] = {
         user: curr.user,
+        name: nameRecord?.name,
+        image: nameRecord?.image,
         shares: 0,
         stories: 0,
       };

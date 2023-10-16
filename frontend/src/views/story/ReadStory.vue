@@ -1,5 +1,5 @@
 <template>
-  <ion-page
+  <div
     :style="{
       height: `calc(100% + ${offset}px)`,
     }"
@@ -86,7 +86,7 @@
         </template>
       </div>
     </ion-content>
-  </ion-page>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -99,7 +99,7 @@ import {
 } from "@ionic/vue";
 import { computed, onMounted, Ref, ref } from "vue";
 import { useStoryStore } from "@/store/story";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import StorySection from "@/components/story/StorySection.vue";
 import NewSection from "../../components/story/NewSection.vue";
 import { useNameStore } from "../../store";
@@ -108,7 +108,7 @@ import { scroll } from "@/scripts/scroll";
 const storyStore = useStoryStore();
 const nameStore = useNameStore();
 const route = useRoute();
-const router = useIonRouter();
+const router = useRouter();
 const storyId = String(route?.params.id);
 const story: Ref<any> = ref(null);
 const loaded = ref(false);

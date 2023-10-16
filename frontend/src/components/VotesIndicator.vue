@@ -167,13 +167,13 @@ import {
   fileTrayFull,
   trashOutline,
 } from "ionicons/icons";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 const votesStore = useVotesStore();
 const storyStore = useStoryStore();
 const authStore = useAuthStore();
 const route = useRoute();
-const router = useIonRouter();
+const router = useRouter();
 
 const storyId = route.params.storyId;
 const error = ref("");

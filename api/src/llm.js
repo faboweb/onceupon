@@ -1,5 +1,6 @@
 const OpenAI = require("openai");
 const { db } = require("./firebase");
+const networks = require("./networks");
 
 const getClient = () => {
   const openai = new OpenAI({
@@ -60,10 +61,12 @@ const createSection = async (network, storyId, amount, description = null) => {
     .get();
   const sectionsData = sections.docs.map((doc) => doc.data());
   const sortedSections = sectionsData.sort((a, b) => a.added - b.added);
-  // const lastSection = sortedSections[sortedSections.length - 1];
-  // const { content: lastSectionContent } = (
-  //   await db.doc("content/" + lastSection.content_cid).get()
-  // ).data();
+  const lastSection = sortedSections[sortedSections.length - 1];
+  const { content: lastSectionContent } = (
+    await db.doc("content/" + lastSection.content_cid).get()
+  ).data();
+
+  const summary = await summarizeStory(network, storyId, true);
 
   const openai = getClient();
   const prompt = `
@@ -72,17 +75,23 @@ const createSection = async (network, storyId, amount, description = null) => {
     - Use 350 to 400 words
     - Don't reveal facts about the setting of the story, instead show those facts through other details.
     - Prefer dialog to show details about a character then describing the details.
+    - Write about one scene only.
+    - Avoid creating a concluding atmosphere; keep the scene ongoing.
+    - Focus on interactions and dialogues without wrapping up any sentiments.
     
-    Summaries of the sections so far:
-    ${sortedSections.map((s) => s.summary).join("\n")}
+    Summary of the story so far:
+    ${summary}
 
     ${
       description
         ? `
-    A description of the section:
+    A description of the section (You don't have to use the full description):
     ${description}`
         : ""
     }
+
+    Ending of last section:
+    ${lastSectionContent.split(" ").slice(100).join(" ")}
     
     New section:
     `;
@@ -123,7 +132,7 @@ const createStory = async (description) => {
   return completion.choices[0].message.content;
 };
 
-const summarizeStory = async (network, storyId) => {
+const summarizeStory = async (network, storyId, long = false) => {
   const sections = await db
     .collection("networks/" + network.id + "/sections")
     .where("story_id", "==", storyId)
@@ -135,7 +144,9 @@ const summarizeStory = async (network, storyId) => {
 
   const openai = getClient();
   const prompt = `
-    Create a summary in max 240 characters based on following section summaries:
+    Create a summary in max ${
+      long ? "100 words" : "240 characters"
+    } based on following section summaries:
     ${summaries.join("\n")}
     `;
 
@@ -180,3 +191,13 @@ module.exports = {
   createStory,
   createSections,
 };
+
+// test
+// const main = async () => {
+//   const network = networks.mainnet;
+//   const storyId = "2b2b0155-0d9d-4073-a0b9-4256b860bba0";
+//   const sections = await createSections(network, storyId);
+//   console.log(sections);
+// };
+
+// main();

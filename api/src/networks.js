@@ -6,6 +6,7 @@ module.exports = {
     admin: "stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv",
     url: "https://rpc-stargaze.pupmos.network",
     mnemonic: process.env.MNEMONIC_MAINNET,
+    graphql: "https://graphql.mainnet.stargaze-apis.com/graphql",
   },
   // testnet: {
   //   id: "testnet",
@@ -14,5 +15,6 @@ module.exports = {
   //   admin: "stars17cv7tkzteht4pxggrgf3jynstsasdf8pv07d3z",
   //   url: "https://rpc.elgafar-1.stargaze-apis.com",
   //   mnemonic: process.env.MNEMONIC,
+  // graphql: "https://graphql.mainnet.stargaze-apis.com/graphql",
   // },
 };

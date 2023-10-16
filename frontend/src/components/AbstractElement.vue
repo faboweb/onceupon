@@ -29,9 +29,10 @@
 import { onMounted, defineProps, computed } from "vue";
 import { useStoryStore } from "../store";
 import { useIonRouter } from "@ionic/vue";
+import { useRouter } from "vue-router";
 
 const storyStore = useStoryStore();
-const router = useIonRouter();
+const router = useRouter();
 
 const props = defineProps({
   proposal: Object,

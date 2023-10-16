@@ -26,7 +26,7 @@
             align-items: center;
           "
         >
-          <nft-element :nft="profilePicture" size="md" class="author" />
+          <author :image="profilePicture" size="md" />
           <div
             @click="goMintscan()"
             style="
@@ -171,7 +171,6 @@
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore, useNameStore, useStoryStore } from "../store";
-import NftElement from "../components/NftElement.vue";
 import NftList from "../components/NftList.vue";
 import MobileFooter from "../components/overview/MobileFooter.vue";
 import AbstractElement from "../components/AbstractElement.vue";
@@ -179,6 +178,7 @@ import { IonPage, IonContent, IonSkeletonText, IonButton } from "@ionic/vue";
 import { useLikeStore } from "../store/likes";
 import { useNftStore } from "../store/nfts";
 import { shortAddress } from "@/store/names";
+import Author from "../components/Author.vue";
 
 const route = useRoute();
 const address = String(route?.params.address);
@@ -202,7 +202,7 @@ const profileName = computed(() => {
   return nameStore.name(address);
 });
 const profilePicture = computed(() => {
-  return nameStore.avatar(address);
+  return nameStore.names[address]?.image;
 });
 
 const self = computed(() => {
@@ -234,7 +234,7 @@ watch(
     loadedLikes.value = [];
     loadedNfts.value = [];
 
-    nameStore.getName(address);
+    // nameStore.getName(address);
     storyStore.loadContributions(address);
     storyStore.getAuthor(address).then((_author) => (author.value = _author));
     nftStore.getLinkedNfts(address).then((nfts) => {

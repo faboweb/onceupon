@@ -64,7 +64,7 @@ export const useStoryStore = defineStore("storyStore", {
         stories.map(async (story) => {
           story.top_nfts.forEach((nft) => nftStore.loadNft(nft));
           cids.push(story.first_section.content_cid);
-          nameStore.getName(story.creator);
+          // nameStore.getName(story.creator);
         })
       );
       await this.loadContent(cids);
@@ -175,13 +175,19 @@ export const useStoryStore = defineStore("storyStore", {
 
       return { stories, shares };
     },
-    async loadAuthors(limit) {
+    async loadAuthors(limit?) {
       const nameStore = useNameStore();
       const authors = await callApi(
         "authors" + (limit ? "?limit=" + limit : ""),
         "GET"
       );
-      authors.forEach((author) => nameStore.getName(author.user));
+      // authors.forEach((author) => nameStore.getName(author.user));
+      authors.forEach((author) => {
+        nameStore.names[author.user] = {
+          name: author.name,
+          image: author.image,
+        };
+      });
 
       return authors;
     },

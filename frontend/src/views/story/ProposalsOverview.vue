@@ -1,5 +1,5 @@
 <template>
-  <ion-page
+  <div
     :style="{
       height: `calc(100% + ${offset}px)`,
     }"
@@ -15,7 +15,7 @@
             height: 2.5rem;
             text-align: right;
             background: #fffdf2;
-            position: fixed;
+            position: absolute;
             width: 100%;
             top: 0;
           "
@@ -105,7 +105,7 @@
         </div>
       </div>
     </ion-content>
-  </ion-page>
+  </div>
 </template>
 
 <script setup lang="ts">

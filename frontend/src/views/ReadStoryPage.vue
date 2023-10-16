@@ -20,72 +20,72 @@
         ref="storyHeader"
         :style="{
           height: offset + 'px',
+          overflow: 'hidden',
         }"
       />
-      <!-- Listen to before and after tab change events -->
-      <ion-tabs
-        style="position: initial; margin-top: 1rem; height: calc(100% - 155px)"
-      >
-        <ion-tab-bar
-          slot="top"
-          style="height: 40px; padding-left: 4rem; padding-right: 4rem"
-        >
-          <ion-tab-button
-            class="font-sm"
-            tab="read"
-            :class="{
-              active: route.path === '/story/' + storyId + '/read',
-            }"
-            :href="'/story/' + storyId + '/read'"
-            @click.passive="scrollOffset = 0"
-          >
-            <ion-label>Story</ion-label>
-          </ion-tab-button>
+      <div style="position: initial; height: calc(100% - 155px)">
+        <div slot="top" class="tab-bar">
+          <router-link :to="'/story/' + storyId + '/read'">
+            <ion-button
+              class="font-sm"
+              fill="clear"
+              :class="{
+                active: route.path.startsWith('/story/' + storyId + '/read'),
+              }"
+              @click.passive="scrollOffset = 0"
+            >
+              <ion-label>Story</ion-label>
+            </ion-button>
+          </router-link>
 
-          <ion-tab-button
-            class="font-sm"
-            tab="proposals"
-            :class="{
-              active: route.path === '/story/' + storyId + '/proposals',
-            }"
-            :href="'/story/' + storyId + '/proposals'"
-            @click.passive="scrollOffset = 0"
-          >
-            <ion-label>Proposals</ion-label>
-          </ion-tab-button>
+          <router-link :to="'/story/' + storyId + '/proposals'">
+            <ion-button
+              class="font-sm"
+              fill="clear"
+              :class="{
+                active: route.path.startsWith(
+                  '/story/' + storyId + '/proposals'
+                ),
+              }"
+              @click.passive="scrollOffset = 0"
+            >
+              <ion-label>Proposals</ion-label>
+            </ion-button>
+          </router-link>
 
-          <ion-tab-button
-            class="font-sm"
-            tab="nfts"
-            :class="{
-              active: route.path === '/story/' + storyId + '/nfts',
-            }"
-            :href="'/story/' + storyId + '/nfts'"
-            @click.passive="scrollOffset = 0"
-          >
-            <ion-label>NFTs</ion-label>
-          </ion-tab-button>
+          <router-link :to="'/story/' + storyId + '/nfts'">
+            <ion-button
+              class="font-sm"
+              fill="clear"
+              :class="{
+                active: route.path.startsWith('/story/' + storyId + '/nfts'),
+              }"
+              @click.passive="scrollOffset = 0"
+            >
+              <ion-label>NFTs</ion-label>
+            </ion-button>
+          </router-link>
 
-          <ion-tab-button
-            class="font-sm"
-            tab="owners"
-            :class="{
-              active: route.path === '/story/' + storyId + '/owners',
-            }"
-            :href="'/story/' + storyId + '/owners'"
-            @click.passive="scrollOffset = 0"
-          >
-            <ion-label>Owners</ion-label>
-          </ion-tab-button>
-        </ion-tab-bar>
+          <router-link :to="'/story/' + storyId + '/owners'">
+            <ion-button
+              class="font-sm"
+              fill="clear"
+              :class="{
+                active: route.path.startsWith('/story/' + storyId + '/owners'),
+              }"
+              @click.passive="scrollOffset = 0"
+            >
+              <ion-label>Owners</ion-label>
+            </ion-button>
+          </router-link>
+        </div>
 
-        <!-- Use v-slot:bottom with Vue ^2.6.0 -->
-        <ion-router-outlet
+        <router-view
           :style="{
             height: `calc(100% + ${160 - offset}px)`,
           }"
         />
-      </ion-tabs>
+      </div>
     </ion-content>
   </ion-page>
 </template>
@@ -104,7 +104,7 @@ import {
   IonToolbar,
 } from "@ionic/vue";
 import { computed, onMounted, ref, Ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useNameStore, useStoryStore } from "../store";
 import StoryHeader from "../components/story/StoryHeader.vue";
 import VotesIndicator from "../components/VotesIndicator.vue";
@@ -117,11 +117,11 @@ const nameStore = useNameStore();
 const voteStore = useVotesStore();
 
 const route = useRoute();
-const router = useIonRouter();
+const router = useRouter();
 const scrollOffset = ref(0);
 
 const offset = computed(() => {
-  return scrollOffset.value > 120 ? 40 : 160 - scrollOffset.value;
+  return scrollOffset.value > 160 ? 0 : 160 - scrollOffset.value;
 });
 
 const storyId = String(route?.params.id);
@@ -153,12 +153,46 @@ onMounted(async () => {
 });
 </script>
 <style lang="scss" scoped>
-.tab-selected {
+.active {
   border-bottom: 2px solid black;
   font-weight: 700;
   color: black;
 }
 ion-tab-button::part(native):hover {
   color: var(--main-color) !important;
+}
+ion-button {
+  font-weight: normal;
+  color: black !important;
+  border-radius: 0;
+  width: 100%;
+
+  --background: transparent;
+  --border-radius: none;
+
+  button {
+    width: 100%;
+  }
+}
+.tab-bar {
+  background: #fffdf2;
+  z-index: 10000;
+  height: 40px;
+  padding-left: 4rem;
+  padding-right: 4rem;
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid
+    var(
+      --ion-tab-bar-border-color,
+      var(--ion-border-color, var(--ion-color-step-150, rgba(0, 0, 0, 0.07)))
+    );
+  justify-content: center;
+  padding-left: 4rem;
+  padding-right: 4rem;
+
+  > * {
+    flex: 1;
+  }
 }
 </style>

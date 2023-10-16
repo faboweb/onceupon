@@ -7,7 +7,7 @@
       <a
         class="font-secondary"
         style="cursor: pointer; font-size: 16px"
-        @click="router.push('/stories')"
+        @click="router.push('/overview/stories')"
         >See all</a
       >
     </div>
@@ -39,10 +39,11 @@
 <script setup lang="ts">
 import StoryElement from "@/components/StoryElement.vue";
 import { IonContent, IonIcon, IonSkeletonText, useIonRouter } from "@ionic/vue";
+import { useRouter } from "vue-router";
 import { useStoryStore } from "../../store";
 
 const storyStore = useStoryStore();
-const router = useIonRouter();
+const router = useRouter();
 </script>
 
 <style>

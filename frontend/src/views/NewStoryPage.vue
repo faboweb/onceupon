@@ -135,8 +135,9 @@ import MobileFooter from "@/components/overview/MobileFooter.vue";
 import { add } from "ionicons/icons";
 import NftElement from "@/components/NftElement.vue";
 import { callApiAuthenticated } from "../scripts/api";
+import { useRouter } from "vue-router";
 
-const router = useIonRouter();
+const router = useRouter();
 const storyStore = useStoryStore();
 const authStore = useAuthStore();
 const content = ref("");
