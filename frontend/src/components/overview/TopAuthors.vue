@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStoryStore } from "../../store";
 import { IonSkeletonText, useIonRouter } from "@ionic/vue";
 import { useRouter } from "vue-router";
@@ -53,13 +53,8 @@ import Author from "../Author.vue";
 const storyStore = useStoryStore();
 const router = useRouter();
 
-const loaded = ref(false);
-const authors = ref([]);
-
-onMounted(async () => {
-  authors.value = await storyStore.loadAuthors(5);
-  loaded.value = true;
-});
+const loaded = ref(true);
+const authors = computed(() => storyStore.authors.slice(0, 5));
 </script>
 
 <style>

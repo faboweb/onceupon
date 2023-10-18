@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useNameStore, useStoryStore } from "../../store";
 import { IonPage, IonContent, IonSkeletonText, useIonRouter } from "@ionic/vue";
 import { shortAddress } from "../../store/names";
@@ -67,7 +67,7 @@ const storyStore = useStoryStore();
 const router = useRouter();
 const nameStore = useNameStore();
 
-const authors = ref([]);
+const authors = computed(() => storyStore.authors);
 </script>
 
 <style>

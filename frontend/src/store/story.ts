@@ -18,6 +18,7 @@ interface State {
   cidLookup: any; // dictionary cid -> content
   contributions: any; // dictionary address -> story ids
   votes: any; // dictionary story id -> proposal id -> votes
+  authors: any[];
 }
 
 export const useStoryStore = defineStore("storyStore", {
@@ -32,6 +33,7 @@ export const useStoryStore = defineStore("storyStore", {
     cidLookup: {},
     contributions: {},
     votes: {},
+    authors: [],
   }),
   getters: {
     allStories: (state) => state.stories,
@@ -180,6 +182,9 @@ export const useStoryStore = defineStore("storyStore", {
       const authors = await callApi(
         "authors" + (limit ? "?limit=" + limit : ""),
         "GET"
+      );
+      this.authors = this.authors.concat(
+        authors.filter((a) => !this.authors.find((b) => b.user === a.user))
       );
       // authors.forEach((author) => nameStore.getName(author.user));
       authors.forEach((author) => {
