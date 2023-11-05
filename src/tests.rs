@@ -2,6 +2,7 @@
 mod tests {
     use crate::contract::{execute, instantiate, query};
     use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+    use crate::state::VOTES;
     use crate::types::{Export, Section, Story, UploadSection, VoteSubmission, NFT};
 
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
@@ -132,6 +133,27 @@ mod tests {
 
         env.block.height += 10;
 
+        // not allowing to submit votes that don't match entries
+        let msg = ExecuteMsg::Vote {
+            votes: vec![VoteSubmission {
+                story_id: "a".to_string(),
+                section_id: "c".to_string(),
+                vote: 1,
+            }],
+        };
+        let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
+        assert!(res.is_err());
+
+        let msg = ExecuteMsg::Vote {
+            votes: vec![VoteSubmission {
+                story_id: "x".to_string(),
+                section_id: "b".to_string(),
+                vote: 1,
+            }],
+        };
+        let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
+        assert!(res.is_err());
+
         // when voted, progress
         let msg = ExecuteMsg::Vote {
             votes: vec![VoteSubmission {
@@ -142,6 +164,11 @@ mod tests {
         };
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
         assert!(res.is_ok());
+
+        // reseliance if vote has wrong ids (deprecate)
+        let k = ("a".to_string(), "z".to_string(), "address".to_string());
+        let vote_stored = VOTES.save(deps.as_mut().storage, k, &1);
+        assert!(vote_stored.is_ok());
 
         let msg = ExecuteMsg::Cycle {};
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);

@@ -171,6 +171,23 @@ pub fn vote_multiple(
             vote.section_id.to_string(),
             info.sender.to_string(),
         );
+        if STORIES
+            .may_load(deps.storage, vote.story_id.to_string())
+            .unwrap()
+            .is_none()
+        {
+            return false;
+        }
+        if SECTIONS
+            .may_load(
+                deps.storage,
+                (vote.story_id.to_string(), vote.section_id.to_string()),
+            )
+            .unwrap()
+            .is_none()
+        {
+            return false;
+        }
         VOTES.save(deps.storage, k, &vote.vote).is_ok()
     });
     if res == false {
@@ -241,6 +258,16 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
     let mut voted_stories = HashMap::<String, HashMap<String, SectionVotes>>::new();
     votes.for_each(|vote| {
         let ((story_id, section_id, _), vote) = vote.unwrap();
+
+        // deprecate, the voting function would not check for validity of story and section
+        if SECTIONS
+            .may_load(storage, (story_id.clone(), section_id.clone()))
+            .unwrap()
+            .is_none()
+        {
+            return;
+        }
+
         if voted_stories.contains_key(&story_id) {
             let mut section_votes = voted_stories.get(&story_id).unwrap().clone();
             if section_votes.contains_key(&section_id) {
