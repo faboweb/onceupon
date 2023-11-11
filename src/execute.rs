@@ -268,6 +268,15 @@ pub fn cycle(deps: DepsMut, env: Env) -> Result<Response, ContractError> {
             return;
         }
 
+        // deprecate, the voting function would not check for validity of story and section
+        if STORIES
+            .may_load(storage, story_id.clone())
+            .unwrap()
+            .is_none()
+        {
+            return;
+        }
+
         if voted_stories.contains_key(&story_id) {
             let mut section_votes = voted_stories.get(&story_id).unwrap().clone();
             if section_votes.contains_key(&section_id) {
