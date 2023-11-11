@@ -169,6 +169,9 @@ mod tests {
         let k = ("a".to_string(), "z".to_string(), "address".to_string());
         let vote_stored = VOTES.save(deps.as_mut().storage, k, &1);
         assert!(vote_stored.is_ok());
+        let k = ("z".to_string(), "b".to_string(), "address".to_string());
+        let vote_stored = VOTES.save(deps.as_mut().storage, k, &1);
+        assert!(vote_stored.is_ok());
 
         let msg = ExecuteMsg::Cycle {};
         let res = execute(deps.as_mut(), env.clone(), info.clone(), msg);
