@@ -37,13 +37,13 @@ CONTRACT=$(starsd query wasm list-contract-by-code $CODE_ID --node https://rpc.s
 # stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq
 
 # Propose via governance (NEW)
-title="BugFix OnceUpon to v0.13.3"
+title="BugFix OnceUpon to v0.13.4"
 desc=$(cat proposal.md | jq -Rsa | tr -d '"')
 deposit="50000000000ustars"
 PROPOSER="stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv"
 CREATOR="stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv"
 # shasum -a 256 artifacts/onceupon_cosmwasm-aarch64.wasm
-CODE_HASH="70969a19bd43484902b5e53cb7a9103cb3da268dc1bd75acb431b5245a9728a5"
+CODE_HASH="6108a1e2cbd23944fa10ceb3b716c573223e59d962b7a36c73c7fed53c21dea2"
 starsd tx gov submit-proposal wasm-store artifacts/onceupon_cosmwasm-aarch64.wasm \
     --title "$title" \
     --description "$desc" \
@@ -56,10 +56,10 @@ starsd tx gov submit-proposal wasm-store artifacts/onceupon_cosmwasm-aarch64.was
     --instantiate-anyof-addresses $CREATOR -y \
     --node https://rpc.stargaze-apis.com:443 \
     --code-hash $CODE_HASH \
-    --code-source-url https://github.com/faboweb/onceupon/tree/v0.13.1 \
-    --builder cosmwasm/rust-optimizer-arm64:0.12.13
+    --code-source-url https://github.com/faboweb/onceupon/tree/v0.13.4 \
+    --builder cosmwasm/rust-optimizer-arm64:0.14.0
 # starsd query wasm list-code --node https://rpc.stargaze-apis.com:443 --chain-id stargaze-1 --page 2
-CODE_ID=134
+CODE_ID=136
 CONTRACT='stars1eh58m7augmf7777k0kcgxwetse3tnsa6n7kwn458lfdv0zzknu2sgde4kq'
 ARGS='{}'
 PROPOSER="stars1xy2at2a0qeehv9ccptt8f879nxmrl35xsasvpv"
