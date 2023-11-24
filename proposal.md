@@ -4,7 +4,7 @@ BugFix in existing SmartContract
 Current version: https://onceupon.community/
 Future version: https://onceupon-delta.vercel.app/
 
-Git: https://github.com/faboweb/onceupon/releases/tag/0.13.4
+Git: https://github.com/faboweb/onceupon/releases/tag/0.14.2
 
 Changes:
 
