@@ -118,7 +118,7 @@ const index = async (network) => {
           shares: shares
             .filter(([storyId]) => storyId === story.id)
             .reduce((acc, [storyId, userId, amount]) => acc + amount, 0),
-          lastUpdate: (await getBlock(network, story.last_cycle)).header.time,
+          lastUpdate: (await getBlock(network, story.last_cycle))?.header.time,
           top_nfts: Object.entries(
             sections.reduce((acc, curr) => {
               if (curr.nft) {
